@@ -4,13 +4,13 @@
 
 ## Language Mechanics 6
 
-### Syntax 6
+>### Syntax 6
 
-#### Variable 6
-##### Built-in types 6
-##### Zero value concept 6
-##### Declare and initialize 7
-##### Conversion vs casting 8
+>>#### Variable 6
+>>>##### Built-in types 6
+>>>##### Zero value concept 6
+>>>##### Declare and initialize 7
+>>>##### Conversion vs casting 8
 
 #### Struct 8
 ##### Declare and initialize 8
