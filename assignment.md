@@ -7,7 +7,7 @@
 | 3   | 37-55   | Decoupling<br>- Method<br>- Interface<br>                                                                                                              |                                     |           |
 | 4   | 55-70   | Decoupling<br>- Embedding<br>- Exporting<br>**Software Design**<br>Composition<br>- Grouping types                                                     |                                     |           |
 | 5   | 70-89   | Composition<br>- Decoupling                                                                                                                            |                                     |           |
-| 6   | 89-101  | Composition<br>- Decoupling<br>- Conversion<br>- Interface Pollution<br>- Mocking<br>                                                                  | Mo/kkweon@gmail.com                 |           |
+| 6   | 89-101  | Composition<br>- Conversion<br>- Interface Pollution<br>- Mocking<br>                                                                                  | Mo/kkweon@gmail.com                 |           |
 | 7   | 101-114 | Error Handling<br>- Default error values<br>- Error variables<br>- Type and context<br>- Behavior as context<br>- Finding the bug<br>- Wrapping Errors |                                     |           |
 | 8   | 114-128 | **Concurrency**<br>Mechanics<br>- Goroutine<br>- Language Mechanics                                                                                    |                                     |           |
 | 9   | 128-139 | Mechanics<br>- Data race                                                                                                                               |                                     |           |
