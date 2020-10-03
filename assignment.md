@@ -1,6 +1,6 @@
 ## Assignment table
 
-| No | Pages   | Contents                                                                                                                                                     | Assignee | Reviewers |
+| No | Pages   | Contents                                                                                                                                                     | Assignee (Full name/GitHub account) | Reviewers |
 |----|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|-----------|
 | 1  | 5-20    | **Introduction**</br>Language Mechanics</br>Syntax</br>- Variables</br>- Struct</br>- Pointer</br>- Escape analysis</br>- Function</br>- Constant            |          |           |
 | 2  | 20-37   | Data Structures</br>- Array</br>- Slice</br>- Map                                                                                                            |          |           |
