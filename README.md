@@ -12,14 +12,14 @@
 1. 자신이 맡은 범위의 폴더안에 폴더명과 같은 Markdown 문서를 만들어 PDF 문서의 해당 부분을 복사하고 Markdown 형식에 맞게 정리한다.
 2. 전체 정리가 완료되면 Pull Request를 통해 review를 거쳐 main 브랜치에 merge 한다.
     - 이제 변역을 위한 준비가 완료 되었다.
-3. Branch를 생성하고 범위의 일정 분량을 번역후 Pull Request를 요청하고, 2명 이상의 review와 approval을 받으면 main 브랜치에 merge 한다. 
+3. Branch를 생성하고 범위의 일정 분량을 번역후 Pull Request를 요청하고, 2명 이상의 reviewer로부터 approval을 받으면 main 브랜치에 merge 한다. 
 4. 전체 초벌 번역이 끝나면, 추가적인 번역여부를 결정하며, release 브랜치에 정식 공개버전을 편집하여 공유한다. 
 
 ### Code
 
-- Table of Contents/table-of-contents-eng.md: PDF 문서의 목차를 Markdown 형식으로 정리하고, 보기좋게 편집한 문서
-- assignment.md: 전체 문서를 13 범위로 나누어 놓은 문서. 각 범위는 한 명의 주 번역자와 두 명 이상의 reviewer를 명시해둔다
-- CODEOWNERS: 범위별 폴더/파일 담당자를 명시한 문서 (참고. https://bit.ly/3jyS8mM)
+- [Table of Contents/table-of-contents-eng.md](./Table of Contents/table-of-contents-eng.md): PDF 문서의 목차를 Markdown 형식으로 정리하고, 보기좋게 편집한 문서
+- [assignment.md](./assignment.md): 전체 문서를 13 범위로 나누어 놓은 문서. 각 범위는 한 명의 주 번역자와 두 명 이상의 reviewer를 명시해둔다
+- [CODEOWNERS](./CODEOWNERS): 범위별 폴더/파일 담당자를 명시한 문서 (참고. https://bit.ly/3jyS8mM)
 - 범위 별 폴더
     - 폴더 명과 같은 Markdown 문서(ex. 5-20/5-20.md)가 있으며, 여기에 PDF 문서의 해당 범위를 Markdown 으로 정리 후 한글로 번역을 한다.
     - README.md: table-of-contents-eng.md 파일의 해당 범위 부분을 여기에 옮겨두어 폴더 내 Markdown 문서가 다루는 내용을 알 수 있게 한다. 
@@ -38,7 +38,7 @@
 - [ ] 번역 범위별 폴더와 파일, 그리고 다이어그램 이미지 폴더를 생성해둔다. 
 - [ ] Wiki에 기본 번역 규칙을 정리해둔다. 
 - [ ] 13명 이상의 번역 기여자를 모집한다. 
-    - 원활한 소통을 위해 딥백수 슬랙에 초대한다.
+    - 원활한 소통을 위해 [딥백수](https://dl4ab.github.io/about/) 슬랙에 초대한다.
     - Git 혹은 GitHub 협업에 대한 기본적인 이해가 있어야 한다. 
     - 3주 이내 15-20 페이지의 번역이 가능한 시간적 여유가 있어야 한다. 
 - [ ] 기여자는 번역을 원하는 하나의 범위를 선택하고, 둘 이상의 범위의 reviewer로 신청한다
