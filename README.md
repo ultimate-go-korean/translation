@@ -13,7 +13,7 @@
 2. 전체 정리가 완료되면 Pull Request를 통해 review를 거쳐 main 브랜치에 merge 한다.
     - 이제 변역을 위한 준비가 완료 되었다.
 3. Branch를 생성하고 범위의 일정 분량을 번역후 Pull Request를 요청하고, 2명 이상의 reviewer로부터 approval을 받으면 main 브랜치에 merge 한다. 
-4. 전체 초벌 번역이 끝나면, 추가적인 번역여부를 결정하며, release 브랜치에 정식 공개버전을 편집하여 공유한다. 
+4. 전체 초벌 번역이 끝나면, 추가적인 번역여부를 결정하며, 번역한 Markdown 문서들을 편집하여 공유한다. 
 
 ### Code
 
