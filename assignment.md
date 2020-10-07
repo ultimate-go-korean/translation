@@ -4,7 +4,7 @@
 | --- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------- | --------- |
 | 1   | 5-20    | **Introduction**<br>Language Mechanics<br>Syntax<br>- Variables<br>- Struct<br>- Pointer<br>- Escape analysis<br>- Function<br>- Constant              | Jeong Hyunseok/nicewook@hotmail.com |           |
 | 2   | 20-37   | Data Structures<br>- Array<br>- Slice<br>- Map                                                                                                         |                                     |           |
-| 3   | 37-55   | Decoupling<br>- Method<br>- Interface<br>                                                                                                              |                                     |           |
+| 3   | 37-55   | Decoupling<br>- Method<br>- Interface<br>                                                                                                              | Jeong Yeonghun/aeuveritas@gmail.com |           |
 | 4   | 55-70   | Decoupling<br>- Embedding<br>- Exporting<br>**Software Design**<br>Composition<br>- Grouping types                                                     |                                     |           |
 | 5   | 70-89   | Composition<br>- Decoupling                                                                                                                            |                                     |           |
 | 6   | 89-101  | Composition<br>- Conversion<br>- Interface Pollution<br>- Mocking<br>                                                                                  | Mo/kkweon@gmail.com                 |           |
