@@ -1,4 +1,15 @@
-## Table of Contents
+# 5-20 pages translation
+
+Assigned to
+
+- Jeong Hyunseok/nicewook@hotmail.com
+
+Mandatory reviewer
+
+- John Doe/john.doe@gmail.com
+- Jane Doe/jane.doe@gmail.com
+
+---
 
 ## Introduction 5
 

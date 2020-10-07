@@ -1,4 +1,15 @@
-## Table of Contents
+# 128-139 pages translation
+
+Assigned to
+
+- Jeong Hyunseok/assignee@gmail.com
+
+Mandatory reviewer
+
+- John Doe/john.doe@gmail.com
+- Jane Doe/jane.doe@gmail.com
+
+---
 
 > #### Data race 128
 >
