@@ -1,8 +1,11 @@
 # 20-37 pages translation
 
-- Assigned to
-  - CHOI HEEJAE/gmlwo530@gmail.com
-- Mandatory reviewer
+Assigned to
+
+- CHOI HEEJAE/gmlwo530@gmail.com
+
+Mandatory reviewer
+
 
 ---
 
