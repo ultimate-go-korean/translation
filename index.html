@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <meta name="author" content="Hoanh An" />
+  <title>The Ultimate Go Study Guide</title>
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+  <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
+  <![endif]-->
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">The Ultimate Go Study Guide</h1>
+<p class="author">Hoanh An</p>
+</header>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#introduction-5">Introduction 5</a></li>
+<li><a href="#language-mechanics-6">Language Mechanics 6</a>
+<ul>
+<li><a href="#syntax-6">Syntax 6</a>
+<ul>
+<li><a href="#variable-6">Variable 6</a></li>
+<li><a href="#struct-8">Struct 8</a></li>
+<li><a href="#pointer-11">Pointer 11</a></li>
+<li><a href="#escape-analysis-12">Escape analysis 12</a></li>
+<li><a href="#function-15">Function 15</a></li>
+<li><a href="#constant-17">Constant 17</a></li>
+</ul></li>
+<li><a href="#data-structures">Data Structures</a>
+<ul>
+<li><a href="#array">Array</a></li>
+<li><a href="#slice">Slice</a></li>
+<li><a href="#map">Map</a></li>
+</ul></li>
+<li><a href="#decoupling">Decoupling</a>
+<ul>
+<li><a href="#method">Method</a></li>
+<li><a href="#interface">Interface</a></li>
+<li><a href="#embedding-55">Embedding 55</a></li>
+<li><a href="#exporting-60">Exporting 60</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#software-design-65">Software Design 65</a>
+<ul>
+<li><a href="#composition-65">Composition 65</a>
+<ul>
+<li><a href="#grouping-types-65">Grouping types 65</a></li>
+<li><a href="#decoupling-70">Decoupling 70</a></li>
+<li><a href="#conversion">Conversion</a></li>
+<li><a href="#interface-pollution">Interface Pollution</a></li>
+<li><a href="#mocking">Mocking</a></li>
+</ul></li>
+<li><a href="#error-handling-101">Error Handling 101</a>
+<ul>
+<li><a href="#default-error-values-101">Default error values 101</a></li>
+<li><a href="#error-variables-103">Error variables 103</a></li>
+<li><a href="#type-as-context-105">Type as context 105</a></li>
+<li><a href="#behavior-as-context-107">Behavior as context 107</a></li>
+<li><a href="#finding-the-bug-110">Finding the bug 110</a></li>
+<li><a href="#wrapping-errors-111">Wrapping Errors 111</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#concurrency-114">Concurrency 114</a>
+<ul>
+<li><a href="#mechanics-114">Mechanics 114</a>
+<ul>
+<li><a href="#goroutine-114">Goroutine 114</a></li>
+<li><a href="#language-mechanics-121">Language Mechanics 121</a></li>
+<li><a href="#data-race-128">Data race 128</a></li>
+<li><a href="#channel-139">Channel 139</a></li>
+</ul></li>
+<li><a href="#patterns-164">Patterns 164</a>
+<ul>
+<li><a href="#context-164">Context 164</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#testing-and-profiling-173">Testing and Profiling 173</a>
+<ul>
+<li><a href="#testing-173">Testing 173</a>
+<ul>
+<li><a href="#basic-unit-test-173">Basic Unit Test 173</a></li>
+</ul></li>
+<li><a href="#benchmarking-191">Benchmarking 191</a>
+<ul>
+<li><a href="#basic-benchmark-191">Basic Benchmark 191</a></li>
+<li><a href="#sub-benchmark-192">Sub Benchmark 192</a></li>
+</ul></li>
+<li><a href="#profiling-193">Profiling 193</a>
+<ul>
+<li><a href="#stack-trace-193">Stack Trace 193</a></li>
+<li><a href="#godebug-196">GODEBUG 196</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#keep-in-touch-199">Keep in touch 199</a></li>
+</ul>
+</nav>
+<h2 id="introduction-5">Introduction 5</h2>
+<h2 id="language-mechanics-6">Language Mechanics 6</h2>
+<h3 id="syntax-6">Syntax 6</h3>
+<h4 id="variable-6">Variable 6</h4>
+<h5 id="built-in-types-6">Built-in types 6</h5>
+<h5 id="zero-value-concept-6">Zero value concept 6</h5>
+<h5 id="declare-and-initialize-7">Declare and initialize 7</h5>
+<h5 id="conversion-vs-casting-8">Conversion vs casting 8</h5>
+<h4 id="struct-8">Struct 8</h4>
+<h5 id="declare-and-initialize-8">Declare and initialize 8</h5>
+<h5 id="name-type-vs-anonymous-type-10">Name type vs anonymous type 10</h5>
+<h4 id="pointer-11">Pointer 11</h4>
+<h5 id="everything-is-about-pass-by-value-11">Everything is about pass by value 11</h5>
+<h5 id="pass-by-value-11">Pass by value 11</h5>
+<h4 id="escape-analysis-12">Escape analysis 12</h4>
+<h4 id="function-15">Function 15</h4>
+<h4 id="constant-17">Constant 17</h4>
+<h5 id="declare-and-initialize-17">Declare and initialize 17</h5>
+<h5 id="iota-19">iota 19</h5>
+<h3 id="data-structures">Data Structures</h3>
+<h4 id="array">Array</h4>
+<h5 id="cpu-cache">CPU Cache</h5>
+<p>Cores DO NOT access main memory directly but their local caches. What store in caches are data and instruction.</p>
+<p>Cache speed from fastest to slowest: L1 -&gt; L2 -&gt; L3 -&gt; main memory. As Scott Meyers has said “If performance matters then the total memory you have is the total amount of caches”. Access to main memory is incredibly slow. Practically speaking it might not even be there.</p>
+<p>So how do we write code that can be sympathetic with the caching system to make sure that we don’t have a cache miss or at least, we minimize cache misses to our fullest potential?</p>
+<p>Processor has a Prefetcher. It predicts what data is needed ahead of time. There are different granularities depending on where we are on the machine. Our programming model uses a byte. We can read and write to a byte at a time. However, from the caching system point of view, our granularity is not 1 byte. It is 64 bytes, called a cache line. All memory us junked up in this 64 bytes cache line. Since the caching mechanism is complex, Prefetcher tries to hide all the latency from us. It has to be able to pick up on predictable access patterns to data. That said, we need to write code that creates predictable access patterns to data.</p>
+<p>One easy way is to create a contiguous allocation of memory and to iterate over them. The array data structure gives us the ability to do so. From the hardware perspective, array is the most important data structure. From Go perspective, slice is. Array is the backing data structure for slice (like Vector in C++). Once we allocate an array, whatever its size, every element is equally distant from other elements. As we iterate over that array, we begin to walk cache line by cache line. As the Prefetcher sees that access pattern, it can pick it up and hide all the latency from us.</p>
+<p>For example, we have a big nxn matrix. We do LinkedList Traverse, Column Traverse, and Row Traverse and benchmark against them. Unsurprisingly, Row Traverse has the best performance. It walks through the matrix cache line by cache line and creates a predictable access pattern. Column Traverse does not walk through the matrix cache line by cache line. It looks like a random access memory pattern. That is why it is the slowest among those. However, that doesn’t explain why LinkedList Traverse’s performance is in the middle. We just think that it might perform as poorly as the Column Traverse. This leads us to another cache: TLB - Translation Lookaside Buffer. Its job is to maintain the operating system’s page and offset to where physical memory is.</p>
+<h5 id="translation-lookaside-buffer">Translation Lookaside Buffer</h5>
+<p>Back to the different granularity, the caching system moves data in and out the hardware at 64 bytes at a time. However, the operating system manages memory by paging its 4K (traditional page size for an operating system).</p>
+<p>For every page that we are managing, let’s take our virtual memory addresses because that we use (softwares runs virtual addresses, its sandbox, that is how we use/share physical memory) and map it to the right page and offset for that physical memory.</p>
+<p>A miss on the TLB can be worse than just the cache miss alone. The LinkedList is somewhere in between because the chance of multiple nodes being on the same page is probably pretty good. Even though we can get cache misses because cache lines aren’t necessary in the distance that is predictable, we probably do not have so many TLB cache misses. In the Column Traverse, not only do we have cache misses, we probably have a TLB cache miss on every access as well.</p>
+<p>That said, data-oriented design matters. It is not enough to write the most efficient algorithm, how we access our data can have much more lasting effect on the performance than the algorithm itself.</p>
+<h5 id="declare-and-initialize">Declare and initialize</h5>
+<p>Declare an array of five strings that is initialized to its zero value. To recap, a string is a 2 word data structure: a pointer and a length. Since this array is set to its zero value, every string in this array is also set to its zero value, which means that each string has the first word pointed to nil and the second word is 0.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">var</span> strings [<span class="dv">5</span>]<span class="dt">string</span></span></code></pre></div>
+<p>At index 0, a string now has a pointer to a backing array of bytes (characters in string) and its length is 5.</p>
+<h5 id="what-is-the-cost">What is the cost?</h5>
+<p>The cost of this assignment is the cost of copying 2 bytes. We have two string values that have pointers to the same backing array of bytes. Therefore, the cost of this assignment is just 2 words.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>strings[<span class="dv">0</span>] = <span class="st">&quot;Apple&quot;</span></span></code></pre></div>
+<p>Similarly, assign more values to the rest of the slice.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>strings[<span class="dv">1</span>] = <span class="st">&quot;Orange&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true"></a>strings[<span class="dv">2</span>] = <span class="st">&quot;Banana&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true"></a>strings[<span class="dv">3</span>] = <span class="st">&quot;Grape&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a>strings[<span class="dv">4</span>] = <span class="st">&quot;Plum&quot;</span></span></code></pre></div>
+<h5 id="iterate-over-the-array-of-strings">Iterate over the array of strings</h5>
+<p>Using range, not only we can get the index but also a copy of the value in the array. fruit is now a string value; its scope is within the for statement. In the first iteration, we have the word “Apple”. It is a string that has the first word also points to (1) and the second word is 5. So we now have 3 different string values all sharing the same backing array.</p>
+<p><strong>What are we passing to the Println function?</strong></p>
+<p>We are using value semantics here. We are not sharing our string value. Println is getting its own copy, its own string value. It means when we get to the Println call, there are now 4 string values all sharing the same backing array. We don’t want to take the address of a string. We know the size of a string ahead of time. That means it has the ability to be on the stack because it is not creating allocation and also not causing pressure on the GC. The string has been designed to leverage value mechanics, to stay on the stack, out of the way of creating garbage. Hence, the only thing that has to be on the heap, if anything is the backing array, which is the one thing that being shared</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Iterate over array</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="kw">for</span> i, fruit := <span class="kw">range</span> strings {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a>    fmt.Println(i, fruit)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>=&gt; Iterate over array
+0 Apple
+1 Orange
+2 Banana
+3 Grape
+4 Plum</code></pre>
+<p>Declare an array of 4 integers that is initialized with some values using literal syntax.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a>numbers := [<span class="dv">4</span>]<span class="dt">int</span>{<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>}</span></code></pre></div>
+<p>Iterate over the array of numbers using traditional style.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Iterate over array using traditional style</span><span class="ch">\n</span><span class="st">&quot;</span>​)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a><span class="kw">for</span> i := <span class="dv">0</span>;i &lt; <span class="bu">len</span>(numbers);i++ {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a>    fmt.Println(i, numbers[i])</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>=&gt; Iterate over array using traditional style
+0 10
+1 20
+2 30
+3 40</code></pre>
+<h5 id="different-type-arrays">Different type arrays</h5>
+<p>Declare an array of 5 integers that is initialized to its zero value.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">var</span> five [<span class="dv">5</span>]<span class="dt">int</span></span></code></pre></div>
+<p>Declare an array of 4 integers that is initialized with some values.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>four := [<span class="dv">4</span>]<span class="dt">int</span>{<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>}</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Different type arrays</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a>fmt.Println(five)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a>fmt.Println(four)</span></code></pre></div>
+<pre><code>=&gt; Different type arrays
+[0 0 0 0 0]
+[10 20 30 40]</code></pre>
+<p>When we try to assign four to five like so five = four, the compiler says that “cannot use four (type [4]int) as type [5]int in assignment”. This cannot happen because they have different types (size and representation). The size of an array makes up its type name: [4]int vs [5]int. Just like what we’ve seen with pointers. The * in *int is not an operator but part of the type name. Unsurprisingly, all arrays have known size at compile time.</p>
+<h5 id="contiguous-memory-allocations">Contiguous memory allocations</h5>
+<p>Declare an array of 6 strings initialized with values.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true"></a>six := [<span class="dv">6</span>]<span class="dt">string</span>{<span class="st">&quot;Annie&quot;</span>, <span class="st">&quot;Betty&quot;</span>, <span class="st">&quot;Charley&quot;</span>, <span class="st">&quot;Doug&quot;</span>, <span class="st">&quot;Edward&quot;</span>, <span class="st">&quot;Hoanh&quot;</span>}</span></code></pre></div>
+<p>Iterate over the array displaying the value and address of each element. By looking at the output of this Printf function, we can see that this array is truly a contiguous block of memory. We know a string is 2 words and depending on computer architecture, it will have x byte. The distance between two consecutive IndexAddr is exactly x byte. v is its own variable on the stack and it has the same address every single time.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true"></a><span class="kw">for</span> i, v := <span class="kw">range</span> six {</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Value[%s]</span><span class="ch">\t</span><span class="st">Address[%p] IndexAddr[%p]</span><span class="ch">\n</span><span class="st">&quot;</span>, v, &amp;v, &amp;six[i])</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>=&gt; Contiguous memory allocations
+Value[Annie] Address[0xc000010250] IndexAddr[0xc000052180]
+Value[Betty] Address[0xc000010250] IndexAddr[0xc000052190]
+Value[Charley] Address[0xc000010250] IndexAddr[0xc0000521a0]
+Value[Doug] Address[0xc000010250] IndexAddr[0xc0000521b0]
+Value[Edward] Address[0xc000010250] IndexAddr[0xc0000521c0]
+Value[Hoanh] Address[0xc000010250] IndexAddr[0xc0000521d0]</code></pre>
+<h4 id="slice">Slice</h4>
+<h5 id="declare-and-initialize-1">Declare and initialize</h5>
+<p>Create a slice with a length of 5 elements. make is a special built-in function that only works with slice, map and channel. make creates a slice that has an array of 5 strings behind it. We are getting back a 3 word data structure: the first word points to the backing array, second word is length and third one is capacity.</p>
+<h5 id="length-vs-capacity">Length vs Capacity</h5>
+<p>Length is the number of elements from this pointer position we have access to (read and write). Capacity is the total number of elements from this pointer position that exist in the backing array.</p>
+<p>Because it uses syntactic sugar, it looks just like an array. It also has the same cost that we’ve seen in array. However, there’s one thing to be mindful about: there is no value in the bracket []string inside the make function. With that in mind, we can constantly notice that we are dealing with a slice, not array.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true"></a>slice1 := <span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">5</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true"></a>slice1[<span class="dv">0</span>] = <span class="st">&quot;Apple&quot;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true"></a>slice1[<span class="dv">1</span>] = <span class="st">&quot;Orange&quot;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true"></a>slice1[<span class="dv">2</span>] = <span class="st">&quot;Banana&quot;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true"></a>slice1[<span class="dv">3</span>] = <span class="st">&quot;Grape&quot;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true"></a>slice1[<span class="dv">4</span>] = <span class="st">&quot;Plum&quot;</span></span></code></pre></div>
+<p>We can’t access an index of a slice beyond its length.</p>
+<pre><code>Error: panic: runtime error: index out of range slice1[5] = &quot;Runtime error&quot;</code></pre>
+<p>We are passing the value of slice, not its address. So the Println function will have its own copy of the slice.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Printing a slice</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true"></a>fmt.Println(slice1)</span></code></pre></div>
+<pre><code>=&gt; Printing a slice
+[Apple Orange Banana Grape Plum]</code></pre>
+<h5 id="reference-type">Reference type</h5>
+<p>To create a slice with a length of 5 elements and a capacity of 8, we can use the keyword ​<em>make</em>​. <em>make</em> allows us to adjust the capacity directly on construction of this initialization.</p>
+<p>What we end up having now is a 3 word data structure where the first word points to an array of 8 elements, length is 5 and capacity is 8. It means that I can read and write to the first 5 elements and I have 3 elements of capacity that I can leverage later.</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a>slice2 := <span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">5</span>, <span class="dv">8</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a>slice2[<span class="dv">0</span>] = <span class="st">&quot;Apple&quot;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true"></a>slice2[<span class="dv">1</span>] = <span class="st">&quot;Orange&quot;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true"></a>slice2[<span class="dv">2</span>] = <span class="st">&quot;Banana&quot;</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true"></a>slice2[<span class="dv">3</span>] = <span class="st">&quot;Grape&quot;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true"></a>slice2[<span class="dv">4</span>] = <span class="st">&quot;Plum&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Length vs Capacity</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true"></a>inspectSlice(slice2)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true"></a><span class="co">// inspectSlice exposes the slice header for review.</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true"></a><span class="co">// Parameter: again, there is no value in side the []string so we want a slice.</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true"></a><span class="co">// Range over a slice, just like we did with array.</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true"></a><span class="co">// While len tells us the length, cap tells us the capacity</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true"></a><span class="co">// In the output, we can see the addresses are aligning as expected.</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true"></a><span class="kw">func</span> inspectSlice(slice []<span class="dt">string</span>) {</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Length[%d] Capacity[%d]</span><span class="ch">\n</span><span class="st">&quot;</span>, <span class="bu">len</span>(slice), <span class="bu">cap</span>(slice))</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="kw">range</span> slice {</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true"></a>        fmt.Printf(<span class="st">&quot;[%d] %p %s</span><span class="ch">\n</span><span class="st">&quot;</span>, i, &amp;slice[i], slice[i])</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true"></a>    }</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>=&gt; Length vs Capacity
+Length[5] Capacity[8]
+[0] 0xc00007e000 Apple
+[1] 0xc00007e010 Orange
+[2] 0xc00007e020 Banana
+[3] 0xc00007e030 Grape
+[4] 0xc00007e040 Plum</code></pre>
+<h5 id="idea-of-appending-making-slice-a-dynamic-data-structure">Idea of appending: making slice a dynamic data structure</h5>
+<p>Declare a nil slice of strings, set to its zero value. 3 word data structure:</p>
+<p>first one points to nil, second and last are zero.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true"></a><span class="kw">var</span> data []<span class="dt">string</span></span></code></pre></div>
+<p>What if I do data := string{}? Is it the same?</p>
+<p>No, because data in this case is not set to its zero value. This is why we always use var for zero value because not every type when we create an empty literal we have its zero value in return. What actually happens here is that we have a slice but it has a pointer (as opposed to nil). This is considered an empty slice, not a nil slice. There is a semantic between a nil slice and an empty slice. Any reference type that is set to its zero value can be considered nil. If we pass a nil slice to a marshal function, we get back a string that says null but when we pass an empty slice, we get an empty JSON document. But where does that pointer point to? It is an empty struct, which we will review later.</p>
+<p>Capture the capacity of the slice.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true"></a>    lastCap := <span class="bu">cap</span>(data)</span></code></pre></div>
+<p>Append ~100k strings to the slice.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true"></a>    <span class="kw">for</span> record := <span class="dv">1</span>;record &lt;= <span class="dv">102400</span>;record++ {</span></code></pre></div>
+<p>Use the built-in function append to add to the slice. It allows us to add value to a slice, making the data structure dynamic, yet still allows us to use that contiguous block of memory that gives us the predictable access pattern from mechanical sympathy. The append call is working with value semantic. We are not sharing this slice but appending to it and returning a new copy of it. The slice gets to stay on the stack, not heap.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true"></a>    data = <span class="bu">append</span>(data, fmt.Sprintf(<span class="st">&quot;Rec: %d&quot;</span>, record))</span></code></pre></div>
+<p>Every time append runs, it checks the length and capacity. If it is the same, it means that we have no room. append creates a new backing array, double its size, copy the old value back in and append the new value. It mutates its copy on its stack frame and returns us a copy. We replace our slice with the new copy. If it is not the same, it means that we have extra elements of capacity we can use. Now we can bring these extra capacities into the length and no copy is being made. This is very efficient. Looking at the last column in the output, when the backing array is 1000 elements or less, it doubles the size of the backing array for growth. Once we pass 1000 elements, the growth rate moves to 25%. When the capacity of the slice changes, display the changes.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a>    <span class="kw">if</span> lastCap != <span class="bu">cap</span>(data) {</span></code></pre></div>
+<p>Calculate the percent of change.</p>
+<div class="sourceCode" id="cb30"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true"></a>    capChg := <span class="dt">float64</span>(<span class="bu">cap</span>(data)-lastCap) / <span class="dt">float64</span>(lastCap) * 100 </span></code></pre></div>
+<p>Save the new values for capacity.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a>    lastCap = <span class="bu">cap</span>(data)</span></code></pre></div>
+<p>Display the results.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Addr[%p]</span><span class="ch">\t</span><span class="st">Index[%d]</span><span class="ch">\t\t</span><span class="st">Cap[%d - %2.f%%]</span><span class="ch">\n</span><span class="st">&quot;</span>, &amp;data[<span class="dv">0</span>], record, <span class="bu">cap</span>(data), capChg)</span></code></pre></div>
+<pre><code>=&gt; Idea of appending
+Addr[0xc0000102a0] Index[1] Cap[1 - +Inf%]
+Addr[0xc00000c0c0] Index[2] Cap[2 - 100%]
+Addr[0xc000016080] Index[3] Cap[4 - 100%]
+Addr[0xc00007e080] Index[5] Cap[8 - 100%]
+Addr[0xc000100000] Index[9] Cap[16 - 100%]
+Addr[0xc000102000] Index[17] Cap[32 - 100%]
+Addr[0xc00007a400] Index[33] Cap[64 - 100%]
+Addr[0xc000104000] Index[65] Cap[128 - 100%]
+Addr[0xc000073000] Index[129] Cap[256 - 100%]
+Addr[0xc000106000] Index[257] Cap[512 - 100%]
+Addr[0xc00010a000] Index[513] Cap[1024 - 100%]
+Addr[0xc000110000] Index[1025] Cap[1280 - 25%]
+Addr[0xc00011a000] Index[1281] Cap[1704 - 33%]
+Addr[0xc000132000] Index[1705] Cap[2560 - 50%]
+Addr[0xc000140000] Index[2561] Cap[3584 - 40%]
+Addr[0xc000154000] Index[3585] Cap[4608 - 29%]
+Addr[0xc000180000] Index[4609] Cap[6144 - 33%]
+Addr[0xc000198000] Index[6145] Cap[7680 - 25%]
+Addr[0xc0001b6000] Index[7681] Cap[9728 - 27%]
+Addr[0xc000200000] Index[9729] Cap[12288 - 26%]
+Addr[0xc000230000] Index[12289] Cap[15360 - 25%]
+Addr[0xc000280000] Index[15361] Cap[19456 - 27%]
+Addr[0xc000300000] Index[19457] Cap[24576 - 26%]
+Addr[0xc000360000] Index[24577] Cap[30720 - 25%]
+Addr[0xc000400000] Index[30721] Cap[38400 - 25%]
+Addr[0xc000300000] Index[38401] Cap[48128 - 25%]
+Addr[0xc000600000] Index[48129] Cap[60416 - 26%]
+Addr[0xc0006ec000] Index[60417] Cap[75776 - 25%]
+Addr[0xc000814000] Index[75777] Cap[94720 - 25%]
+Addr[0xc000600000] Index[94721] Cap[118784 - 25%]</code></pre>
+<h5 id="slice-of-slice">Slice of slice</h5>
+<p>Take a slice of slice2. We want just indexes 2 and 3. The length is slice3 is 2 and capacity is 6.</p>
+<p>Parameters are [starting_index:(starting_index + length)]</p>
+<p>By looking at the output, we can see that they are sharing the same backing array. These slice headers get to stay on the stack when we use these value semantics. Only the backing array that needed to be on the heap.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true"></a>slice3 := slice2[<span class="dv">2</span>:<span class="dv">4</span>]</span></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Slice of slice (before)</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true"></a>inspectSlice(slice2)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true"></a>inspectSlice(slice3)</span></code></pre></div>
+<p>When we change the value of the index 0 of slice3, who are going to see this change?</p>
+<pre><code>=&gt; Slice of slice (before)
+Length[5] Capacity[8]
+[0] 0xc00007e000 Apple
+[1] 0xc00007e010 Orange
+[2] 0xc00007e020 Banana
+[3] 0xc00007e030 Grape
+[4] 0xc00007e040 Plum
+Length[2] Capacity[6]
+[0] 0xc00007e020 Banana
+[1] 0xc00007e030 Grape</code></pre>
+<div class="sourceCode" id="cb37"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true"></a>slice3[<span class="dv">0</span>] = <span class="st">&quot;CHANGED&quot;</span></span></code></pre></div>
+<p>The answer is both. We have to always be aware that we are modifying an existing slice. We have to be aware who is using it, who is sharing that backing array.</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Slice of slice (after)</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true"></a>inspectSlice(slice2)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true"></a>inspectSlice(slice3)</span></code></pre></div>
+<pre><code>=&gt; Slice of slice (after)
+Length[5] Capacity[8]
+[0] 0xc00007e000 Apple
+[1] 0xc00007e010 Orange
+[2] 0xc00007e020 CHANGED
+[3] 0xc00007e030 Grape
+[4] 0xc00007e040 Plum
+Length[2] Capacity[6]
+[0] 0xc00007e020 CHANGED
+[1] 0xc00007e030 Grape</code></pre>
+<p>How about slice3 := append(slice3, “CHANGED”)? Similar problem will occur with append if the length and capacity is not the same. Instead of changing slice3 at index 0, we call append on slice3. Since the length of slice3 is 2, capacity is 6 at the moment, we have extra rooms for modification. We go and change the element at index 3 of slice3, which is index 4 of slice2. That is very dangerous. So, what if the length and capacity is the same? Instead of making slice3 capacity 6, we set it to 2 by adding another parameter to the slicing syntax like this: slice3 := slice2[2:4:4]</p>
+<p>When append looks at this slice and sees that the length and capacity is the same, it wouldn’t bring in the element at index 4 of slice2. It would detach. slice3 will have a length of 2 and capacity of 2, still share the same backing array. On the call to append, length and capacity will be different. The addresses are also different. This is called a 3 index slice. This new slice will get its own backing array and we don’t affect anything at all to our original slice.</p>
+<h5 id="copy-a-slice">Copy a slice</h5>
+<p>copy only works with string and slice only. Make a new slice big enough to hold elements of the original slice and copy the values over using the built-in copy function.</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true"></a>slice4 := <span class="bu">make</span>([]<span class="dt">string</span>, <span class="bu">len</span>(slice2))</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true"></a><span class="bu">copy</span>(slice4, slice2)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Copy a slice</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true"></a>inspectSlice(slice4)</span></code></pre></div>
+<pre><code>=&gt; Copy a slice
+Length[5] Capacity[5]
+[0] 0xc00005c050 Apple
+[1] 0xc00005c060 Orange
+[2] 0xc00005c070 CHANGED
+[3] 0xc00005c080 Grape
+[4] 0xc00005c090 Plum</code></pre>
+<h5 id="slice-and-reference">Slice and reference</h5>
+<p>Declare a slice of integers with 7 values.</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true"></a>x := <span class="bu">make</span>([]<span class="dt">int</span>, <span class="dv">7</span>)</span></code></pre></div>
+<p>Random starting counters.</p>
+<div class="sourceCode" id="cb43"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true"></a><span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">7</span>; i++ {</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true"></a>    x[i] = i * <span class="dv">100</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Set a pointer to the second element of the slice.</p>
+<div class="sourceCode" id="cb44"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true"></a>twohundred := &amp;x[<span class="dv">1</span>]</span></code></pre></div>
+<p>Append a new value to the slice. This line of code raises a red flag. We have x is a slice with length 7, capacity 7. Since the length and capacity is the same, append doubles its size then copy values over. x nows points to different memory block and has a length of 8, capacity of 14.</p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true"></a>x = <span class="bu">append</span>(x, <span class="dv">800</span>)</span></code></pre></div>
+<p>When we change the value of the second element of the slice, twohundred is not gonna change because it points to the old slice. Everytime we read it, we will get the wrong value.</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true"></a>x[<span class="dv">1</span>]++</span></code></pre></div>
+<p>By printing out the output, we can see that we are in trouble.</p>
+<div class="sourceCode" id="cb47"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Slice and reference</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true"></a>fmt.Println(<span class="st">&quot;twohundred:&quot;</span>, *twohundred, <span class="st">&quot;x[1]:&quot;</span>, x[<span class="dv">1</span>])</span></code></pre></div>
+<pre><code>=&gt; Slice and reference
+twohundred: 100 x[1]: 101</code></pre>
+<h5 id="utf-8">UTF-8</h5>
+<p>Everything in Go is based on UTF-8 character sets. If we use different encoding scheme, we might have a problem.</p>
+<p>Declare a string with both Chinese and English characters. For each Chinese character, we need 3 byte for each one. The UTF-8 is built on 3 layers: bytes, code point and character. From Go perspective, string are just bytes. That is what we are storing.</p>
+<p>In our example, the first 3 bytes represents a single code point that represents that single character. We can have anywhere from 1 to 4 bytes representing a code point (a code point is a 32 bit value) and anywhere from 1 to multiple code points can actually represent a character. To keep it simple, we only have 3 bytes representing 1 code point representing 1 character. So we can read s as 3 bytes, 3 bytes, 1 byte, 1 byte,… (since there are only 2 Chinese characters in the first place, the rest are English)</p>
+<div class="sourceCode" id="cb49"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true"></a>s := <span class="st">&quot;世界 means world&quot;</span></span></code></pre></div>
+<p>UTFMax is 4 – up to 4 bytes per encoded rune -&gt; maximum number of bytes we need to represent any code point is 4. mRune is its own type. It is an alias for int32 type. Similar to type byte we are using, it is just an alias for uint8.</p>
+<div class="sourceCode" id="cb50"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true"></a><span class="kw">var</span> buf [utf8.UTFMax]<span class="dt">byte</span></span></code></pre></div>
+<p>When we are ranging over a string, are we doing it byte by byte or code point by code point or character by character? The answer is code point by code point. On the first iteration, i is 0. On the next one, i is 3 because we are moving to the next code point. Then i is 6.</p>
+<div class="sourceCode" id="cb51"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true"></a><span class="kw">for</span> i, r := <span class="kw">range</span> s {</span></code></pre></div>
+<p>Capture the number of bytes for this rune/code point.</p>
+<div class="sourceCode" id="cb52"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true"></a>    rl := utf8.RuneLen(r)</span></code></pre></div>
+<p>Calculate the slice offset for the bytes associated with this rune.</p>
+<div class="sourceCode" id="cb53"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true"></a>    si := i + rl</span></code></pre></div>
+<p>Copy rune from the string to our buffer. We want to go through every code point and copy them into our array buf, and display them on the screen. “Every array is just a slice waiting to happen.” - Go saying We are using the slicing syntax, creating our slice header where buf becomes the backing array. All of them are on the stack. There is no allocation here.</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true"></a>    <span class="bu">copy</span>(buf[:], s[i:si])</span></code></pre></div>
+<p>Display the details.</p>
+<div class="sourceCode" id="cb55"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;%2d: %q; codepoint: %#6x; encoded bytes: %#v</span><span class="ch">\n</span><span class="st">&quot;</span>​, i, r, r, buf[:rl])</span></code></pre></div>
+<pre><code>0: &#39;世&#39;; codepoint: 0x4e16; encoded bytes: []byte{0xe4, 0xb8, 0x96}
+3: &#39;界&#39;; codepoint: 0x754c; encoded bytes: []byte{0xe7, 0x95, 0x8c}
+6: &#39; &#39;; codepoint: 0x20; encoded bytes: []byte{0x20}
+7: &#39;m&#39;; codepoint: 0x6d; encoded bytes: []byte{0x6d}
+8: &#39;e&#39;; codepoint: 0x65; encoded bytes: []byte{0x65}
+9: &#39;a&#39;; codepoint: 0x61; encoded bytes: []byte{0x61}
+10: &#39;n&#39;; codepoint: 0x6e; encoded bytes: []byte{0x6e}
+11: &#39;s&#39;; codepoint: 0x73; encoded bytes: []byte{0x73}
+12: &#39; &#39;; codepoint: 0x20; encoded bytes: []byte{0x20}
+13: &#39;w&#39;; codepoint: 0x77; encoded bytes: []byte{0x77}
+14: &#39;o&#39;; codepoint: 0x6f; encoded bytes: []byte{0x6f}
+15: &#39;r&#39;; codepoint: 0x72; encoded bytes: []byte{0x72}
+16: &#39;l&#39;; codepoint: 0x6c; encoded bytes: []byte{0x6c}
+17: &#39;d&#39;; codepoint: 0x64; encoded bytes: []byte{0x64}</code></pre>
+<h4 id="map">Map</h4>
+<p>user defines a user in the program.</p>
+<div class="sourceCode" id="cb57"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true"></a><span class="kw">type</span> user <span class="kw">struct</span> {</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true"></a>    name <span class="dt">string</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true"></a>    username <span class="dt">string</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true"></a>}</span></code></pre></div>
+<h5 id="declare-and-initialize-2">Declare and initialize</h5>
+<p>Declare and make a map that stores values of type user with a key of type string.</p>
+<div class="sourceCode" id="cb58"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true"></a>    users1 := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">string</span>]user)</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true"></a></span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true"></a>    <span class="co">// Add key/value pairs to the map</span></span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true"></a>    users1[<span class="st">&quot;Roy&quot;</span>] = user{<span class="st">&quot;Rob&quot;</span>, <span class="st">&quot;Roy&quot;</span>}</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true"></a>    users1[<span class="st">&quot;Ford&quot;</span>] = user{<span class="st">&quot;Henry&quot;</span>, <span class="st">&quot;Ford&quot;</span>}</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true"></a>    users1[<span class="st">&quot;Mouse&quot;</span>] = user{<span class="st">&quot;Mickey&quot;</span>, <span class="st">&quot;Mouse&quot;</span>}</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true"></a>    users1[<span class="st">&quot;Jackson&quot;</span>] = user{<span class="st">&quot;Michael&quot;</span>, <span class="st">&quot;Jackson&quot;</span>}</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true"></a></span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true"></a>    <span class="co">// Iterate over map</span></span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Iterate over map</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true"></a>    <span class="kw">for</span> key, value := <span class="kw">range</span> users1 {</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true"></a>            fmt.Println(key, value)</span>
+<span id="cb58-14"><a href="#cb58-14" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>=&gt; Iterate over map
+Roy {Rob Roy}
+Ford {Henry Ford}
+Mouse {Mickey Mouse}
+Jackson {Michael Jackson}</code></pre>
+<h5 id="map-literals">Map literals</h5>
+<p>Declare and initialize the map with values.</p>
+<div class="sourceCode" id="cb60"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true"></a>users2 := <span class="kw">map</span>[<span class="dt">string</span>]user{</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true"></a>    <span class="st">&quot;Roy&quot;</span>: {<span class="st">&quot;Rob&quot;</span>, <span class="st">&quot;Roy&quot;</span>},</span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true"></a>    <span class="st">&quot;Ford&quot;</span>: {<span class="st">&quot;Henry&quot;</span>, <span class="st">&quot;Ford&quot;</span>},</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true"></a>    <span class="st">&quot;Mouse&quot;</span>: {<span class="st">&quot;Mickey&quot;</span>, <span class="st">&quot;Mouse&quot;</span>},</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true"></a>    <span class="st">&quot;Jackson&quot;</span>: {<span class="st">&quot;Michael&quot;</span>, <span class="st">&quot;Jackson&quot;</span>},</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb61"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true"></a><span class="co">// Iterate over the map.</span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Map literals</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true"></a><span class="kw">for</span> key, value := <span class="kw">range</span> users2 {</span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true"></a>    fmt.Println(key, value)</span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>=&gt; Map literals
+Roy {Rob Roy}
+Ford {Henry Ford}
+Mouse {Mickey Mouse}
+Jackson {Michael Jackson}</code></pre>
+<h5 id="delete-key">Delete key</h5>
+<div class="sourceCode" id="cb63"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true"></a><span class="bu">delete</span>(users2, <span class="st">&quot;Roy&quot;</span>)</span></code></pre></div>
+<h5 id="find-key">Find key</h5>
+<p>Find the Roy key. If found is True, we will get a copy value of that type. if found is False, u is still a value of type user but is set to its zero value.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true"></a>u1, found1 := users2[<span class="st">&quot;Roy&quot;</span>]</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true"></a>u2, found2 := users2[<span class="st">&quot;Ford&quot;</span>]</span></code></pre></div>
+<p>Display the value and found flag.</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Find key</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true"></a>fmt.Println(<span class="st">&quot;Roy&quot;</span>, found1, u1)</span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true"></a>fmt.Println(<span class="st">&quot;Ford&quot;</span>, found2, u2)</span></code></pre></div>
+<pre><code>=&gt; Find key
+Roy false { }
+Ford true {Henry Ford}</code></pre>
+<h5 id="map-key-restrictions">Map key restrictions</h5>
+<div class="sourceCode" id="cb67"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true"></a><span class="kw">type</span> users []user</span></code></pre></div>
+<p>Using this syntax, we can define a set of users This is a second way we can define users. We can use an existing type and use it as a base for another type. These are two different types. There is no relationship here. However, when we try use it as a key, like: u := make(map[users]int) the compiler says we cannot use that: “invalid map key type users”</p>
+<p>The reason is: whatever we use for the key, the value must be comparable. We have to use it in some sort of boolean expression in order for the map to create a hash value for it.</p>
+<h3 id="decoupling">Decoupling</h3>
+<h4 id="method">Method</h4>
+<h5 id="value-and-pointer-receiver-call">Value and Pointer Receiver Call</h5>
+<h5 id="value-and-pointer-semantics">Value and Pointer Semantics</h5>
+<h5 id="methods-are-just-functions">Methods are just functions</h5>
+<h4 id="interface">Interface</h4>
+<h5 id="valueless-type">Valueless type</h5>
+<h5 id="interface-via-pointer-receiver">Interface via pointer receiver</h5>
+<h5 id="slice-of-interface">Slice of interface</h5>
+<h4 id="embedding-55">Embedding 55</h4>
+<h5 id="declaring-fields-not-embedding-55">Declaring fields, NOT Embedding 55</h5>
+<h5 id="embedding-types-56">Embedding types 56</h5>
+<h5 id="embedded-type-and-interface-57">Embedded type and Interface 57</h5>
+<h5 id="outer-and-inner-type-implementing-the-same-interface-58">Outer and inner type implementing the same interface 58</h5>
+<h4 id="exporting-60">Exporting 60</h4>
+<h5 id="guideline-60">Guideline 60</h5>
+<h5 id="exported-identifier-60">Exported identifier 60</h5>
+<h5 id="accessing-a-value-of-an-unexported-identifier-61">Accessing a value of an unexported identifier 61</h5>
+<h5 id="unexported-fields-from-an-exported-struct-62">Unexported fields from an exported struct 62</h5>
+<h5 id="exported-types-with-embedded-unexported-types-63">Exported types with embedded unexported types 63</h5>
+<h2 id="software-design-65">Software Design 65</h2>
+<h3 id="composition-65">Composition 65</h3>
+<h4 id="grouping-types-65">Grouping types 65</h4>
+<h5 id="grouping-by-state-65">Grouping By State 65</h5>
+<h5 id="grouping-by-behavior-67">Grouping By Behavior 67</h5>
+<h4 id="decoupling-70">Decoupling 70</h4>
+<h5 id="struct-composition-70">Struct Composition 70</h5>
+<h5 id="decoupling-with-interface-74">Decoupling With Interface 74</h5>
+<h5 id="interface-composition-79">Interface Composition 79</h5>
+<h5 id="decoupling-with-interface-composition-84">Decoupling With Interface Composition 84</h5>
+<h4 id="conversion">Conversion</h4>
+<h5 id="interface-conversions">Interface Conversions</h5>
+<p>Mover provides support for moving things.</p>
+<div class="sourceCode" id="cb68"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true"></a><span class="kw">type</span> Mover <span class="kw">interface</span> {</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true"></a>  Move()</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Locker provides support for locking and unlocking things.</p>
+<div class="sourceCode" id="cb69"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true"></a><span class="kw">type</span> Locker <span class="kw">interface</span> {</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true"></a>  Lock()</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true"></a>  Unlock()</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>MoveLocker</code> provides support for moving and locking things.</p>
+<div class="sourceCode" id="cb70"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true"></a><span class="kw">type</span> MoveLocker <span class="kw">interface</span> {</span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true"></a>  Mover</span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true"></a>  Locker</span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>bike</code> represents a concrete type for the example.</p>
+<div class="sourceCode" id="cb71"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true"></a><span class="kw">type</span> bike <span class="kw">struct</span> {}</span></code></pre></div>
+<p><code>Move</code> can change the position of a bike.</p>
+<div class="sourceCode" id="cb72"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Move () {</span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true"></a>  fmt.Println( <span class="st">&quot;Moving the bike&quot;</span> )</span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>Lock</code> prevents a bike from moving.</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Lock () {</span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true"></a>  fmt.Println( <span class="st">&quot;Locking the bike&quot;</span> )</span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>Unlock</code> allows a bike to be moved.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Unlock () {</span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true"></a>  fmt.Println( <span class="st">&quot;Unlocking the bike&quot;</span> )</span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true"></a>}</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true"></a></span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true"></a><span class="kw">func</span> main () {</span></code></pre></div>
+<p>Declare variables of the <code>MoveLocker</code> and <code>Mover</code> interfaces set to their zero value.</p>
+<div class="sourceCode" id="cb75"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true"></a>  <span class="kw">var</span> ml MoveLocker</span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true"></a>  <span class="kw">var</span> m Mover</span></code></pre></div>
+<p>Create a value of type <code>bike</code> and assign the value to the <code>MoveLocker</code> interface value.</p>
+<div class="sourceCode" id="cb76"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true"></a>  ml = bike{}</span></code></pre></div>
+<p>An interface value of type <code>MoveLocker</code> can be implicitly converted into a value of type <code>Mover</code>. They both declare a method named <code>move</code>.</p>
+<div class="sourceCode" id="cb77"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true"></a>  m = ml</span></code></pre></div>
+<figure>
+<img src="../diagrams/91.jpg" alt="Implicit conversion of MoveLocker to Mover" /><figcaption aria-hidden="true">Implicit conversion of <code>MoveLocker</code> to <code>Mover</code></figcaption>
+</figure>
+<p>However, we cannot go in the other direction, like so:</p>
+<div class="sourceCode" id="cb78"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true"></a>  ml = m</span></code></pre></div>
+<p>The compiler will say:</p>
+<pre><code>cannot use m (type Mover) as type MoveLocker in assignment:
+Mover does not implement MoveLocker (missing Lock method).</code></pre>
+<h5 id="type-assertion">Type assertion</h5>
+<p>Interface type <code>Mover</code> does not declare methods named lock and unlock. Therefore, the compiler can’t perform an implicit conversion to assign a value of interface type <code>Mover</code> to an interface value of type <code>MoveLocker</code>. It is irrelevant that the concrete type value of type <code>bike</code> that is stored inside of the <code>Mover</code> interface value implements the <code>MoveLocker</code> interface. We can perform a type assertion at runtime to support the assignment.</p>
+<p>Perform a type assertion against the <code>Mover</code> interface value to access a COPY of the concrete type value of type <code>bike</code> that was stored inside of it. Then assign the COPY of the concrete type to the <code>MoveLocker</code> interface. This is the syntax for type assertion. We are taking the interface value itself, dot (bike).We are using bike as a parameter. If <code>m</code> is not <code>nil</code> and there is a <code>bike</code> inside of <code>m</code>, we will get a copy of it since we are using value semantics. Or else, a panic occurs. <code>b</code> is having a copy of <code>bike</code> value.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true"></a>    b := m.(bike)</span></code></pre></div>
+<p>We can prevent panic when type assertion breaks by destructuring the boolean value that represents type assertion result.</p>
+<div class="sourceCode" id="cb81"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true"></a>    b, ok := m.(bike)</span>
+<span id="cb81-2"><a href="#cb81-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Does m has value of bike?:&quot;</span>, ok)</span>
+<span id="cb81-3"><a href="#cb81-3" aria-hidden="true"></a></span>
+<span id="cb81-4"><a href="#cb81-4" aria-hidden="true"></a>    ml = b</span></code></pre></div>
+<pre><code>Does m has value of bike?: true</code></pre>
+<p>It’s important to note that the type assertion syntax provides a way to state what type of value is stored inside the interface. This is more powerful from a language and readability standpoint, than using a casting syntax, like in other languages.</p>
+<h5 id="runtime-type-assertion">Runtime Type Assertion</h5>
+<div class="sourceCode" id="cb83"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb83-3"><a href="#cb83-3" aria-hidden="true"></a>  <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb83-4"><a href="#cb83-4" aria-hidden="true"></a>  <span class="st">&quot;math/rand&quot;</span></span>
+<span id="cb83-5"><a href="#cb83-5" aria-hidden="true"></a>  <span class="st">&quot;time&quot;</span></span>
+<span id="cb83-6"><a href="#cb83-6" aria-hidden="true"></a>)</span></code></pre></div>
+<p><code>car</code> represents something you drive.</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true"></a><span class="kw">type</span> car <span class="kw">struct</span>{}</span></code></pre></div>
+<p>String implements the <code>fmt.Stringer</code> interface.</p>
+<div class="sourceCode" id="cb85"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true"></a><span class="kw">func</span> (car) String() <span class="dt">string</span> {</span>
+<span id="cb85-2"><a href="#cb85-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="st">&quot;Vroom!&quot;</span></span>
+<span id="cb85-3"><a href="#cb85-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>cloud</code> represents somewhere you store information.</p>
+<div class="sourceCode" id="cb86"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true"></a><span class="kw">type</span> cloud <span class="kw">struct</span>{}</span></code></pre></div>
+<p>String implements the <code>fmt.Stringer</code> interface.</p>
+<div class="sourceCode" id="cb87"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true"></a><span class="kw">func</span> (cloud) String() <span class="dt">string</span> {</span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="st">&quot;Big Data!&quot;</span></span>
+<span id="cb87-3"><a href="#cb87-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Seed the number random generator.</p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true"></a>  rand.Seed(time.Now().UnixNano())</span></code></pre></div>
+<p>Create a slice of the Stringer interface values.</p>
+<div class="sourceCode" id="cb89"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true"></a>  mvs := []fmt.Stringer{</span>
+<span id="cb89-2"><a href="#cb89-2" aria-hidden="true"></a>    car{},</span>
+<span id="cb89-3"><a href="#cb89-3" aria-hidden="true"></a>    cloud{},</span>
+<span id="cb89-4"><a href="#cb89-4" aria-hidden="true"></a>  }</span></code></pre></div>
+<p>Let’s run this experiment ten times.</p>
+<div class="sourceCode" id="cb90"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true"></a>  <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">10</span>; i++ {</span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true"></a>    rn := rand.Intn(<span class="dv">2</span>)</span></code></pre></div>
+<p>Perform a type assertion that we have a concrete type of cloud in the interface value we randomly chose. This shows us that this checking is at runtime, not compile time.</p>
+<div class="sourceCode" id="cb91"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true"></a>    <span class="kw">if</span> v, ok := mvs[rn].(cloud); ok {</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true"></a>      fmt.Println(<span class="st">&quot;Got Lucky:&quot;</span>, v)</span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true"></a>      <span class="kw">continue</span></span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true"></a>    }</span></code></pre></div>
+<p>We have to guarantee that the variable in question (<code>x</code> in <code>x.(T)</code>) can always be asserted correctly as T type Or else, We wouldn’t want to use that <code>ok</code> variable because we want it to panic if there is an integrity issue. We must shut it down immediately if that happens if we cannot recover from a panic and guarantee that we are back at 100% integrity, the software has to be restarted.</p>
+<p>Shutting down means you have to call <code>log.Fatal</code>, <code>os.exit</code>, or <code>panic</code> for stack trace. When we use type assertion, we need to understand when it is okay that whatever we are asking for is not there.</p>
+<p>If the type assertion is causing us to call the concrete value out, that should raise a big flag. We are using interface to maintain a level of decoupling and now we are using type assertion to go back to the concrete.</p>
+<p>When we are in the concrete, we are putting our codes in the situation where cascading changes can cause widespread refactoring. What we want with interface is the opposite, internal changes minimize cascading changes.</p>
+<div class="sourceCode" id="cb92"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Got Unlucky&quot;</span>)</span>
+<span id="cb92-2"><a href="#cb92-2" aria-hidden="true"></a>  }</span>
+<span id="cb92-3"><a href="#cb92-3" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>Got Unlucky
+Got Unlucky
+Got Lucky: Big Data!
+Got Unlucky
+Got Lucky: Big Data!
+Got Lucky: Big Data!
+Got Unlucky
+Got Lucky: Big Data!
+Got Unlucky
+Got Unlucky</code></pre>
+<h4 id="interface-pollution">Interface Pollution</h4>
+<p>It comes from the fact that people are designing software from the interface first down instead of concrete type up. So, why are we using an interface here?</p>
+<p><strong>Myth #1:</strong> We are using interfaces because we have to use interfaces.</p>
+<p>Answer: No. We don’t have to use interfaces. We use it when it is practical and reasonable to do so.</p>
+<p>Even though they are wonderful, there is a cost of using interfaces: a level of indirection and potential allocation when we store concrete type inside of them. Unless the cost of that is worth whatever decoupling we are getting, we shouldn’t be using interfaces.</p>
+<p><strong>Myth #2:</strong>  We need to be able to test our code so we need to use interfaces.</p>
+<p>Answer: No. We must design our API that is usable for user application developer first, not our test.</p>
+<p>Below is an example that creates interface pollution by improperly using an interface when one is not needed.</p>
+<p>Server defines a contract for TCP servers. This is a little bit of a smell because this is some sort of APIs that is going to be exposed to users and already that is a lot of behaviors brought in a generic interface.</p>
+<div class="sourceCode" id="cb94"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true"></a>type Server interface {</span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true"></a>  Start() <span class="dt">error</span></span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true"></a>  Stop() <span class="dt">error</span></span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true"></a>  Wait() <span class="dt">error</span></span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>server</code> is our Server implementation. They match the name. However, that is not necessarily bad.</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true"></a>type server struct {</span>
+<span id="cb95-2"><a href="#cb95-2" aria-hidden="true"></a>  host <span class="dt">string</span></span>
+<span id="cb95-3"><a href="#cb95-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>NewServer</code> returns an interface value of type Server with a server implementation. Here is the factory function. It immediately starts to smell even worse. It is returning the interface value.</p>
+<p>It is not that functions and interfaces cannot return interface values. They can. But normally, that should raise a flag. The concrete type is the data that has the behavior and the interface normally should be used as accepting the input to the data, not necessarily going out.</p>
+<p>SMELL - Storing an unexported type pointer in the interface.</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true"></a><span class="kw">func</span> NewServer(host <span class="dt">string</span>) Server {</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true"></a>  <span class="kw">return</span> &amp;server{host}</span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Start allows the server to begin to accept requests. From now, let’s pretend there is a specific implementation for each of these methods.</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true"></a><span class="kw">func</span> (s *server) Start() error {</span>
+<span id="cb97-2"><a href="#cb97-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb97-3"><a href="#cb97-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Stop shuts the server down.</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true"></a><span class="kw">func</span> (s *server) Stop() <span class="dt">error</span> {</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Wait prevents the server from accepting new connections.</p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true"></a><span class="kw">func</span> (s *server) Wait() error {</span>
+<span id="cb99-2"><a href="#cb99-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb99-3"><a href="#cb99-3" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb100"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<p>Create a new <code>Server</code>.</p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true"></a>  srv := NewServer(<span class="st">&quot;localhost&quot;</span>)</span></code></pre></div>
+<p>Use the API.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true"></a>  srv.Start()</span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true"></a>  srv.Stop()</span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true"></a>  srv.Wait()</span>
+<span id="cb102-4"><a href="#cb102-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p>This code here couldn’t care less nor would it change if <code>srv</code> was the concrete type, not the interface. The interface is not providing any level of support whatsoever. There is no decoupling here that is happening. It is not giving us anything special here. All is doing is causing us another level of indirection.</p>
+<p>It smells because:</p>
+<ul>
+<li>The package declares an interface that matches the entire API of its own concrete type.</li>
+<li>The interface is exported but the concrete type is unexported.</li>
+<li>The factory function returns the interface value with the unexported concrete type value inside.</li>
+<li>The interface can be removed and nothing changes for the user of the API.</li>
+<li>The interface is not decoupling the API from change.</li>
+</ul>
+<h5 id="remove-interface-pollution">Remove Interface Pollution</h5>
+<p>We’re going to remove the improper interface usage from the previous program.</p>
+<p><code>Server</code> implementation.</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true"></a>type Server <span class="kw">struct</span> {</span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true"></a>  host <span class="dt">string</span></span>
+<span id="cb103-3"><a href="#cb103-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>NewServer</code> returns just a concrete pointer of type <code>Server</code></p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true"></a><span class="kw">func</span> NewServer(host <span class="dt">string</span>) *Server {</span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true"></a>  return &amp;Server{host}</span>
+<span id="cb104-3"><a href="#cb104-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>Start</code> allows the server to begin to accept requests.</p>
+<div class="sourceCode" id="cb105"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true"></a><span class="kw">func</span> (s *Server) Start() <span class="dt">error</span> {         </span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>Stop</code> shuts the server down.</p>
+<div class="sourceCode" id="cb106"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true"></a>func (s *Server) Stop() <span class="dt">error</span> {</span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>Wait</code> prevents the server from accepting new connections.</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true"></a><span class="kw">func</span> (s *Server) Wait() <span class="dt">error</span> {</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb107-3"><a href="#cb107-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Create a new <code>Server</code>.</p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true"></a>  srv := NewServer(<span class="st">&quot;localhost&quot;</span>)</span></code></pre></div>
+<p>Use the APIs.</p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true"></a>  srv.Start()</span>
+<span id="cb109-2"><a href="#cb109-2" aria-hidden="true"></a>  srv.Stop()</span>
+<span id="cb109-3"><a href="#cb109-3" aria-hidden="true"></a>  srv.Wait()</span>
+<span id="cb109-4"><a href="#cb109-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p><strong>Guidelines around interface pollution:</strong></p>
+<p>Use an interface:</p>
+<ul>
+<li>When users of the API need to provide an implementation detail.</li>
+<li>When APIs have multiple implementations that need to be maintained.</li>
+<li>When parts of the APIs that can change have been identified and require decoupling.</li>
+</ul>
+<p>Question an interface:</p>
+<ul>
+<li>When its only purpose is for writing testable APIs (write usable APIs first).</li>
+<li>When it’s not providing support for the API to decouple from change.</li>
+<li>When it’s not clear how the interface makes the code better.</li>
+</ul>
+<h4 id="mocking">Mocking</h4>
+<h5 id="package-to-mock">Package To Mock</h5>
+<p>It is important to mock things. Most things over the network can be mocked in our test. However, mocking our database is a different story because it is too complex. This is where Docker can come in and simplify our code by allowing us to launch our database while running our tests and have that clean database for everything we do.</p>
+<p>Every API only needs to focus on its test. We no longer have to worry about the application user or user over API test. We used to worry about: if we don’t have that interface, the user who uses our API can’t write tests. That is gone. The example below will demonstrate the reason.</p>
+<p>Imagine we are working at a company that decides to incorporate Go as a part of its stack. They have their internal pubsub system that all applications are supposed to use. Maybe they are doing event sourcing and there is a single pubsub platform they are using that is not going to be replaced. They need the pubsub API for Go that they can start building services that connect into this event source.</p>
+<p>So what can change? Can the event source change?</p>
+<p>If the answer is no, then it immediately tells us that we don’t need to use interfaces. We can build the entire API in the concrete, which we would do first anyway. We then write tests to make sure everything works.</p>
+<p>A couple days later, they come to us with a problem. They have to write tests and they cannot hit the pubsub system directly when my test runs so they need to mock that out. They want us to give them an interface. However, we don’t need an interface because our API doesn’t need an interface. They need an interface, not us. They need to decouple from the pubsub system, not us.</p>
+<p>They can do any decoupling they want because this is Go. The next file will be an example of their application. Package pubsub simulates a package that provides publication/subscription type services.</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true"></a><span class="kw">package</span>  main</span>
+<span id="cb110-2"><a href="#cb110-2" aria-hidden="true"></a></span>
+<span id="cb110-3"><a href="#cb110-3" aria-hidden="true"></a><span class="kw">import</span>  (</span>
+<span id="cb110-4"><a href="#cb110-4" aria-hidden="true"></a>  <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb110-5"><a href="#cb110-5" aria-hidden="true"></a>)</span></code></pre></div>
+<p><code>PubSub</code> provides access to a queue system.</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true"></a><span class="kw">type</span> PubSub struct {</span>
+<span id="cb111-2"><a href="#cb111-2" aria-hidden="true"></a>  host <span class="dt">string</span></span>
+<span id="cb111-3"><a href="#cb111-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>New creates a pubsub value for use.</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true"></a><span class="kw">func</span> New(host <span class="dt">string</span>) *PubSub {</span>
+<span id="cb112-2"><a href="#cb112-2" aria-hidden="true"></a>  ps := PubSub{</span>
+<span id="cb112-3"><a href="#cb112-3" aria-hidden="true"></a>    host: host,</span>
+<span id="cb112-4"><a href="#cb112-4" aria-hidden="true"></a>  }</span>
+<span id="cb112-5"><a href="#cb112-5" aria-hidden="true"></a></span>
+<span id="cb112-6"><a href="#cb112-6" aria-hidden="true"></a>  <span class="kw">return</span>  &amp;ps</span>
+<span id="cb112-7"><a href="#cb112-7" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Publish sends the data to the specified key.</p>
+<div class="sourceCode" id="cb113"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true"></a><span class="kw">func</span> (ps *PubSub) Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span> {</span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Actual PubSub: Publish&quot;</span>)</span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true"></a>  return   <span class="ot">nil</span></span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Subscribe sets up a request to receive messages from the specified key.</p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true"></a><span class="kw">func</span> (ps *PubSub) Subscribe(key <span class="dt">string</span>) <span class="dt">error</span> {</span>
+<span id="cb114-2"><a href="#cb114-2" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Actual PubSub: Subscribe&quot;</span>)</span>
+<span id="cb114-3"><a href="#cb114-3" aria-hidden="true"></a>  return <span class="ot">nil</span></span>
+<span id="cb114-4"><a href="#cb114-4" aria-hidden="true"></a>}</span></code></pre></div>
+<h5 id="client">Client</h5>
+<p>Sample program to show how we can personally mock concrete types when we need to for our own packages or tests.</p>
+<div class="sourceCode" id="cb115"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true"></a><span class="kw">package</span>  main</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true"></a></span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true"></a><span class="kw">import</span>  (</span>
+<span id="cb115-4"><a href="#cb115-4" aria-hidden="true"></a>  <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb115-5"><a href="#cb115-5" aria-hidden="true"></a>)</span></code></pre></div>
+<p><code>publisher</code> is an interface to allow this package to mock the pubsub package. When we are writing our applications, declare our own interface that maps out all the APIs calls we need for the APIs. The concrete types APIs in the previous files satisfy it out of the box. We can write the entire application with mocking decoupling from concrete implementations.</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true"></a><span class="kw">type</span> publisher <span class="kw">interface</span> {</span>
+<span id="cb116-2"><a href="#cb116-2" aria-hidden="true"></a>  Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span></span>
+<span id="cb116-3"><a href="#cb116-3" aria-hidden="true"></a>  Subscribe(key <span class="dt">string</span>) <span class="dt">error</span></span>
+<span id="cb116-4"><a href="#cb116-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>mock</code> is a concrete type to help support the mocking of the pubsub package.</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true"></a><span class="kw">type</span> mock <span class="kw">struct</span>{}</span></code></pre></div>
+<p><code>Publish</code> implements the <code>publisher</code> interface for the mock.</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true"></a><span class="kw">func</span> (m *mock) Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span> {</span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true"></a>  <span class="co">// ADD YOUR MOCK FOR THE PUBLISH CALL.</span></span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Mock PubSub: Publish&quot;</span>)</span>
+<span id="cb118-4"><a href="#cb118-4" aria-hidden="true"></a>  return <span class="ot">nil</span></span>
+<span id="cb118-5"><a href="#cb118-5" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>Subscribe</code> implements the <code>publisher</code> interface for the mock.</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true"></a><span class="kw">func</span>  (m *mock) Subscribe(key <span class="dt">string</span>) <span class="dt">error</span> {</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true"></a>  <span class="co">// ADD YOUR MOCK FOR THE SUBSCRIBE CALL.</span></span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Mock PubSub: Subscribe&quot;</span>)</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true"></a>  return <span class="ot">nil</span></span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Create a slice of <code>publisher</code> interface values. Assign the address of a pubsub. <code>PubSub</code> value and the address of a mock value.</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true"></a>  pubs := []publisher{</span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true"></a>    New(<span class="st">&quot;localhost&quot;</span>),</span>
+<span id="cb120-4"><a href="#cb120-4" aria-hidden="true"></a>    &amp;mock{},</span>
+<span id="cb120-5"><a href="#cb120-5" aria-hidden="true"></a>  }</span></code></pre></div>
+<p>Range over the interface value to see how the publisher interface provides the level of decoupling the user needs. The <code>pubsub</code> package did not need to provide the interface type.</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb121-1"><a href="#cb121-1" aria-hidden="true"></a>  <span class="kw">for</span> _, p := <span class="kw">range</span> pubs {</span>
+<span id="cb121-2"><a href="#cb121-2" aria-hidden="true"></a>    p.Publish(<span class="st">&quot;key&quot;</span>, <span class="st">&quot;value&quot;</span>)</span>
+<span id="cb121-3"><a href="#cb121-3" aria-hidden="true"></a>    p.Subscribe(<span class="st">&quot;key&quot;</span>)</span>
+<span id="cb121-4"><a href="#cb121-4" aria-hidden="true"></a>  }</span>
+<span id="cb121-5"><a href="#cb121-5" aria-hidden="true"></a>}</span></code></pre></div>
+<h3 id="error-handling-101">Error Handling 101</h3>
+<h4 id="default-error-values-101">Default error values 101</h4>
+<h4 id="error-variables-103">Error variables 103</h4>
+<h4 id="type-as-context-105">Type as context 105</h4>
+<h4 id="behavior-as-context-107">Behavior as context 107</h4>
+<h4 id="finding-the-bug-110">Finding the bug 110</h4>
+<h4 id="wrapping-errors-111">Wrapping Errors 111</h4>
+<h2 id="concurrency-114">Concurrency 114</h2>
+<h3 id="mechanics-114">Mechanics 114</h3>
+<h4 id="goroutine-114">Goroutine 114</h4>
+<h4 id="language-mechanics-121">Language Mechanics 121</h4>
+<h5 id="sequence-123">Sequence 123</h5>
+<h5 id="goroutine-time-slicing-124">Goroutine time slicing 124</h5>
+<h5 id="goroutines-and-parallelism-126">Goroutines and parallelism 126</h5>
+<h4 id="data-race-128">Data race 128</h4>
+<h5 id="race-detection-128">Race Detection 128</h5>
+<h5 id="atomic-functions-131">Atomic Functions 131</h5>
+<h5 id="mutexes-133">Mutexes 133</h5>
+<h5 id="readwrite-mutex-135">Read/Write Mutex 135</h5>
+<h4 id="channel-139">Channel 139</h4>
+<h5 id="language-mechanics-139">Language Mechanics 139</h5>
+<h5 id="unbuffered-channel-signaling-with-data-141">Unbuffered channel: Signaling with data 141</h5>
+<h5 id="unbuffered-channel-double-signal-143">Unbuffered channel: Double signal 143</h5>
+<h5 id="unbuffered-channel-select-and-receive-144">Unbuffered channel: select and receive 144</h5>
+<h5 id="unbuffered-channel-select-and-send-145">Unbuffered channel: select and send 145</h5>
+<h5 id="buffered-channel-select-and-drop-146">Buffered channel: Select and drop 146</h5>
+<h5 id="unbuffered-channel-tennis-match-148">Unbuffered channel (Tennis match) 148</h5>
+<h5 id="unbuffered-channel-replay-race-150">Unbuffered channel (Replay race) 150</h5>
+<h5 id="buffered-channel-fan-out-153">Buffered channel: Fan Out 153</h5>
+<h5 id="select-157">Select 157</h5>
+<h3 id="patterns-164">Patterns 164</h3>
+<h4 id="context-164">Context 164</h4>
+<h5 id="store-and-retrieve-values-from-a-context-164">Store and retrieve values from a context 164</h5>
+<h5 id="withcancel-166">WithCancel 166</h5>
+<h5 id="withdeadline-168">WithDeadline 168</h5>
+<h5 id="withtimeout-169">WithTimeout 169</h5>
+<h5 id="requestresponse-171">Request/Response 171</h5>
+<h2 id="testing-and-profiling-173">Testing and Profiling 173</h2>
+<h3 id="testing-173">Testing 173</h3>
+<h4 id="basic-unit-test-173">Basic Unit Test 173</h4>
+<h5 id="table-test-176">Table Test 176</h5>
+<h5 id="sub-test-177">Sub Test 177</h5>
+<h5 id="web-server-181">Web Server 181</h5>
+<h5 id="mock-server-187">Mock Server 187</h5>
+<h3 id="benchmarking-191">Benchmarking 191</h3>
+<h4 id="basic-benchmark-191">Basic Benchmark 191</h4>
+<h4 id="sub-benchmark-192">Sub Benchmark 192</h4>
+<h3 id="profiling-193">Profiling 193</h3>
+<h4 id="stack-trace-193">Stack Trace 193</h4>
+<h5 id="review-stack-trace-193">Review Stack Trace 193</h5>
+<h5 id="packing-195">Packing 195</h5>
+<h4 id="godebug-196">GODEBUG 196</h4>
+<h5 id="memory-tracing-196">Memory Tracing 196</h5>
+<h2 id="keep-in-touch-199">Keep in touch 199</h2>
+</body>
+</html>
