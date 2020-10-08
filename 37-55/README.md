@@ -2,7 +2,7 @@
 
 Assigned to
 
-- Jeong Hyunseok/assignee@gmail.com
+- Jeong Yeonghun/aeuveritas@gmail.com
 
 Mandatory reviewer
 
@@ -27,4 +27,3 @@ Mandatory reviewer
 > >
 > > ##### Interface via pointer receiver 50
 > >
-> > ##### Slice of interface 53
