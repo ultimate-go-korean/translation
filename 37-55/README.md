@@ -26,4 +26,3 @@ Mandatory reviewer
 > > ##### Valueless type 46
 > >
 > > ##### Interface via pointer receiver 50
-> >

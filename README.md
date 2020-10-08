@@ -1,5 +1,10 @@
 # "The Ultimate Go Study Guide" 한글 번역 프로젝트
 
+
+[toc]:./Table%20of%20Contents/table-of-contents-eng.md
+
+![CI](https://github.com/ultimate-go-korean/translation/workflows/CI/badge.svg)
+
 "The Ultimate Go Study Guide" 라는 무료 또는 자발적 기부를 받는 Go 언어 전자책을 알게 되었다. 기본적인 문법부터 다루면서도 마냥 가볍지만은 않은, 이론적인 면까지 언급하는 진행이 마음에 들어 번역을 욕심내게 되었다. 영어가 부담스러운 Go 언어 입문자 분들께 도움이 되었으면 한다.
 
 ## 번역에 참여 하게 되면
@@ -17,12 +22,12 @@
 
 ### Code
 
-- [Table of Contents/table-of-contents-eng.md](./Table of Contents/table-of-contents-eng.md): PDF 문서의 목차를 Markdown 형식으로 정리하고, 보기좋게 편집한 문서
+- [Table of Contents/table-of-contents-eng.md][toc]: PDF 문서의 목차를 Markdown 형식으로 정리하고, 보기좋게 편집한 문서
 - [assignment.md](./assignment.md): 전체 문서를 13 범위로 나누어 놓은 문서. 각 범위는 한 명의 주 번역자와 두 명 이상의 reviewer를 명시해둔다
 - [CODEOWNERS](./CODEOWNERS): 범위별 폴더/파일 담당자를 명시한 문서 (참고. https://bit.ly/3jyS8mM)
 - 범위 별 폴더
   - 폴더 명과 같은 Markdown 문서(ex. 5-20/5-20.md)가 있으며, 여기에 PDF 문서의 해당 범위를 Markdown 으로 정리 후 한글로 번역을 한다.
-  - README.md: table-of-contents-eng.md 파일의 해당 범위 부분을 여기에 옮겨두어 폴더 내 Markdown 문서가 다루는 내용을 알 수 있게 한다.
+  - README.md: [table-of-contents-eng.md][toc] 파일의 해당 범위 부분을 여기에 옮겨두어 폴더 내 Markdown 문서가 다루는 내용을 알 수 있게 한다.
 
 ### Issues
 
