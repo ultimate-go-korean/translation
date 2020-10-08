@@ -1,4 +1,15 @@
-## Table of Contents
+# 101-114 pages translation
+
+Assigned to
+
+- 권용민/@snowmerak
+
+Mandatory reviewer
+
+- 권경모/@kkweon
+- 최희재/@gmlwo530
+
+---
 
 ### Error Handling 101
 

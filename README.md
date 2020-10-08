@@ -5,7 +5,7 @@
 ![CI](https://github.com/ultimate-go-korean/translation/workflows/CI/badge.svg)
 ![Deployment](https://github.com/ultimate-go-korean/translation/workflows/Deployment/badge.svg)
 
-"The Ultimate Go Study Guide" 라는 무료 또는 자발적 기부를 받는 Go 언어 전자책을 알게 되었다. 기본적인 문법부터 다루면서도 마냥 가볍지만은 않은, 이론적인 면까지 언급하는 진행이 마음에 들어 번역을 욕심내게 되었다. 영어가 부담스러운 Go 언어 입문자 분들께 도움이 되었으면 한다.
+"The Ultimate Go Study Guide" 라는 무료(또는 자발적 기부를 받는) Go 언어 전자책을 알게 되었다. 기본적인 문법부터 다루면서도 마냥 가볍지만은 않은, 이론적인 면까지 언급하는 진행이 마음에 들어 번역을 욕심내게 되었다. 영어가 부담스러운 Go 언어 입문자 분들께 도움이 되었으면 한다.
 
 ## 번역에 참여 하게 되면
 

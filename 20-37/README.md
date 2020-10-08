@@ -2,9 +2,12 @@
 
 Assigned to
 
-- CHOI HEEJAE/gmlwo530@gmail.com
+- 최희재/@gmlwo530
 
 Mandatory reviewer
+
+- 권용민/@snowmerak
+- 서병선/@famersbs
 
 ---
 
