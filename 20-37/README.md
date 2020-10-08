@@ -6,7 +6,6 @@ Assigned to
 
 Mandatory reviewer
 
-
 ---
 
 ### Data Structures 20
