@@ -19,7 +19,7 @@
 
 ### Code
 
-- [Table of Contents/table-of-contents-eng.md](./Table of Contents/table-of-contents-eng.md): PDF 문서의 목차를 Markdown 형식으로 정리하고, 보기좋게 편집한 문서
+- [Table of Contents/table-of-contents-eng.md](./Table%20of%20Contents/table-of-contents-eng.md): PDF 문서의 목차를 Markdown 형식으로 정리하고, 보기좋게 편집한 문서
 - [assignment.md](./assignment.md): 전체 문서를 13 범위로 나누어 놓은 문서. 각 범위는 한 명의 주 번역자와 두 명 이상의 reviewer를 명시해둔다
 - [CODEOWNERS](./CODEOWNERS): 범위별 폴더/파일 담당자를 명시한 문서 (참고. https://bit.ly/3jyS8mM)
 - 범위 별 폴더
