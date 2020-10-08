@@ -1,0 +1,31 @@
+{
+  "name": "ultimate-go-korean",
+  "version": "1.0.0",
+  "description": "\"The Ultimate Go Study Guide\" 라는 무료 또는 자발적 기부를 받는 Go 언어 전자책을 알게 되었다. 기본적인 문법부터 다루면서도 마냥 가볍지만은 않은, 이론적인 면까지 언급하는 진행이 마음에 들어 번역을 욕심내게 되었다. 영어가 부담스러운 Go 언어 입문자 분들께 도움이 되었으면 한다.",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write \"**/*.{js,json,html,css,md,yaml,yml}\"",
+    "format:check": "prettier --check \"**/*.{js,json,html,css,md,yaml,yml}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ultimate-go-korean/translation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ultimate-go-korean/translation/issues"
+  },
+  "homepage": "https://github.com/ultimate-go-korean/translation#readme",
+  "devDependencies": {
+    "husky": "^4.3.0",
+    "prettier": "^2.1.2",
+    "pretty-quick": "^3.0.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --verbose --staged --pattern \"**/*.*(js|md|json|yaml|yml|html|css)\" --pattern \"*.*(js|json|md|yaml|yml)\""
+    }
+  }
+}
