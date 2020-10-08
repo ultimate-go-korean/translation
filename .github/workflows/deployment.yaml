@@ -1,0 +1,31 @@
+name: Deployment
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install pandoc
+        run: |
+          wget https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-linux-amd64.tar.gz
+          tar xzvf pandoc-${PANDOC_VERSION}-linux-amd64.tar.gz
+          sudo mv pandoc-${PANDOC_VERSION}/bin/pandoc /usr/local/bin/
+        env:
+          PANDOC_VERSION: 2.10.1
+      - run: bash run_pandoc.sh
+
+      - name: Deploy 🚀
+        # only deploy when pushing to main branch
+        if: ${{ github.event_name == 'push' }}
+        uses: JamesIves/github-pages-deploy-action@3.6.2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages # The branch the action should deploy to.
+          FOLDER: build # The folder the action should deploy.
+          CLEAN: true # Automatically remove deleted files from the deploy branch
