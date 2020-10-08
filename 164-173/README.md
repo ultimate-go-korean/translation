@@ -7,6 +7,7 @@ Assigned to
 Mandatory reviewer
 
 - 권경모/@kkweon
+- 정영훈/@aeuveritas
 
 ---
 

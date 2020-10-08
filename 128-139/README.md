@@ -7,6 +7,7 @@ Assigned to
 Mandatory reviewer
 
 - 조동헌/@davinnovation
+- 강영주/@979156
 
 ---
 

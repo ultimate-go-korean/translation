@@ -3,6 +3,7 @@
 Assigned to
 
 - 최희재/@gmlwo530
+- 신정훈/@shin2jhoon
 
 Mandatory reviewer
 

@@ -7,6 +7,8 @@ Assigned to
 Mandatory reviewer
 
 - 배지원/@baewang
+- 정영훈/@aeuveritas
+- 신정훈/@shin2jhoon
 
 ---
 

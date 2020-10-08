@@ -8,6 +8,7 @@ Mandatory reviewer
 
 - 김지훈/@ghun2
 - 배지원/@baewang
+- 강영주/@979156
 
 ---
 

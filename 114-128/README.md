@@ -8,6 +8,7 @@ Mandatory reviewer
 
 - 권용민/@snowmerak
 - 조용래/@dramgonfly
+- 신정훈/@shin2jhoon
 
 ---
 

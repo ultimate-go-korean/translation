@@ -3,6 +3,7 @@
 Assigned to
 
 - 권용민/@snowmerak
+- 강영주/@979156
 
 Mandatory reviewer
 
