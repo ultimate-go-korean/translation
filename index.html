@@ -124,14 +124,14 @@
 <li><a href="#interface-pollution">Interface Pollution</a></li>
 <li><a href="#mocking">Mocking</a></li>
 </ul></li>
-<li><a href="#error-handling-101">Error Handling 101</a>
+<li><a href="#error-handling">Error Handling</a>
 <ul>
-<li><a href="#default-error-values-101">Default error values 101</a></li>
-<li><a href="#error-variables-103">Error variables 103</a></li>
-<li><a href="#type-as-context-105">Type as context 105</a></li>
-<li><a href="#behavior-as-context-107">Behavior as context 107</a></li>
-<li><a href="#finding-the-bug-110">Finding the bug 110</a></li>
-<li><a href="#wrapping-errors-111">Wrapping Errors 111</a></li>
+<li><a href="#default-error-values">Default error values</a></li>
+<li><a href="#error-variables">Error variables</a></li>
+<li><a href="#type-as-context">Type as context</a></li>
+<li><a href="#behavior-as-context">Behavior as context</a></li>
+<li><a href="#finding-the-bug">Finding the bug</a></li>
+<li><a href="#wrapping-errors">Wrapping Errors</a></li>
 </ul></li>
 </ul></li>
 <li><a href="#concurrency-114">Concurrency 114</a>
@@ -835,13 +835,329 @@ Got Unlucky</code></pre>
 <span id="cb121-3"><a href="#cb121-3" aria-hidden="true"></a>    p.Subscribe(<span class="st">&quot;key&quot;</span>)</span>
 <span id="cb121-4"><a href="#cb121-4" aria-hidden="true"></a>  }</span>
 <span id="cb121-5"><a href="#cb121-5" aria-hidden="true"></a>}</span></code></pre></div>
-<h3 id="error-handling-101">Error Handling 101</h3>
-<h4 id="default-error-values-101">Default error values 101</h4>
-<h4 id="error-variables-103">Error variables 103</h4>
-<h4 id="type-as-context-105">Type as context 105</h4>
-<h4 id="behavior-as-context-107">Behavior as context 107</h4>
-<h4 id="finding-the-bug-110">Finding the bug 110</h4>
-<h4 id="wrapping-errors-111">Wrapping Errors 111</h4>
+<h3 id="error-handling">Error Handling</h3>
+<h4 id="default-error-values">Default error values</h4>
+<p>Integrity matters. Nothing trumps integrity. Therefore, part of integrity is error handling. It is a big part of what we do everyday. It has to be a part of the main code. First, let’s look at the language mechanic first on how the default error type is implemented.</p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true"></a>package​ main</span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true"></a>import​ ​<span class="st">&quot;fmt&quot;</span></span></code></pre></div>
+<p>http://golang.org/pkg/builtin/#error</p>
+<p>This is pre-included in the language so it looks like an unexported type. It has one active behavior, which is Error returned a string. Error handling is decoupled because we are always working with error interface when we are testing our code.</p>
+<p>Errors in Go are really just values. We are going to valuate these through the decoupling of the interface. Decoupling error handling means that cascading changes will bubble up through the user application, causes cascading wide effect through the code base. It’s important that we leverage the interface here as much as we can.</p>
+<div class="sourceCode" id="cb123"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true"></a>type​ <span class="dt">error</span> ​interface​ {</span>
+<span id="cb123-2"><a href="#cb123-2" aria-hidden="true"></a>    Error() ​string</span>
+<span id="cb123-3"><a href="#cb123-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>http://golang.org/src/pkg/errors/errors.go</p>
+<p>This is the default concrete type that comes from the error package. It is an unexported type that has an unexported field. This gives us enough context to make us form a decision.</p>
+<p>We have responsibility around error handling to give the caller enough context to make them form a decision so they know how to handle this situation.</p>
+<div class="sourceCode" id="cb124"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true"></a>type​ errorString ​struct​ {</span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true"></a>    s ​string</span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>http://golang.org/src/pkg/errors/errors.go</p>
+<p>This is using a pointer receiver and returning a string. If the caller must call this method and parse a string to see what is going on then we fail.</p>
+<p>This method is only for logging information about the error.</p>
+<div class="sourceCode" id="cb125"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true"></a>func​ (e *errorString) ​Error​() ​string​ {</span>
+<span id="cb125-2"><a href="#cb125-2" aria-hidden="true"></a>    return​ e.s</span>
+<span id="cb125-3"><a href="#cb125-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>http://golang.org/src/pkg/errors/errors.go</p>
+<p>New returns an error interface that formats as the given text. When we call New, what we are doing is creating errorString value, putting some sort of string in there.. Since we are returning the address of a concrete type, the user will get an error interface value where the first word is a *errorString and the second word points to the original value. We are going to stay decoupled during the error handling.</p>
+<div class="sourceCode" id="cb126"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true"></a>func​ ​New​(text ​string​) ​error​ {</span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true"></a>    return​ &amp;errorString{text}</span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>This is a very traditional way of error handling in Go. We are calling webCall and returning the error interface and storing that in a variable.</p>
+<p>nil is a special value in Go. What “error != nil” actually means is that we are asking if there is a concrete type value that is stored in error type interface. Because if error is not nil, there is a concrete value stored inside. If it is the case, we’ve got an error.</p>
+<p>Now do we handle the error, do we return the error up the call stack for someone else to handle? We will talk about this later.</p>
+<div class="sourceCode" id="cb127"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true"></a>func​ ​main​() {</span>
+<span id="cb127-2"><a href="#cb127-2" aria-hidden="true"></a>    if​ err := webCall(); err != ​nil​ {</span>
+<span id="cb127-3"><a href="#cb127-3" aria-hidden="true"></a>        fmt.Println(err)</span>
+<span id="cb127-4"><a href="#cb127-4" aria-hidden="true"></a>        <span class="kw">return</span></span>
+<span id="cb127-5"><a href="#cb127-5" aria-hidden="true"></a>    }</span>
+<span id="cb127-6"><a href="#cb127-6" aria-hidden="true"></a>    fmt.Println(​<span class="st">&quot;Life is good&quot;</span>​)</span>
+<span id="cb127-7"><a href="#cb127-7" aria-hidden="true"></a>}</span></code></pre></div>
+<p>webCall performs a web operation.</p>
+<div class="sourceCode" id="cb128"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true"></a>func​ ​webCall​() ​error​ {</span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true"></a>    return​ New(​<span class="st">&quot;Bad Request&quot;</span>​)</span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true"></a>}</span></code></pre></div>
+<h4 id="error-variables">Error variables</h4>
+<p>Let’s use error variables to determine the exact error being returned.</p>
+<div class="sourceCode" id="cb129"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true"></a>package​ main</span>
+<span id="cb129-2"><a href="#cb129-2" aria-hidden="true"></a>import​ (</span>
+<span id="cb129-3"><a href="#cb129-3" aria-hidden="true"></a>    <span class="st">&quot;errors&quot;</span></span>
+<span id="cb129-4"><a href="#cb129-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb129-5"><a href="#cb129-5" aria-hidden="true"></a>)</span></code></pre></div>
+<p>We want these to be on the top of the source code file. Naming convention: starting with Err. They have to be exported because our users need to access them.</p>
+<p>These are all error interfaces that we have discussed in the last file, with variables tied to them. The contexts for these errors are the variables themselves. This allows us to continue using the default error type, that unexported type with unexported field to maintain a level of decoupling through error handling.</p>
+<p>ErrBadRequest is returned when there are problems with the request. ErrPageMoved is returned when a 301/302 is returned.</p>
+<div class="sourceCode" id="cb130"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true"></a>var​ (</span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true"></a>    ErrBadRequest = errors.New(​<span class="st">&quot;Bad Request&quot;</span>​)</span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true"></a>    ErrPageMoved = errors.New(​<span class="st">&quot;Page Moved&quot;</span>​)</span>
+<span id="cb130-4"><a href="#cb130-4" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb131"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true"></a>func​ ​main​() {</span>
+<span id="cb131-2"><a href="#cb131-2" aria-hidden="true"></a>    if​ err := webCall(​true​); err != ​nil​ {</span>
+<span id="cb131-3"><a href="#cb131-3" aria-hidden="true"></a>        switch​ err {</span>
+<span id="cb131-4"><a href="#cb131-4" aria-hidden="true"></a>        case​ ErrBadRequest:</span>
+<span id="cb131-5"><a href="#cb131-5" aria-hidden="true"></a>            fmt.Println(​<span class="st">&quot;Bad Request Occurred&quot;</span>​)</span>
+<span id="cb131-6"><a href="#cb131-6" aria-hidden="true"></a>            <span class="kw">return</span></span>
+<span id="cb131-7"><a href="#cb131-7" aria-hidden="true"></a>        case​ ErrPageMoved:</span>
+<span id="cb131-8"><a href="#cb131-8" aria-hidden="true"></a>            fmt.Println(​<span class="st">&quot;The Page moved&quot;</span>​)</span>
+<span id="cb131-9"><a href="#cb131-9" aria-hidden="true"></a>            <span class="kw">return</span></span>
+<span id="cb131-10"><a href="#cb131-10" aria-hidden="true"></a>        default​:</span>
+<span id="cb131-11"><a href="#cb131-11" aria-hidden="true"></a>            fmt.Println(err)</span>
+<span id="cb131-12"><a href="#cb131-12" aria-hidden="true"></a>            <span class="kw">return</span></span>
+<span id="cb131-13"><a href="#cb131-13" aria-hidden="true"></a>        }</span>
+<span id="cb131-14"><a href="#cb131-14" aria-hidden="true"></a>    }</span>
+<span id="cb131-15"><a href="#cb131-15" aria-hidden="true"></a>    fmt.Println(​<span class="st">&quot;Life is good&quot;</span>​)</span>
+<span id="cb131-16"><a href="#cb131-16" aria-hidden="true"></a>}</span></code></pre></div>
+<p>webCall performs a web operation.</p>
+<div class="sourceCode" id="cb132"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true"></a>func​ ​webCall​(b ​bool​) ​error​ {</span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true"></a>    if​ b {</span>
+<span id="cb132-3"><a href="#cb132-3" aria-hidden="true"></a>        return​ ErrBadRequest</span>
+<span id="cb132-4"><a href="#cb132-4" aria-hidden="true"></a>    }</span>
+<span id="cb132-5"><a href="#cb132-5" aria-hidden="true"></a>    return​ ErrPageMoved</span>
+<span id="cb132-6"><a href="#cb132-6" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>Bad Request Occurred</code></pre>
+<h4 id="type-as-context">Type as context</h4>
+<p>It is not always possible to be able to say the interface value itself will be enough context. Sometimes, it requires more context. For example, a networking problem can be really complicated. Error variables wouldn’t work there. Only when the error variables wouldn’t work, we should go ahead and start working with a custom concrete type for the error.</p>
+<p>Below are two custom error types from the JSON package in the standard library and how we can use those. This is type as context.</p>
+<p>http://golang.org/src/pkg/encoding/json/decode.go</p>
+<div class="sourceCode" id="cb134"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb134-2"><a href="#cb134-2" aria-hidden="true"></a>import​ (</span>
+<span id="cb134-3"><a href="#cb134-3" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb134-4"><a href="#cb134-4" aria-hidden="true"></a>    <span class="st">&quot;reflect&quot;</span></span>
+<span id="cb134-5"><a href="#cb134-5" aria-hidden="true"></a>)</span></code></pre></div>
+<p>An UnmarshalTypeError describes a JSON value that was not appropriate for a value of a specific Go type. Naming convention: The word “Error” ends at the name of the type.</p>
+<div class="sourceCode" id="cb135"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb135-1"><a href="#cb135-1" aria-hidden="true"></a>type​ UnmarshalTypeError ​struct​ {</span>
+<span id="cb135-2"><a href="#cb135-2" aria-hidden="true"></a>    Value ​string​ ​<span class="co">// description of JSON value</span></span>
+<span id="cb135-3"><a href="#cb135-3" aria-hidden="true"></a>    Type reflect.Type ​<span class="co">// type of Go value it could not be assigned to</span></span>
+<span id="cb135-4"><a href="#cb135-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p>UnmarshalTypeError implements the error interface. We are using pointer semantics. In the implementation, we are validating all the fields being used in the error message. If not, we have a problem. Because why would you add a field to the custom error type and not displaying it on your log when this method would call. We only do this when we really need it.</p>
+<div class="sourceCode" id="cb136"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true"></a>func​ (e *UnmarshalTypeError) ​Error​() ​string​ {</span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true"></a>    return​ ​<span class="st">&quot;json: cannot unmarshal &quot;</span>​ + e.Value + ​<span class="st">&quot; into Go value of type &quot;</span>​ + e.Type.String()</span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>An InvalidUnmarshalError describes an invalid argument passed to Unmarshal. The argument to Unmarshal must be a non-nil pointer. This concrete type is used when we don’t pass the address of a value into the Unmarshal function.</p>
+<div class="sourceCode" id="cb137"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb137-1"><a href="#cb137-1" aria-hidden="true"></a>type​ InvalidUnmarshalError ​struct​ {</span>
+<span id="cb137-2"><a href="#cb137-2" aria-hidden="true"></a>    Type reflect.Type</span>
+<span id="cb137-3"><a href="#cb137-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>InvalidUnmarshalError implements the error interface.</p>
+<div class="sourceCode" id="cb138"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb138-1"><a href="#cb138-1" aria-hidden="true"></a>func​ (e *InvalidUnmarshalError) ​Error​() ​string​ {</span>
+<span id="cb138-2"><a href="#cb138-2" aria-hidden="true"></a>    if​ e.Type == ​nil​ {</span>
+<span id="cb138-3"><a href="#cb138-3" aria-hidden="true"></a>        return​ ​<span class="st">&quot;json: Unmarshal(nil)&quot;</span></span>
+<span id="cb138-4"><a href="#cb138-4" aria-hidden="true"></a>    }</span>
+<span id="cb138-5"><a href="#cb138-5" aria-hidden="true"></a>    if​ e.Type.Kind() != reflect.Ptr {</span>
+<span id="cb138-6"><a href="#cb138-6" aria-hidden="true"></a>        return​ ​<span class="st">&quot;json: Unmarshal(non-pointer &quot;</span>​ + e.Type.String() + <span class="st">&quot;)&quot;</span></span>
+<span id="cb138-7"><a href="#cb138-7" aria-hidden="true"></a>    }</span>
+<span id="cb138-8"><a href="#cb138-8" aria-hidden="true"></a>    return​ ​<span class="st">&quot;json: Unmarshal(nil &quot;</span>​ + e.Type.String() + ​<span class="st">&quot;)&quot;</span></span>
+<span id="cb138-9"><a href="#cb138-9" aria-hidden="true"></a>}</span></code></pre></div>
+<p>user is a type for use in the Unmarshal call.</p>
+<div class="sourceCode" id="cb139"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb139-1"><a href="#cb139-1" aria-hidden="true"></a>type​ user ​struct​ {</span>
+<span id="cb139-2"><a href="#cb139-2" aria-hidden="true"></a>    Name ​int</span>
+<span id="cb139-3"><a href="#cb139-3" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb140"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb140-1"><a href="#cb140-1" aria-hidden="true"></a>func​ ​main​() {</span>
+<span id="cb140-2"><a href="#cb140-2" aria-hidden="true"></a>    var​ u user</span>
+<span id="cb140-3"><a href="#cb140-3" aria-hidden="true"></a>    err := Unmarshal([]​byte​(​<span class="st">`{&quot;name&quot;:&quot;bill&quot;}`</span>​), u) ​<span class="co">// Run with a value and pointer.</span></span>
+<span id="cb140-4"><a href="#cb140-4" aria-hidden="true"></a>    if​ err != ​nil​ {</span>
+<span id="cb140-5"><a href="#cb140-5" aria-hidden="true"></a>        This is a special ​type​ assertion that only works on the ​switch​.</span>
+<span id="cb140-6"><a href="#cb140-6" aria-hidden="true"></a>​        switch​ e := err.(​type​) {</span>
+<span id="cb140-7"><a href="#cb140-7" aria-hidden="true"></a>        case​ *UnmarshalTypeError:</span>
+<span id="cb140-8"><a href="#cb140-8" aria-hidden="true"></a>            fmt.Printf(​<span class="st">&quot;UnmarshalTypeError: Value[%s] Type[%v]</span><span class="ch">\n</span><span class="st">&quot;</span>​, e.Value, e.Type)</span>
+<span id="cb140-9"><a href="#cb140-9" aria-hidden="true"></a>        case​ *InvalidUnmarshalError:</span>
+<span id="cb140-10"><a href="#cb140-10" aria-hidden="true"></a>            fmt.Printf(​<span class="st">&quot;InvalidUnmarshalError: Type[%v]</span><span class="ch">\n</span><span class="st">&quot;</span>​, e.Type)</span>
+<span id="cb140-11"><a href="#cb140-11" aria-hidden="true"></a>        default​:</span>
+<span id="cb140-12"><a href="#cb140-12" aria-hidden="true"></a>            fmt.Println(err)</span>
+<span id="cb140-13"><a href="#cb140-13" aria-hidden="true"></a>        }</span>
+<span id="cb140-14"><a href="#cb140-14" aria-hidden="true"></a>        <span class="kw">return</span></span>
+<span id="cb140-15"><a href="#cb140-15" aria-hidden="true"></a>    }</span>
+<span id="cb140-16"><a href="#cb140-16" aria-hidden="true"></a>    fmt.Println(​<span class="st">&quot;Name:&quot;</span>​, u.Name)</span>
+<span id="cb140-17"><a href="#cb140-17" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Unmarshal simulates an unmarshal call that always fails. Notice the parameters here: The first one is a slice of byte and the second one is an empty interface. The empty interface basically says nothing, which means any value can be passed into this function. We are going to reflect on the concrete type that is stored inside this interface and we are going to validate that it is a pointer or not nil. We then return different error types depending on these.</p>
+<div class="sourceCode" id="cb141"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb141-1"><a href="#cb141-1" aria-hidden="true"></a>func​ ​Unmarshal​(data []​byte​, v ​interface​{}) ​error​ {</span>
+<span id="cb141-2"><a href="#cb141-2" aria-hidden="true"></a>    rv := reflect.ValueOf(v)</span>
+<span id="cb141-3"><a href="#cb141-3" aria-hidden="true"></a>    if​ rv.Kind() != reflect.Ptr || rv.IsNil() {</span>
+<span id="cb141-4"><a href="#cb141-4" aria-hidden="true"></a>        return​ &amp;InvalidUnmarshalError{reflect.TypeOf(v)}</span>
+<span id="cb141-5"><a href="#cb141-5" aria-hidden="true"></a>    }</span>
+<span id="cb141-6"><a href="#cb141-6" aria-hidden="true"></a>    return​ &amp;UnmarshalTypeError{​<span class="st">&quot;string&quot;</span>​, reflect.TypeOf(v)}</span>
+<span id="cb141-7"><a href="#cb141-7" aria-hidden="true"></a>}</span></code></pre></div>
+<p>There is one flaw when using type as context here. In this case, we are now going back to the concrete. We walk away from the decoupling because our code is now bound to these concrete types. If the developer who wrote the json package makes any changes to these concrete types, that’s gonna create a cascading effect all the way through our code. We are no longer protected by the decoupling of the error interface.</p>
+<p>This sometimes has to happen. Can we do something different not to lose the decoupling. This is where the idea of behavior as context comes in.</p>
+<h4 id="behavior-as-context">Behavior as context</h4>
+<p>Behavior as context allows us to use a custom error type as our context but avoid that type assertion back to the concrete. We get to maintain a level of decoupling in our code.</p>
+<div class="sourceCode" id="cb142"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb142-1"><a href="#cb142-1" aria-hidden="true"></a>package​ main</span>
+<span id="cb142-2"><a href="#cb142-2" aria-hidden="true"></a>import​ (</span>
+<span id="cb142-3"><a href="#cb142-3" aria-hidden="true"></a>    <span class="st">&quot;bufio&quot;</span></span>
+<span id="cb142-4"><a href="#cb142-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb142-5"><a href="#cb142-5" aria-hidden="true"></a>    <span class="st">&quot;io&quot;</span></span>
+<span id="cb142-6"><a href="#cb142-6" aria-hidden="true"></a>    <span class="st">&quot;log&quot;</span></span>
+<span id="cb142-7"><a href="#cb142-7" aria-hidden="true"></a>    <span class="st">&quot;net&quot;</span></span>
+<span id="cb142-8"><a href="#cb142-8" aria-hidden="true"></a>)</span></code></pre></div>
+<p>client represents a single connection in the room.</p>
+<div class="sourceCode" id="cb143"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb143-1"><a href="#cb143-1" aria-hidden="true"></a>type​ client ​struct​ {</span>
+<span id="cb143-2"><a href="#cb143-2" aria-hidden="true"></a>    name ​string</span>
+<span id="cb143-3"><a href="#cb143-3" aria-hidden="true"></a>    reader *bufio.Reader</span>
+<span id="cb143-4"><a href="#cb143-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p>TypeAsContext shows how to check multiple types of possible custom error types that can be returned from the net package.</p>
+<div class="sourceCode" id="cb144"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb144-1"><a href="#cb144-1" aria-hidden="true"></a>func​ (c *client) ​TypeAsContext​() {</span>
+<span id="cb144-2"><a href="#cb144-2" aria-hidden="true"></a>    for​ {</span></code></pre></div>
+<p>We are using reader interface value to decouple ourselves from the network read.</p>
+<div class="sourceCode" id="cb145"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb145-1"><a href="#cb145-1" aria-hidden="true"></a>        line, err := c.reader.ReadString(​<span class="ch">&#39;\n&#39;</span>​)</span>
+<span id="cb145-2"><a href="#cb145-2" aria-hidden="true"></a>        if​ err != ​nil​ {</span></code></pre></div>
+<p>This is using type as context like the previous example. What special here is the method named Temporary. If it is, we can keep going but if not, we have to break things down and build things back up. Every one of these cases care only about 1 thing: the behavior of Temporary. This is what important. We can switch here, from type as context to type as behavior if we do this type assertion and only ask about the potential behavior of that concrete type itself. We can go ahead and declare our own interface called temporary like below.</p>
+<div class="sourceCode" id="cb146"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb146-1"><a href="#cb146-1" aria-hidden="true"></a>            switch​ e := err.(​type​) {</span>
+<span id="cb146-2"><a href="#cb146-2" aria-hidden="true"></a>            case​ *net.OpError:</span>
+<span id="cb146-3"><a href="#cb146-3" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
+<span id="cb146-4"><a href="#cb146-4" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;Temporary: Client leaving chat&quot;</span>​)</span>
+<span id="cb146-5"><a href="#cb146-5" aria-hidden="true"></a>                    <span class="kw">return</span></span>
+<span id="cb146-6"><a href="#cb146-6" aria-hidden="true"></a>                }</span>
+<span id="cb146-7"><a href="#cb146-7" aria-hidden="true"></a>            case​ *net.AddrError:</span>
+<span id="cb146-8"><a href="#cb146-8" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
+<span id="cb146-9"><a href="#cb146-9" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;Temporary: Client leaving chat&quot;</span>​)</span>
+<span id="cb146-10"><a href="#cb146-10" aria-hidden="true"></a>                    <span class="kw">return</span></span>
+<span id="cb146-11"><a href="#cb146-11" aria-hidden="true"></a>                }</span>
+<span id="cb146-12"><a href="#cb146-12" aria-hidden="true"></a>            case​ *net.DNSConfigError:</span>
+<span id="cb146-13"><a href="#cb146-13" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
+<span id="cb146-14"><a href="#cb146-14" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;Temporary: Client leaving return chat&quot;</span>)</span>
+<span id="cb146-15"><a href="#cb146-15" aria-hidden="true"></a>                    <span class="kw">return</span></span>
+<span id="cb146-16"><a href="#cb146-16" aria-hidden="true"></a>                }</span>
+<span id="cb146-17"><a href="#cb146-17" aria-hidden="true"></a>            default​:</span>
+<span id="cb146-18"><a href="#cb146-18" aria-hidden="true"></a>                if​ err == io.EOF {</span>
+<span id="cb146-19"><a href="#cb146-19" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;EOF: Client leaving chat&quot;</span>​)</span>
+<span id="cb146-20"><a href="#cb146-20" aria-hidden="true"></a>                    <span class="kw">return</span></span>
+<span id="cb146-21"><a href="#cb146-21" aria-hidden="true"></a>                }</span>
+<span id="cb146-22"><a href="#cb146-22" aria-hidden="true"></a>            log.Println(​<span class="st">&quot;read-routine&quot;</span>​, err)</span>
+<span id="cb146-23"><a href="#cb146-23" aria-hidden="true"></a>            }</span>
+<span id="cb146-24"><a href="#cb146-24" aria-hidden="true"></a>        }</span>
+<span id="cb146-25"><a href="#cb146-25" aria-hidden="true"></a>    fmt.Println(line)</span>
+<span id="cb146-26"><a href="#cb146-26" aria-hidden="true"></a>    }</span>
+<span id="cb146-27"><a href="#cb146-27" aria-hidden="true"></a>}</span></code></pre></div>
+<p>temporary is declared to test for the existence of the method coming from the net package. Because Temporary is the only behavior we care about. If the concrete type has the method named temporary then this is what we want. We get to stay decoupled and continue to work at the interface level.</p>
+<div class="sourceCode" id="cb147"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb147-1"><a href="#cb147-1" aria-hidden="true"></a>type​ temporary ​interface​ {</span>
+<span id="cb147-2"><a href="#cb147-2" aria-hidden="true"></a>    Temporary() ​bool</span>
+<span id="cb147-3"><a href="#cb147-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>BehaviorAsContext shows how to check for the behavior of an interface that can be returned from the net package.</p>
+<div class="sourceCode" id="cb148"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb148-1"><a href="#cb148-1" aria-hidden="true"></a>func​ (c *client) ​BehaviorAsContext​() {</span>
+<span id="cb148-2"><a href="#cb148-2" aria-hidden="true"></a>    for​ {</span>
+<span id="cb148-3"><a href="#cb148-3" aria-hidden="true"></a>        line, err := c.reader.ReadString(​<span class="ch">&#39;\n&#39;</span>​)</span>
+<span id="cb148-4"><a href="#cb148-4" aria-hidden="true"></a>        if​ err != ​nil​ {</span>
+<span id="cb148-5"><a href="#cb148-5" aria-hidden="true"></a>            switch​ e := err.(​type​) {</span></code></pre></div>
+<p>We can reduce 3 cases into 1 by asking in the case here during type assertion: Does the concrete type stored inside the error interface also implement this interface. We can declare and leverage that interface ourselves.</p>
+<div class="sourceCode" id="cb149"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb149-1"><a href="#cb149-1" aria-hidden="true"></a>            case​ temporary:</span>
+<span id="cb149-2"><a href="#cb149-2" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
+<span id="cb149-3"><a href="#cb149-3" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;Temporary: Client leaving return chat&quot;</span>)</span>
+<span id="cb149-4"><a href="#cb149-4" aria-hidden="true"></a>                    <span class="kw">return</span></span>
+<span id="cb149-5"><a href="#cb149-5" aria-hidden="true"></a>                }</span>
+<span id="cb149-6"><a href="#cb149-6" aria-hidden="true"></a>            default​:</span>
+<span id="cb149-7"><a href="#cb149-7" aria-hidden="true"></a>                if​ err == io.EOF {</span>
+<span id="cb149-8"><a href="#cb149-8" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;EOF: Client leaving chat&quot;</span>​)</span>
+<span id="cb149-9"><a href="#cb149-9" aria-hidden="true"></a>                    <span class="kw">return</span></span>
+<span id="cb149-10"><a href="#cb149-10" aria-hidden="true"></a>                }</span>
+<span id="cb149-11"><a href="#cb149-11" aria-hidden="true"></a>                log.Println(​<span class="st">&quot;read-routine&quot;</span>​, err)</span>
+<span id="cb149-12"><a href="#cb149-12" aria-hidden="true"></a>            }</span>
+<span id="cb149-13"><a href="#cb149-13" aria-hidden="true"></a>        }</span>
+<span id="cb149-14"><a href="#cb149-14" aria-hidden="true"></a>        fmt.Println(line)</span>
+<span id="cb149-15"><a href="#cb149-15" aria-hidden="true"></a>    }</span>
+<span id="cb149-16"><a href="#cb149-16" aria-hidden="true"></a>}</span></code></pre></div>
+<p><strong>Lesson:</strong></p>
+<p>Thank to Go Implicit Conversion. We can maintain a level of decoupling by creating an interface with methods or behaviors that we only want, and use it instead of concrete type for type assertion switch.</p>
+<h4 id="finding-the-bug">Finding the bug</h4>
+<div class="sourceCode" id="cb150"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb150-1"><a href="#cb150-1" aria-hidden="true"></a>package​ main</span>
+<span id="cb150-2"><a href="#cb150-2" aria-hidden="true"></a>import​ ​<span class="st">&quot;log&quot;</span></span></code></pre></div>
+<p>customError is just an empty struct.</p>
+<div class="sourceCode" id="cb151"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb151-1"><a href="#cb151-1" aria-hidden="true"></a>type​ customError ​struct​{}</span></code></pre></div>
+<p>Error implements the error interface.</p>
+<div class="sourceCode" id="cb152"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb152-1"><a href="#cb152-1" aria-hidden="true"></a>func​ (c *customError) ​Error​() ​string​ {</span>
+<span id="cb152-2"><a href="#cb152-2" aria-hidden="true"></a>    return​ ​<span class="st">&quot;Find the bug.&quot;</span></span>
+<span id="cb152-3"><a href="#cb152-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>fail returns nil values for both return types.</p>
+<div class="sourceCode" id="cb153"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb153-1"><a href="#cb153-1" aria-hidden="true"></a>func​ ​fail​() ([]​byte​, *customError) {</span>
+<span id="cb153-2"><a href="#cb153-2" aria-hidden="true"></a>    return​ ​nil​, ​nil</span>
+<span id="cb153-3"><a href="#cb153-3" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb154"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb154-1"><a href="#cb154-1" aria-hidden="true"></a>func​ ​main​() {</span>
+<span id="cb154-2"><a href="#cb154-2" aria-hidden="true"></a>    var​ err <span class="dt">error</span></span></code></pre></div>
+<p>When we call fail, it returns the value of nil. However, we have the nil value of type *customError. We always want to use the error interface as the return value. The customError type is just an artifact, a value that we store inside. We cannot use the custom type directly. We must use the error interface, like so func fail() ([]byte, error)</p>
+<div class="sourceCode" id="cb155"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb155-1"><a href="#cb155-1" aria-hidden="true"></a>    if​ _, err = fail(); err != ​nil​ {</span>
+<span id="cb155-2"><a href="#cb155-2" aria-hidden="true"></a>        log.Fatal(​<span class="st">&quot;Why did this fail?&quot;</span>​)</span>
+<span id="cb155-3"><a href="#cb155-3" aria-hidden="true"></a>    }</span>
+<span id="cb155-4"><a href="#cb155-4" aria-hidden="true"></a>    log.Println(​<span class="st">&quot;No Error&quot;</span>​)</span>
+<span id="cb155-5"><a href="#cb155-5" aria-hidden="true"></a>}</span></code></pre></div>
+<h4 id="wrapping-errors">Wrapping Errors</h4>
+<p>Error handling has to be part of our code and usually it is bound to logging. The main goal of logging is to debug. We only log things that are actionable. Only log the contexts that are allowed us to identify what is going on. Anything else ideally is noise and would be better suited up on the dashboard through metrics. For example, socket connection and disconnection, we can log these but these are not actionable because we don’t necessarily lookup the log for that.</p>
+<p>There is a package that is written by Dave Cheney called errors that let us simplify error handling and logging at the same time. Below is a demonstration on how to leverage the package to simplify our code. By reducing logging, we also reduce a large amount of pressure on the heap (garbage collection).</p>
+<div class="sourceCode" id="cb156"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb156-1"><a href="#cb156-1" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb156-2"><a href="#cb156-2" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb156-3"><a href="#cb156-3" aria-hidden="true"></a></span>
+<span id="cb156-4"><a href="#cb156-4" aria-hidden="true"></a>    <span class="st">&quot;github.com/pkg/errors&quot;</span></span>
+<span id="cb156-5"><a href="#cb156-5" aria-hidden="true"></a>)</span></code></pre></div>
+<p>AppError represents a custom error type.</p>
+<div class="sourceCode" id="cb157"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb157-1"><a href="#cb157-1" aria-hidden="true"></a>type​ AppError ​struct​ {</span>
+<span id="cb157-2"><a href="#cb157-2" aria-hidden="true"></a>    State ​int</span>
+<span id="cb157-3"><a href="#cb157-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>AppError implements the error interface.</p>
+<div class="sourceCode" id="cb158"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb158-1"><a href="#cb158-1" aria-hidden="true"></a>func​ (c *AppError) ​Error​() ​string​ {</span>
+<span id="cb158-2"><a href="#cb158-2" aria-hidden="true"></a>    return​ fmt.Sprintf(​<span class="st">&quot;App Error, State: %d&quot;</span>​, c.State)</span>
+<span id="cb158-3"><a href="#cb158-3" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb159"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb159-1"><a href="#cb159-1" aria-hidden="true"></a>func​ ​main​() {</span></code></pre></div>
+<p>Make the function call and validate the error. firstCall calls secondCall calls thirdCall then results in AppError. Start down the call stack, in thirdCall, where the error occurs. This is the root of the error. We return it up the call stack in our traditional error interface value.</p>
+<p>Back to secondCall, we get the interface value and there is a concrete type stored inside the value. secondCall has to make a decision whether to handle the error and push up the call stack if it cannot handle. If secondCall decides to handle the error, it has the responsibility of logging it. If not, its responsibility is to move it up. However, if we are going to push it up the call stack, we cannot lose context. This is where the error package comes in. We create a new interface value that wraps this error, add a context around it and push it up. This maintains the call stack of where we are in the code.</p>
+<p>Similarly, firstCall doesn’t handle the error but wraps and pushes it up. In main, we are handling the call, which means the error stops here and we have to log it.</p>
+<p>In order to properly handle this error, we need to know that the root cause of this error was. It is the original error that is not wrapped. Cause method will bubble up this error out of these wrapping and allow us to be able to use all the language mechanics we have.</p>
+<p>We are not only able to access the State even though we’ve done this assertion back to concrete, we can log out the entire stack trace by using %+v for this call.</p>
+<p>Use type as context to determine cause. We got our custom error type.</p>
+<div class="sourceCode" id="cb160"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb160-1"><a href="#cb160-1" aria-hidden="true"></a>    if​ err := firstCall(​10​); err != ​nil​ {</span>
+<span id="cb160-2"><a href="#cb160-2" aria-hidden="true"></a>        switch​ v := errors.Cause(err).(​type​) {</span>
+<span id="cb160-3"><a href="#cb160-3" aria-hidden="true"></a>        case​ *AppError:</span>
+<span id="cb160-4"><a href="#cb160-4" aria-hidden="true"></a>            fmt.Println(​<span class="st">&quot;Custom App Error:&quot;</span>​, v.State)</span></code></pre></div>
+<p>Display the stack trace for the error.</p>
+<div class="sourceCode" id="cb161"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb161-1"><a href="#cb161-1" aria-hidden="true"></a>            fmt.Println(​<span class="st">&quot;</span><span class="ch">\n</span><span class="st">Stack Trace</span><span class="ch">\n</span><span class="st">********************************&quot;</span>​)</span>
+<span id="cb161-2"><a href="#cb161-2" aria-hidden="true"></a>            fmt.Printf(​<span class="st">&quot;%+v</span><span class="ch">\n</span><span class="st">&quot;</span>​, err)</span>
+<span id="cb161-3"><a href="#cb161-3" aria-hidden="true"></a>            fmt.Println(​<span class="st">&quot;</span><span class="ch">\n</span><span class="st">No Trace</span><span class="ch">\n</span><span class="st">********************************&quot;</span>​)</span>
+<span id="cb161-4"><a href="#cb161-4" aria-hidden="true"></a>            fmt.Printf(​<span class="st">&quot;%v</span><span class="ch">\n</span><span class="st">&quot;</span>​, err)</span>
+<span id="cb161-5"><a href="#cb161-5" aria-hidden="true"></a>        }</span>
+<span id="cb161-6"><a href="#cb161-6" aria-hidden="true"></a>    }</span>
+<span id="cb161-7"><a href="#cb161-7" aria-hidden="true"></a>}</span></code></pre></div>
+<p>firstCall makes a call to a secondCall function and wraps any error.</p>
+<div class="sourceCode" id="cb162"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb162-1"><a href="#cb162-1" aria-hidden="true"></a>func​ ​firstCall​(i ​int​) ​error​ {</span>
+<span id="cb162-2"><a href="#cb162-2" aria-hidden="true"></a>    if​ err := secondCall(i); err != ​nil​ {</span>
+<span id="cb162-3"><a href="#cb162-3" aria-hidden="true"></a>        return​ errors.Wrapf(err, ​<span class="st">&quot;firstCall-&gt;secondCall(%d)&quot;</span>​, i)</span>
+<span id="cb162-4"><a href="#cb162-4" aria-hidden="true"></a>    }</span>
+<span id="cb162-5"><a href="#cb162-5" aria-hidden="true"></a>    return​ ​nil</span>
+<span id="cb162-6"><a href="#cb162-6" aria-hidden="true"></a>}</span></code></pre></div>
+<p>secondCall makes a call to a thirdCall function and wraps any error.</p>
+<div class="sourceCode" id="cb163"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb163-1"><a href="#cb163-1" aria-hidden="true"></a>func​ ​secondCall​(i ​int​) ​error​ {</span>
+<span id="cb163-2"><a href="#cb163-2" aria-hidden="true"></a>    if​ err := thirdCall(); err != ​nil​ {</span>
+<span id="cb163-3"><a href="#cb163-3" aria-hidden="true"></a>        return​ errors.Wrap(err, ​<span class="st">&quot;secondCall-&gt;thirdCall()&quot;</span>​)</span>
+<span id="cb163-4"><a href="#cb163-4" aria-hidden="true"></a>    }</span>
+<span id="cb163-5"><a href="#cb163-5" aria-hidden="true"></a>    return​ ​nil</span>
+<span id="cb163-6"><a href="#cb163-6" aria-hidden="true"></a>}</span></code></pre></div>
+<p>thirdCall function creates an error value we will validate.</p>
+<div class="sourceCode" id="cb164"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb164-1"><a href="#cb164-1" aria-hidden="true"></a>func​ ​thirdCall​() ​error​ {</span>
+<span id="cb164-2"><a href="#cb164-2" aria-hidden="true"></a>    return​ &amp;AppError{​99​}</span>
+<span id="cb164-3"><a href="#cb164-3" aria-hidden="true"></a>}</span></code></pre></div>
+<pre><code>Custom App Error: 99
+Stack Trace
+********************************
+App Error, State: 99
+secondCall-&gt;thirdCall()
+main.secondCall
+    /tmp/sandbox880380539/prog.go:74
+main.firstCall
+    /tmp/sandbox880380539/prog.go:65
+main.main
+    /tmp/sandbox880380539/prog.go:43
+runtime.main
+    /usr/local/go-faketime/src/runtime/proc.go:203
+runtime.goexit
+    /usr/local/go-faketime/src/runtime/asm_amd64.s:1373
+firstCall-&gt;secondCall(10)
+main.firstCall
+    /tmp/sandbox880380539/prog.go:66
+main.main
+    /tmp/sandbox880380539/prog.go:43
+runtime.main
+    /usr/local/go-faketime/src/runtime/proc.go:203
+runtime.goexit
+    /usr/local/go-faketime/src/runtime/asm_amd64.s:1373
+
+No Trace
+********************************
+firstCall-&gt;secondCall(10): secondCall-&gt;thirdCall(): App Error, State: 99</code></pre>
 <h2 id="concurrency-114">Concurrency 114</h2>
 <h3 id="mechanics-114">Mechanics 114</h3>
 <h4 id="goroutine-114">Goroutine 114</h4>
