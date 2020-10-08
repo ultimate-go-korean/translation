@@ -63,3 +63,4 @@
 
 - Original Repo: https://github.com/hoanhan101/ultimate-go
 - Download the book: https://gumroad.com/l/bpUYF
+   - 번역 시점의 버전: Hoanh An, The Ultimate Go Study Guide.pdf(970,882 bytes)
