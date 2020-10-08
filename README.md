@@ -1,7 +1,6 @@
 # "The Ultimate Go Study Guide" 한글 번역 프로젝트
 
-
-[toc]:./Table%20of%20Contents/table-of-contents-eng.md
+[toc]: ./Table%20of%20Contents/table-of-contents-eng.md
 
 ![CI](https://github.com/ultimate-go-korean/translation/workflows/CI/badge.svg)
 
