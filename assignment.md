@@ -3,7 +3,7 @@
 | No  | Pages   | Contents                                                                                                                                               | Assignee (Full name/GitHub account) | Reviewers |
 | --- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------- | --------- |
 | 1   | 5-20    | **Introduction**<br>Language Mechanics<br>Syntax<br>- Variables<br>- Struct<br>- Pointer<br>- Escape analysis<br>- Function<br>- Constant              | Jeong Hyunseok/nicewook@hotmail.com |           |
-| 2   | 20-37   | Data Structures<br>- Array<br>- Slice<br>- Map                                                                                                         |                                     |           |
+| 2   | 20-37   | Data Structures<br>- Array<br>- Slice<br>- Map                                                                                                         | CHOI HEEJAE/gmlwo530@gmail.com      |           |
 | 3   | 37-55   | Decoupling<br>- Method<br>- Interface<br>                                                                                                              | Jeong Yeonghun/aeuveritas@gmail.com |           |
 | 4   | 55-70   | Decoupling<br>- Embedding<br>- Exporting<br>**Software Design**<br>Composition<br>- Grouping types                                                     |                                     |           |
 | 5   | 70-89   | Composition<br>- Decoupling                                                                                                                            |                                     |           |
