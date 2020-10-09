@@ -2,12 +2,12 @@
 
 Assigned to
 
-- Jeong Hyunseok/assignee@gmail.com
+- 김준희/@juunini
 
 Mandatory reviewer
 
-- John Doe/john.doe@gmail.com
-- Jane Doe/jane.doe@gmail.com
+- 조동헌/@davinnovation
+- Mark Hahn/@TangoEnSkai
 
 ---
 
