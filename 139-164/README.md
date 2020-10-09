@@ -2,12 +2,13 @@
 
 Assigned to
 
-- Jeong Hyunseok/assignee@gmail.com
+- 조용래/@dreamgonfly
 
 Mandatory reviewer
 
-- John Doe/john.doe@gmail.com
-- Jane Doe/jane.doe@gmail.com
+- 배지원/@baewang
+- 정영훈/@aeuveritas
+- 신정훈/@shin2jhoon
 
 ---
 

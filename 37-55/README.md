@@ -2,12 +2,12 @@
 
 Assigned to
 
-- Jeong Yeonghun/aeuveritas@gmail.com
+- 정영훈/@aeuveritas
 
 Mandatory reviewer
 
-- John Doe/john.doe@gmail.com
-- Jane Doe/jane.doe@gmail.com
+- 김지훈/@ghun2
+- 최희재/@gmlwo530
 
 ---
 
