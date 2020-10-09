@@ -15,6 +15,7 @@ html {
 body {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 1.5rem;
 
   background-color: white;
   font-family: "Nanum Gothic", sans-serif;
@@ -73,6 +74,8 @@ li {
 pre {
   background-color: #eee;
   padding: 1rem;
+
+  overflow-x: scroll;
 }
 
 img {
