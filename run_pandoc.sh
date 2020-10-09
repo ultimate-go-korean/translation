@@ -10,6 +10,7 @@ pandoc \
   --highlight-style pygments \
   --self-contained \
   --resource-path=diagrams \
+  --css style.css \
   -o build/index.html \
   title.txt \
   5-20/5-20.md \
