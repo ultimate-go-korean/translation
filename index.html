@@ -1394,46 +1394,46 @@ My name is Hoanh An and my email is hoanhan101@gmail.com</code></pre>
 <h5 id="interface-conversions">Interface Conversions</h5>
 <p>Mover provides support for moving things.</p>
 <div class="sourceCode" id="cb181"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb181-1"><a href="#cb181-1" aria-hidden="true"></a><span class="kw">type</span> Mover <span class="kw">interface</span> {</span>
-<span id="cb181-2"><a href="#cb181-2" aria-hidden="true"></a>  Move()</span>
+<span id="cb181-2"><a href="#cb181-2" aria-hidden="true"></a>    Move()</span>
 <span id="cb181-3"><a href="#cb181-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Locker provides support for locking and unlocking things.</p>
 <div class="sourceCode" id="cb182"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb182-1"><a href="#cb182-1" aria-hidden="true"></a><span class="kw">type</span> Locker <span class="kw">interface</span> {</span>
-<span id="cb182-2"><a href="#cb182-2" aria-hidden="true"></a>  Lock()</span>
-<span id="cb182-3"><a href="#cb182-3" aria-hidden="true"></a>  Unlock()</span>
+<span id="cb182-2"><a href="#cb182-2" aria-hidden="true"></a>    Lock()</span>
+<span id="cb182-3"><a href="#cb182-3" aria-hidden="true"></a>    Unlock()</span>
 <span id="cb182-4"><a href="#cb182-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>MoveLocker</code> provides support for moving and locking things.</p>
 <div class="sourceCode" id="cb183"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb183-1"><a href="#cb183-1" aria-hidden="true"></a><span class="kw">type</span> MoveLocker <span class="kw">interface</span> {</span>
-<span id="cb183-2"><a href="#cb183-2" aria-hidden="true"></a>  Mover</span>
-<span id="cb183-3"><a href="#cb183-3" aria-hidden="true"></a>  Locker</span>
+<span id="cb183-2"><a href="#cb183-2" aria-hidden="true"></a>    Mover</span>
+<span id="cb183-3"><a href="#cb183-3" aria-hidden="true"></a>    Locker</span>
 <span id="cb183-4"><a href="#cb183-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>bike</code> represents a concrete type for the example.</p>
 <div class="sourceCode" id="cb184"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb184-1"><a href="#cb184-1" aria-hidden="true"></a><span class="kw">type</span> bike <span class="kw">struct</span> {}</span></code></pre></div>
 <p><code>Move</code> can change the position of a bike.</p>
-<div class="sourceCode" id="cb185"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Move () {</span>
-<span id="cb185-2"><a href="#cb185-2" aria-hidden="true"></a>  fmt.Println( <span class="st">&quot;Moving the bike&quot;</span> )</span>
+<div class="sourceCode" id="cb185"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb185-1"><a href="#cb185-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Move() {</span>
+<span id="cb185-2"><a href="#cb185-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Moving the bike&quot;</span>)</span>
 <span id="cb185-3"><a href="#cb185-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>Lock</code> prevents a bike from moving.</p>
 <div class="sourceCode" id="cb186"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb186-1"><a href="#cb186-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Lock () {</span>
-<span id="cb186-2"><a href="#cb186-2" aria-hidden="true"></a>  fmt.Println( <span class="st">&quot;Locking the bike&quot;</span> )</span>
+<span id="cb186-2"><a href="#cb186-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Locking the bike&quot;</span>)</span>
 <span id="cb186-3"><a href="#cb186-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>Unlock</code> allows a bike to be moved.</p>
 <div class="sourceCode" id="cb187"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb187-1"><a href="#cb187-1" aria-hidden="true"></a><span class="kw">func</span> (bike) Unlock () {</span>
-<span id="cb187-2"><a href="#cb187-2" aria-hidden="true"></a>  fmt.Println( <span class="st">&quot;Unlocking the bike&quot;</span> )</span>
+<span id="cb187-2"><a href="#cb187-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Unlocking the bike&quot;</span>)</span>
 <span id="cb187-3"><a href="#cb187-3" aria-hidden="true"></a>}</span>
 <span id="cb187-4"><a href="#cb187-4" aria-hidden="true"></a></span>
 <span id="cb187-5"><a href="#cb187-5" aria-hidden="true"></a><span class="kw">func</span> main () {</span></code></pre></div>
 <p>Declare variables of the <code>MoveLocker</code> and <code>Mover</code> interfaces set to their zero value.</p>
-<div class="sourceCode" id="cb188"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true"></a>  <span class="kw">var</span> ml MoveLocker</span>
-<span id="cb188-2"><a href="#cb188-2" aria-hidden="true"></a>  <span class="kw">var</span> m Mover</span></code></pre></div>
+<div class="sourceCode" id="cb188"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb188-1"><a href="#cb188-1" aria-hidden="true"></a>    <span class="kw">var</span> ml MoveLocker</span>
+<span id="cb188-2"><a href="#cb188-2" aria-hidden="true"></a>    <span class="kw">var</span> m Mover</span></code></pre></div>
 <p>Create a value of type <code>bike</code> and assign the value to the <code>MoveLocker</code> interface value.</p>
-<div class="sourceCode" id="cb189"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true"></a>  ml = bike{}</span></code></pre></div>
+<div class="sourceCode" id="cb189"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb189-1"><a href="#cb189-1" aria-hidden="true"></a>    ml = bike{}</span></code></pre></div>
 <p>An interface value of type <code>MoveLocker</code> can be implicitly converted into a value of type <code>Mover</code>. They both declare a method named <code>move</code>.</p>
-<div class="sourceCode" id="cb190"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb190-1"><a href="#cb190-1" aria-hidden="true"></a>  m = ml</span></code></pre></div>
+<div class="sourceCode" id="cb190"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb190-1"><a href="#cb190-1" aria-hidden="true"></a>    m = ml</span></code></pre></div>
 <figure>
 <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMDAsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAFEApIDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9U6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAor5m/aw8SeNbPxz8FPDHhLxZceEl8Ua/cWGpXVnFFJIbdbWSRgvmqy7vlO04+9t+Vvu181eJPGPxh8M/C/4866nxc8QTf8Kk8QfYdC8yG2aXUB5kMjf2g3l/vl8uVVVV2dW3bvlVQD66/aQ+N3jj4G+H9Q8Q6F8NLfxp4X0vTZdS1G/k8Qx6fJb+XuZlWJoZGk+Vd24V6X8O/FZ8eeA/DXiVrT7C2tadbal9m8zzPJ86JZNm7au7buC7sV5v+1/dfbP2PvitcbdrTeE759v+9btXY/s9/wDJA/hr/wBi1pv/AKSx0AegUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUVyPjv4meFPhfZ2d34s8Q6d4dtbqVoIZtSuFgjkkEbSMu5v9lWb/AIDXny/tifBVtF03WP8AhZ/hxdP1C6ks7eVrtV3TLt3Ky/eXbvj3M2F+df7y0Ae30UUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB4L8dvh34i8ZfF/4G61pGnG703w14gur7VJvNjj+zwtZyRq21mUt8zKvy7q8a8dfs8/EPWfg1+1RoVnoDTat438SSX/h+3+226/boTHaru3NJtj/1cnyybW+Wvt+igD5l/aw/4WX4g+FOvfDzwd8K7zxaniDw3JYyavDrVhZx2dxIrR+W0c0is235W3L8vzV0/wCy/rPj+DwPo3hbxt8Mr3wKdB0eysY7651iyvkvZI41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UAFFFFABXBeMf+SofD3/AH9Q/wDSeu9rgvGP/JUPh7/v6h/6T0Ad7RRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHNah4A8OaxfzX1/otjeXkxXzJp4Fdm2rtX/x2oP+FX+EP+hY0n/wDjrrKKAOT/4Vf4Q/6FjSf/AOOj/hV/hD/oWNJ/8AAOOusooA5P8A4Vf4Q/6FjSf/AADjo/4Vf4Q/6FjSf/AOOusooA5P/hV/hD/oWNJ/8A46P+FX+EP+hY0n/wAA466yigDk/wDhV/hD/oWNJ/8AAOOj/hV/hD/oWNJ/8A466yigDk/+FX+EP+hY0n/wDjo/4Vf4Q/6FjSf/AADjrrKKAOTb4V+EG/5lrS//AAFWug03TbXSbGGzsoVtrWFdsccf3VFXKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDM1zRrfxBo93pt1v+z3UbRyeW21trVyEPwX0OCGONb3WNqrtX/iYyV6FRQBwf/Cm9E/5+9Y/8Gc3/wAVR/wpvRP+fvWP/BnN/wDFV3lFAHB/8Kb0T/n71j/wZzf/ABVH/Cm9E/5+9Y/8Gc3/AMVXeUUAcH/wpvRP+fvWP/BnN/8AFUf8Kb0T/n71j/wZzf8AxVd5RQBwf/Cm9E/5+9Y/8Gc3/wAVR/wpvRP+fvWP/BnN/wDFV3lFAHB/8Kb0T/n71j/wZzf/ABVH/Cm9E/5+9Y/8Gc3/AMVXeUUAcH/wpvRP+fvWP/BnN/8AFVJo/wALNF0bXrHVYpr+a8s/M8v7TdtMo3Ltb73s1dxRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAf/9k=" alt="Implicit conversion of MoveLocker to Mover" /><figcaption aria-hidden="true">Implicit conversion of <code>MoveLocker</code> to <code>Mover</code></figcaption>
 </figure>
 <p>However, we cannot go in the other direction, like so:</p>
-<div class="sourceCode" id="cb191"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true"></a>  ml = m</span></code></pre></div>
+<div class="sourceCode" id="cb191"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb191-1"><a href="#cb191-1" aria-hidden="true"></a>    ml = m</span></code></pre></div>
 <p>The compiler will say:</p>
 <pre><code>cannot use m (type Mover) as type MoveLocker in assignment:
 Mover does not implement MoveLocker (missing Lock method).</code></pre>
@@ -1451,44 +1451,44 @@ Mover does not implement MoveLocker (missing Lock method).</code></pre>
 <h5 id="runtime-type-assertion">Runtime Type Assertion</h5>
 <div class="sourceCode" id="cb196"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb196-1"><a href="#cb196-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb196-2"><a href="#cb196-2" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb196-3"><a href="#cb196-3" aria-hidden="true"></a>  <span class="st">&quot;fmt&quot;</span></span>
-<span id="cb196-4"><a href="#cb196-4" aria-hidden="true"></a>  <span class="st">&quot;math/rand&quot;</span></span>
-<span id="cb196-5"><a href="#cb196-5" aria-hidden="true"></a>  <span class="st">&quot;time&quot;</span></span>
+<span id="cb196-3"><a href="#cb196-3" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb196-4"><a href="#cb196-4" aria-hidden="true"></a>    <span class="st">&quot;math/rand&quot;</span></span>
+<span id="cb196-5"><a href="#cb196-5" aria-hidden="true"></a>    <span class="st">&quot;time&quot;</span></span>
 <span id="cb196-6"><a href="#cb196-6" aria-hidden="true"></a>)</span></code></pre></div>
 <p><code>car</code> represents something you drive.</p>
 <div class="sourceCode" id="cb197"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb197-1"><a href="#cb197-1" aria-hidden="true"></a><span class="kw">type</span> car <span class="kw">struct</span>{}</span></code></pre></div>
 <p>String implements the <code>fmt.Stringer</code> interface.</p>
 <div class="sourceCode" id="cb198"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb198-1"><a href="#cb198-1" aria-hidden="true"></a><span class="kw">func</span> (car) String() <span class="dt">string</span> {</span>
-<span id="cb198-2"><a href="#cb198-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="st">&quot;Vroom!&quot;</span></span>
+<span id="cb198-2"><a href="#cb198-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="st">&quot;Vroom!&quot;</span></span>
 <span id="cb198-3"><a href="#cb198-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>cloud</code> represents somewhere you store information.</p>
 <div class="sourceCode" id="cb199"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb199-1"><a href="#cb199-1" aria-hidden="true"></a><span class="kw">type</span> cloud <span class="kw">struct</span>{}</span></code></pre></div>
 <p>String implements the <code>fmt.Stringer</code> interface.</p>
 <div class="sourceCode" id="cb200"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb200-1"><a href="#cb200-1" aria-hidden="true"></a><span class="kw">func</span> (cloud) String() <span class="dt">string</span> {</span>
-<span id="cb200-2"><a href="#cb200-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="st">&quot;Big Data!&quot;</span></span>
+<span id="cb200-2"><a href="#cb200-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="st">&quot;Big Data!&quot;</span></span>
 <span id="cb200-3"><a href="#cb200-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Seed the number random generator.</p>
 <div class="sourceCode" id="cb201"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb201-1"><a href="#cb201-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
-<span id="cb201-2"><a href="#cb201-2" aria-hidden="true"></a>  rand.Seed(time.Now().UnixNano())</span></code></pre></div>
+<span id="cb201-2"><a href="#cb201-2" aria-hidden="true"></a>    rand.Seed(time.Now().UnixNano())</span></code></pre></div>
 <p>Create a slice of the Stringer interface values.</p>
-<div class="sourceCode" id="cb202"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb202-1"><a href="#cb202-1" aria-hidden="true"></a>  mvs := []fmt.Stringer{</span>
-<span id="cb202-2"><a href="#cb202-2" aria-hidden="true"></a>    car{},</span>
-<span id="cb202-3"><a href="#cb202-3" aria-hidden="true"></a>    cloud{},</span>
-<span id="cb202-4"><a href="#cb202-4" aria-hidden="true"></a>  }</span></code></pre></div>
+<div class="sourceCode" id="cb202"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb202-1"><a href="#cb202-1" aria-hidden="true"></a>    mvs := []fmt.Stringer{</span>
+<span id="cb202-2"><a href="#cb202-2" aria-hidden="true"></a>        car{},</span>
+<span id="cb202-3"><a href="#cb202-3" aria-hidden="true"></a>        cloud{},</span>
+<span id="cb202-4"><a href="#cb202-4" aria-hidden="true"></a>    }</span></code></pre></div>
 <p>Let’s run this experiment ten times.</p>
-<div class="sourceCode" id="cb203"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb203-1"><a href="#cb203-1" aria-hidden="true"></a>  <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">10</span>; i++ {</span>
-<span id="cb203-2"><a href="#cb203-2" aria-hidden="true"></a>    rn := rand.Intn(<span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb203"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb203-1"><a href="#cb203-1" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">10</span>; i++ {</span>
+<span id="cb203-2"><a href="#cb203-2" aria-hidden="true"></a>        rn := rand.Intn(<span class="dv">2</span>)</span></code></pre></div>
 <p>Perform a type assertion that we have a concrete type of cloud in the interface value we randomly chose. This shows us that this checking is at runtime, not compile time.</p>
-<div class="sourceCode" id="cb204"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb204-1"><a href="#cb204-1" aria-hidden="true"></a>    <span class="kw">if</span> v, ok := mvs[rn].(cloud); ok {</span>
-<span id="cb204-2"><a href="#cb204-2" aria-hidden="true"></a>      fmt.Println(<span class="st">&quot;Got Lucky:&quot;</span>, v)</span>
-<span id="cb204-3"><a href="#cb204-3" aria-hidden="true"></a>      <span class="kw">continue</span></span>
-<span id="cb204-4"><a href="#cb204-4" aria-hidden="true"></a>    }</span></code></pre></div>
+<div class="sourceCode" id="cb204"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb204-1"><a href="#cb204-1" aria-hidden="true"></a>        <span class="kw">if</span> v, ok := mvs[rn].(cloud); ok {</span>
+<span id="cb204-2"><a href="#cb204-2" aria-hidden="true"></a>            fmt.Println(<span class="st">&quot;Got Lucky:&quot;</span>, v)</span>
+<span id="cb204-3"><a href="#cb204-3" aria-hidden="true"></a>            <span class="kw">continue</span></span>
+<span id="cb204-4"><a href="#cb204-4" aria-hidden="true"></a>        }</span></code></pre></div>
 <p>We have to guarantee that the variable in question (<code>x</code> in <code>x.(T)</code>) can always be asserted correctly as T type Or else, We wouldn’t want to use that <code>ok</code> variable because we want it to panic if there is an integrity issue. We must shut it down immediately if that happens if we cannot recover from a panic and guarantee that we are back at 100% integrity, the software has to be restarted.</p>
 <p>Shutting down means you have to call <code>log.Fatal</code>, <code>os.exit</code>, or <code>panic</code> for stack trace. When we use type assertion, we need to understand when it is okay that whatever we are asking for is not there.</p>
 <p>If the type assertion is causing us to call the concrete value out, that should raise a big flag. We are using interface to maintain a level of decoupling and now we are using type assertion to go back to the concrete.</p>
 <p>When we are in the concrete, we are putting our codes in the situation where cascading changes can cause widespread refactoring. What we want with interface is the opposite, internal changes minimize cascading changes.</p>
-<div class="sourceCode" id="cb205"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Got Unlucky&quot;</span>)</span>
-<span id="cb205-2"><a href="#cb205-2" aria-hidden="true"></a>  }</span>
+<div class="sourceCode" id="cb205"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb205-1"><a href="#cb205-1" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;Got Unlucky&quot;</span>)</span>
+<span id="cb205-2"><a href="#cb205-2" aria-hidden="true"></a>    }</span>
 <span id="cb205-3"><a href="#cb205-3" aria-hidden="true"></a>}</span></code></pre></div>
 <pre><code>Got Unlucky
 Got Unlucky
@@ -1510,39 +1510,39 @@ Got Unlucky</code></pre>
 <p>Below is an example that creates interface pollution by improperly using an interface when one is not needed.</p>
 <p>Server defines a contract for TCP servers. This is a little bit of a smell because this is some sort of APIs that is going to be exposed to users and already that is a lot of behaviors brought in a generic interface.</p>
 <div class="sourceCode" id="cb207"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb207-1"><a href="#cb207-1" aria-hidden="true"></a>type Server interface {</span>
-<span id="cb207-2"><a href="#cb207-2" aria-hidden="true"></a>  Start() <span class="dt">error</span></span>
-<span id="cb207-3"><a href="#cb207-3" aria-hidden="true"></a>  Stop() <span class="dt">error</span></span>
-<span id="cb207-4"><a href="#cb207-4" aria-hidden="true"></a>  Wait() <span class="dt">error</span></span>
+<span id="cb207-2"><a href="#cb207-2" aria-hidden="true"></a>    Start() <span class="dt">error</span></span>
+<span id="cb207-3"><a href="#cb207-3" aria-hidden="true"></a>    Stop() <span class="dt">error</span></span>
+<span id="cb207-4"><a href="#cb207-4" aria-hidden="true"></a>    Wait() <span class="dt">error</span></span>
 <span id="cb207-5"><a href="#cb207-5" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>server</code> is our Server implementation. They match the name. However, that is not necessarily bad.</p>
 <div class="sourceCode" id="cb208"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb208-1"><a href="#cb208-1" aria-hidden="true"></a>type server struct {</span>
-<span id="cb208-2"><a href="#cb208-2" aria-hidden="true"></a>  host <span class="dt">string</span></span>
+<span id="cb208-2"><a href="#cb208-2" aria-hidden="true"></a>    host <span class="dt">string</span></span>
 <span id="cb208-3"><a href="#cb208-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>NewServer</code> returns an interface value of type Server with a server implementation. Here is the factory function. It immediately starts to smell even worse. It is returning the interface value.</p>
 <p>It is not that functions and interfaces cannot return interface values. They can. But normally, that should raise a flag. The concrete type is the data that has the behavior and the interface normally should be used as accepting the input to the data, not necessarily going out.</p>
 <p>SMELL - Storing an unexported type pointer in the interface.</p>
 <div class="sourceCode" id="cb209"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb209-1"><a href="#cb209-1" aria-hidden="true"></a><span class="kw">func</span> NewServer(host <span class="dt">string</span>) Server {</span>
-<span id="cb209-2"><a href="#cb209-2" aria-hidden="true"></a>  <span class="kw">return</span> &amp;server{host}</span>
+<span id="cb209-2"><a href="#cb209-2" aria-hidden="true"></a>    <span class="kw">return</span> &amp;server{host}</span>
 <span id="cb209-3"><a href="#cb209-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Start allows the server to begin to accept requests. From now, let’s pretend there is a specific implementation for each of these methods.</p>
 <div class="sourceCode" id="cb210"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb210-1"><a href="#cb210-1" aria-hidden="true"></a><span class="kw">func</span> (s *server) Start() error {</span>
-<span id="cb210-2"><a href="#cb210-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb210-2"><a href="#cb210-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb210-3"><a href="#cb210-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Stop shuts the server down.</p>
 <div class="sourceCode" id="cb211"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb211-1"><a href="#cb211-1" aria-hidden="true"></a><span class="kw">func</span> (s *server) Stop() <span class="dt">error</span> {</span>
-<span id="cb211-2"><a href="#cb211-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb211-2"><a href="#cb211-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb211-3"><a href="#cb211-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Wait prevents the server from accepting new connections.</p>
 <div class="sourceCode" id="cb212"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb212-1"><a href="#cb212-1" aria-hidden="true"></a><span class="kw">func</span> (s *server) Wait() error {</span>
-<span id="cb212-2"><a href="#cb212-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb212-2"><a href="#cb212-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb212-3"><a href="#cb212-3" aria-hidden="true"></a>}</span></code></pre></div>
 <div class="sourceCode" id="cb213"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb213-1"><a href="#cb213-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>Create a new <code>Server</code>.</p>
-<div class="sourceCode" id="cb214"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb214-1"><a href="#cb214-1" aria-hidden="true"></a>  srv := NewServer(<span class="st">&quot;localhost&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb214"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb214-1"><a href="#cb214-1" aria-hidden="true"></a>    srv := NewServer(<span class="st">&quot;localhost&quot;</span>)</span></code></pre></div>
 <p>Use the API.</p>
-<div class="sourceCode" id="cb215"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true"></a>  srv.Start()</span>
-<span id="cb215-2"><a href="#cb215-2" aria-hidden="true"></a>  srv.Stop()</span>
-<span id="cb215-3"><a href="#cb215-3" aria-hidden="true"></a>  srv.Wait()</span>
+<div class="sourceCode" id="cb215"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb215-1"><a href="#cb215-1" aria-hidden="true"></a>    srv.Start()</span>
+<span id="cb215-2"><a href="#cb215-2" aria-hidden="true"></a>    srv.Stop()</span>
+<span id="cb215-3"><a href="#cb215-3" aria-hidden="true"></a>    srv.Wait()</span>
 <span id="cb215-4"><a href="#cb215-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p>This code here couldn’t care less nor would it change if <code>srv</code> was the concrete type, not the interface. The interface is not providing any level of support whatsoever. There is no decoupling here that is happening. It is not giving us anything special here. All is doing is causing us another level of indirection.</p>
 <p>It smells because:</p>
@@ -1557,31 +1557,31 @@ Got Unlucky</code></pre>
 <p>We’re going to remove the improper interface usage from the previous program.</p>
 <p><code>Server</code> implementation.</p>
 <div class="sourceCode" id="cb216"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb216-1"><a href="#cb216-1" aria-hidden="true"></a>type Server <span class="kw">struct</span> {</span>
-<span id="cb216-2"><a href="#cb216-2" aria-hidden="true"></a>  host <span class="dt">string</span></span>
+<span id="cb216-2"><a href="#cb216-2" aria-hidden="true"></a>    host <span class="dt">string</span></span>
 <span id="cb216-3"><a href="#cb216-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>NewServer</code> returns just a concrete pointer of type <code>Server</code></p>
 <div class="sourceCode" id="cb217"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb217-1"><a href="#cb217-1" aria-hidden="true"></a><span class="kw">func</span> NewServer(host <span class="dt">string</span>) *Server {</span>
-<span id="cb217-2"><a href="#cb217-2" aria-hidden="true"></a>  return &amp;Server{host}</span>
+<span id="cb217-2"><a href="#cb217-2" aria-hidden="true"></a>    return &amp;Server{host}</span>
 <span id="cb217-3"><a href="#cb217-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>Start</code> allows the server to begin to accept requests.</p>
 <div class="sourceCode" id="cb218"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb218-1"><a href="#cb218-1" aria-hidden="true"></a><span class="kw">func</span> (s *Server) Start() <span class="dt">error</span> {         </span>
-<span id="cb218-2"><a href="#cb218-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb218-2"><a href="#cb218-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb218-3"><a href="#cb218-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>Stop</code> shuts the server down.</p>
 <div class="sourceCode" id="cb219"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb219-1"><a href="#cb219-1" aria-hidden="true"></a>func (s *Server) Stop() <span class="dt">error</span> {</span>
-<span id="cb219-2"><a href="#cb219-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb219-2"><a href="#cb219-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb219-3"><a href="#cb219-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>Wait</code> prevents the server from accepting new connections.</p>
 <div class="sourceCode" id="cb220"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb220-1"><a href="#cb220-1" aria-hidden="true"></a><span class="kw">func</span> (s *Server) Wait() <span class="dt">error</span> {</span>
-<span id="cb220-2"><a href="#cb220-2" aria-hidden="true"></a>  <span class="kw">return</span> <span class="ot">nil</span></span>
+<span id="cb220-2"><a href="#cb220-2" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb220-3"><a href="#cb220-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Create a new <code>Server</code>.</p>
 <div class="sourceCode" id="cb221"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb221-1"><a href="#cb221-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
-<span id="cb221-2"><a href="#cb221-2" aria-hidden="true"></a>  srv := NewServer(<span class="st">&quot;localhost&quot;</span>)</span></code></pre></div>
+<span id="cb221-2"><a href="#cb221-2" aria-hidden="true"></a>    srv := NewServer(<span class="st">&quot;localhost&quot;</span>)</span></code></pre></div>
 <p>Use the APIs.</p>
-<div class="sourceCode" id="cb222"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb222-1"><a href="#cb222-1" aria-hidden="true"></a>  srv.Start()</span>
-<span id="cb222-2"><a href="#cb222-2" aria-hidden="true"></a>  srv.Stop()</span>
-<span id="cb222-3"><a href="#cb222-3" aria-hidden="true"></a>  srv.Wait()</span>
+<div class="sourceCode" id="cb222"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb222-1"><a href="#cb222-1" aria-hidden="true"></a>    srv.Start()</span>
+<span id="cb222-2"><a href="#cb222-2" aria-hidden="true"></a>    srv.Stop()</span>
+<span id="cb222-3"><a href="#cb222-3" aria-hidden="true"></a>    srv.Wait()</span>
 <span id="cb222-4"><a href="#cb222-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p><strong>Guidelines around interface pollution:</strong></p>
 <p>Use an interface:</p>
@@ -1608,67 +1608,67 @@ Got Unlucky</code></pre>
 <div class="sourceCode" id="cb223"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb223-1"><a href="#cb223-1" aria-hidden="true"></a><span class="kw">package</span>  main</span>
 <span id="cb223-2"><a href="#cb223-2" aria-hidden="true"></a></span>
 <span id="cb223-3"><a href="#cb223-3" aria-hidden="true"></a><span class="kw">import</span>  (</span>
-<span id="cb223-4"><a href="#cb223-4" aria-hidden="true"></a>  <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb223-4"><a href="#cb223-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
 <span id="cb223-5"><a href="#cb223-5" aria-hidden="true"></a>)</span></code></pre></div>
 <p><code>PubSub</code> provides access to a queue system.</p>
 <div class="sourceCode" id="cb224"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb224-1"><a href="#cb224-1" aria-hidden="true"></a><span class="kw">type</span> PubSub struct {</span>
-<span id="cb224-2"><a href="#cb224-2" aria-hidden="true"></a>  host <span class="dt">string</span></span>
+<span id="cb224-2"><a href="#cb224-2" aria-hidden="true"></a>    host <span class="dt">string</span></span>
 <span id="cb224-3"><a href="#cb224-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>New creates a pubsub value for use.</p>
 <div class="sourceCode" id="cb225"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb225-1"><a href="#cb225-1" aria-hidden="true"></a><span class="kw">func</span> New(host <span class="dt">string</span>) *PubSub {</span>
-<span id="cb225-2"><a href="#cb225-2" aria-hidden="true"></a>  ps := PubSub{</span>
-<span id="cb225-3"><a href="#cb225-3" aria-hidden="true"></a>    host: host,</span>
-<span id="cb225-4"><a href="#cb225-4" aria-hidden="true"></a>  }</span>
+<span id="cb225-2"><a href="#cb225-2" aria-hidden="true"></a>    ps := PubSub{</span>
+<span id="cb225-3"><a href="#cb225-3" aria-hidden="true"></a>        host: host,</span>
+<span id="cb225-4"><a href="#cb225-4" aria-hidden="true"></a>    }</span>
 <span id="cb225-5"><a href="#cb225-5" aria-hidden="true"></a></span>
-<span id="cb225-6"><a href="#cb225-6" aria-hidden="true"></a>  <span class="kw">return</span>  &amp;ps</span>
+<span id="cb225-6"><a href="#cb225-6" aria-hidden="true"></a>    <span class="kw">return</span>  &amp;ps</span>
 <span id="cb225-7"><a href="#cb225-7" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Publish sends the data to the specified key.</p>
 <div class="sourceCode" id="cb226"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb226-1"><a href="#cb226-1" aria-hidden="true"></a><span class="kw">func</span> (ps *PubSub) Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span> {</span>
-<span id="cb226-2"><a href="#cb226-2" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Actual PubSub: Publish&quot;</span>)</span>
-<span id="cb226-3"><a href="#cb226-3" aria-hidden="true"></a>  return   <span class="ot">nil</span></span>
+<span id="cb226-2"><a href="#cb226-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Actual PubSub: Publish&quot;</span>)</span>
+<span id="cb226-3"><a href="#cb226-3" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb226-4"><a href="#cb226-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Subscribe sets up a request to receive messages from the specified key.</p>
 <div class="sourceCode" id="cb227"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb227-1"><a href="#cb227-1" aria-hidden="true"></a><span class="kw">func</span> (ps *PubSub) Subscribe(key <span class="dt">string</span>) <span class="dt">error</span> {</span>
-<span id="cb227-2"><a href="#cb227-2" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Actual PubSub: Subscribe&quot;</span>)</span>
-<span id="cb227-3"><a href="#cb227-3" aria-hidden="true"></a>  return <span class="ot">nil</span></span>
+<span id="cb227-2"><a href="#cb227-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Actual PubSub: Subscribe&quot;</span>)</span>
+<span id="cb227-3"><a href="#cb227-3" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb227-4"><a href="#cb227-4" aria-hidden="true"></a>}</span></code></pre></div>
 <h5 id="client">Client</h5>
 <p>Sample program to show how we can personally mock concrete types when we need to for our own packages or tests.</p>
 <div class="sourceCode" id="cb228"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb228-1"><a href="#cb228-1" aria-hidden="true"></a><span class="kw">package</span>  main</span>
 <span id="cb228-2"><a href="#cb228-2" aria-hidden="true"></a></span>
 <span id="cb228-3"><a href="#cb228-3" aria-hidden="true"></a><span class="kw">import</span>  (</span>
-<span id="cb228-4"><a href="#cb228-4" aria-hidden="true"></a>  <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb228-4"><a href="#cb228-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
 <span id="cb228-5"><a href="#cb228-5" aria-hidden="true"></a>)</span></code></pre></div>
 <p><code>publisher</code> is an interface to allow this package to mock the pubsub package. When we are writing our applications, declare our own interface that maps out all the APIs calls we need for the APIs. The concrete types APIs in the previous files satisfy it out of the box. We can write the entire application with mocking decoupling from concrete implementations.</p>
 <div class="sourceCode" id="cb229"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb229-1"><a href="#cb229-1" aria-hidden="true"></a><span class="kw">type</span> publisher <span class="kw">interface</span> {</span>
-<span id="cb229-2"><a href="#cb229-2" aria-hidden="true"></a>  Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span></span>
-<span id="cb229-3"><a href="#cb229-3" aria-hidden="true"></a>  Subscribe(key <span class="dt">string</span>) <span class="dt">error</span></span>
+<span id="cb229-2"><a href="#cb229-2" aria-hidden="true"></a>    Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span></span>
+<span id="cb229-3"><a href="#cb229-3" aria-hidden="true"></a>    Subscribe(key <span class="dt">string</span>) <span class="dt">error</span></span>
 <span id="cb229-4"><a href="#cb229-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>mock</code> is a concrete type to help support the mocking of the pubsub package.</p>
 <div class="sourceCode" id="cb230"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb230-1"><a href="#cb230-1" aria-hidden="true"></a><span class="kw">type</span> mock <span class="kw">struct</span>{}</span></code></pre></div>
 <p><code>Publish</code> implements the <code>publisher</code> interface for the mock.</p>
 <div class="sourceCode" id="cb231"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb231-1"><a href="#cb231-1" aria-hidden="true"></a><span class="kw">func</span> (m *mock) Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span> {</span>
-<span id="cb231-2"><a href="#cb231-2" aria-hidden="true"></a>  <span class="co">// ADD YOUR MOCK FOR THE PUBLISH CALL.</span></span>
-<span id="cb231-3"><a href="#cb231-3" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Mock PubSub: Publish&quot;</span>)</span>
-<span id="cb231-4"><a href="#cb231-4" aria-hidden="true"></a>  return <span class="ot">nil</span></span>
+<span id="cb231-2"><a href="#cb231-2" aria-hidden="true"></a>    <span class="co">// ADD YOUR MOCK FOR THE PUBLISH CALL.</span></span>
+<span id="cb231-3"><a href="#cb231-3" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Mock PubSub: Publish&quot;</span>)</span>
+<span id="cb231-4"><a href="#cb231-4" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb231-5"><a href="#cb231-5" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>Subscribe</code> implements the <code>publisher</code> interface for the mock.</p>
 <div class="sourceCode" id="cb232"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb232-1"><a href="#cb232-1" aria-hidden="true"></a><span class="kw">func</span>  (m *mock) Subscribe(key <span class="dt">string</span>) <span class="dt">error</span> {</span>
-<span id="cb232-2"><a href="#cb232-2" aria-hidden="true"></a>  <span class="co">// ADD YOUR MOCK FOR THE SUBSCRIBE CALL.</span></span>
-<span id="cb232-3"><a href="#cb232-3" aria-hidden="true"></a>  fmt.Println(<span class="st">&quot;Mock PubSub: Subscribe&quot;</span>)</span>
-<span id="cb232-4"><a href="#cb232-4" aria-hidden="true"></a>  return <span class="ot">nil</span></span>
+<span id="cb232-2"><a href="#cb232-2" aria-hidden="true"></a>    <span class="co">// ADD YOUR MOCK FOR THE SUBSCRIBE CALL.</span></span>
+<span id="cb232-3"><a href="#cb232-3" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Mock PubSub: Subscribe&quot;</span>)</span>
+<span id="cb232-4"><a href="#cb232-4" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb232-5"><a href="#cb232-5" aria-hidden="true"></a>}</span></code></pre></div>
 <p>Create a slice of <code>publisher</code> interface values. Assign the address of a pubsub. <code>PubSub</code> value and the address of a mock value.</p>
 <div class="sourceCode" id="cb233"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb233-1"><a href="#cb233-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
-<span id="cb233-2"><a href="#cb233-2" aria-hidden="true"></a>  pubs := []publisher{</span>
-<span id="cb233-3"><a href="#cb233-3" aria-hidden="true"></a>    New(<span class="st">&quot;localhost&quot;</span>),</span>
-<span id="cb233-4"><a href="#cb233-4" aria-hidden="true"></a>    &amp;mock{},</span>
-<span id="cb233-5"><a href="#cb233-5" aria-hidden="true"></a>  }</span></code></pre></div>
+<span id="cb233-2"><a href="#cb233-2" aria-hidden="true"></a>    pubs := []publisher{</span>
+<span id="cb233-3"><a href="#cb233-3" aria-hidden="true"></a>        New(<span class="st">&quot;localhost&quot;</span>),</span>
+<span id="cb233-4"><a href="#cb233-4" aria-hidden="true"></a>        &amp;mock{},</span>
+<span id="cb233-5"><a href="#cb233-5" aria-hidden="true"></a>    }</span></code></pre></div>
 <p>Range over the interface value to see how the publisher interface provides the level of decoupling the user needs. The <code>pubsub</code> package did not need to provide the interface type.</p>
-<div class="sourceCode" id="cb234"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb234-1"><a href="#cb234-1" aria-hidden="true"></a>  <span class="kw">for</span> _, p := <span class="kw">range</span> pubs {</span>
-<span id="cb234-2"><a href="#cb234-2" aria-hidden="true"></a>    p.Publish(<span class="st">&quot;key&quot;</span>, <span class="st">&quot;value&quot;</span>)</span>
-<span id="cb234-3"><a href="#cb234-3" aria-hidden="true"></a>    p.Subscribe(<span class="st">&quot;key&quot;</span>)</span>
-<span id="cb234-4"><a href="#cb234-4" aria-hidden="true"></a>  }</span>
+<div class="sourceCode" id="cb234"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb234-1"><a href="#cb234-1" aria-hidden="true"></a>    <span class="kw">for</span> _, p := <span class="kw">range</span> pubs {</span>
+<span id="cb234-2"><a href="#cb234-2" aria-hidden="true"></a>        p.Publish(<span class="st">&quot;key&quot;</span>, <span class="st">&quot;value&quot;</span>)</span>
+<span id="cb234-3"><a href="#cb234-3" aria-hidden="true"></a>        p.Subscribe(<span class="st">&quot;key&quot;</span>)</span>
+<span id="cb234-4"><a href="#cb234-4" aria-hidden="true"></a>    }</span>
 <span id="cb234-5"><a href="#cb234-5" aria-hidden="true"></a>}</span></code></pre></div>
 <h3 id="error-handling">Error Handling</h3>
 <h4 id="default-error-values">Default error values</h4>
