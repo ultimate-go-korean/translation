@@ -2851,7 +2851,44 @@ User Not Found</code></pre>
 <span id="cb375-6"><a href="#cb375-6" aria-hidden="true"></a>    }</span>
 <span id="cb375-7"><a href="#cb375-7" aria-hidden="true"></a>}</span></code></pre></div>
 <pre class="terminal"><code>work complete</code></pre>
-<h5 id="withdeadline-168">WithDeadline 168</h5>
+<h5 id="withdeadline">WithDeadline</h5>
+<div class="sourceCode" id="cb377"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb377-1"><a href="#cb377-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb377-2"><a href="#cb377-2" aria-hidden="true"></a></span>
+<span id="cb377-3"><a href="#cb377-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb377-4"><a href="#cb377-4" aria-hidden="true"></a>    <span class="st">&quot;context&quot;</span></span>
+<span id="cb377-5"><a href="#cb377-5" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb377-6"><a href="#cb377-6" aria-hidden="true"></a>    <span class="st">&quot;time&quot;</span></span>
+<span id="cb377-7"><a href="#cb377-7" aria-hidden="true"></a>)</span>
+<span id="cb377-8"><a href="#cb377-8" aria-hidden="true"></a></span>
+<span id="cb377-9"><a href="#cb377-9" aria-hidden="true"></a><span class="kw">type</span> data <span class="kw">struct</span> {</span>
+<span id="cb377-10"><a href="#cb377-10" aria-hidden="true"></a>    UserID <span class="dt">string</span></span>
+<span id="cb377-11"><a href="#cb377-11" aria-hidden="true"></a>}</span>
+<span id="cb377-12"><a href="#cb377-12" aria-hidden="true"></a></span>
+<span id="cb377-13"><a href="#cb377-13" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<p>Set a deadline.</p>
+<div class="sourceCode" id="cb378"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb378-1"><a href="#cb378-1" aria-hidden="true"></a>    deadline := time.Now().Add(<span class="dv">150</span> * time.Millisecond)</span></code></pre></div>
+<p>Create a context that is both manually cancellable and will signal a cencel at the specified data/time. We use <code>Background</code> as our parents context and set out deadline time.</p>
+<div class="sourceCode" id="cb379"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb379-1"><a href="#cb379-1" aria-hidden="true"></a>    ctx, cancel := context.WithDeadline(context.Background(), deadline)</span>
+<span id="cb379-2"><a href="#cb379-2" aria-hidden="true"></a>    <span class="kw">defer</span> cancel()</span></code></pre></div>
+<p>Create a channel to received a signal that work is done.</p>
+<div class="sourceCode" id="cb380"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb380-1"><a href="#cb380-1" aria-hidden="true"></a>   ch := <span class="bu">make</span>(<span class="kw">chan</span> data, <span class="dv">1</span>)</span></code></pre></div>
+<p>Ask a Goroutine to do some work for us.</p>
+<div class="sourceCode" id="cb381"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb381-1"><a href="#cb381-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span></code></pre></div>
+<p>Simulate work.</p>
+<div class="sourceCode" id="cb382"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb382-1"><a href="#cb382-1" aria-hidden="true"></a>        time.Sleep(<span class="dv">200</span> * time.Millisecond)</span></code></pre></div>
+<p>Report the work is done.</p>
+<div class="sourceCode" id="cb383"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb383-1"><a href="#cb383-1" aria-hidden="true"></a>        ch &lt;- data{<span class="st">&quot;123&quot;</span>}</span>
+<span id="cb383-2"><a href="#cb383-2" aria-hidden="true"></a>    }()</span></code></pre></div>
+<p>Wait for the work to finish. If it takes too long move on.</p>
+<div class="sourceCode" id="cb384"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb384-1"><a href="#cb384-1" aria-hidden="true"></a>    <span class="kw">select</span> {</span>
+<span id="cb384-2"><a href="#cb384-2" aria-hidden="true"></a>    <span class="kw">case</span> d := &lt;-ch:</span>
+<span id="cb384-3"><a href="#cb384-3" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;work complete&quot;</span>, d)</span>
+<span id="cb384-4"><a href="#cb384-4" aria-hidden="true"></a>    <span class="kw">case</span> &lt;-ctx.Done():</span>
+<span id="cb384-5"><a href="#cb384-5" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;work cancelled&quot;</span>)</span>
+<span id="cb384-6"><a href="#cb384-6" aria-hidden="true"></a></span>
+<span id="cb384-7"><a href="#cb384-7" aria-hidden="true"></a>    }</span>
+<span id="cb384-8"><a href="#cb384-8" aria-hidden="true"></a>}</span></code></pre></div>
+<pre class="terminal"><code>work cancelled</code></pre>
 <h5 id="withtimeout-169">WithTimeout 169</h5>
 <h5 id="requestresponse-171">Request/Response 171</h5>
 <h2 id="testing-and-profiling-173">Testing and Profiling 173</h2>
@@ -2864,30 +2901,30 @@ User Not Found</code></pre>
 <h3 id="benchmarking">Benchmarking</h3>
 <h4 id="basic-benchmark">Basic Benchmark</h4>
 <p>Benchmark file’s have to have <code>&lt;file_name&gt;_test.go</code> and use the Benchmark functions like below. The goal is to know what performs better and what allocate more or less between Sprint and Sprintf. Our guess is that Sprint is gonna be better because it doesn’t have any overhead doing the formatting. However, this is not true. Remember we have to optimize for correctness so we don’t want to guess.</p>
-<div class="sourceCode" id="cb377"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb377-1"><a href="#cb377-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb377-2"><a href="#cb377-2" aria-hidden="true"></a></span>
-<span id="cb377-3"><a href="#cb377-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb377-4"><a href="#cb377-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
-<span id="cb377-5"><a href="#cb377-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
-<span id="cb377-6"><a href="#cb377-6" aria-hidden="true"></a>)</span>
-<span id="cb377-7"><a href="#cb377-7" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
+<div class="sourceCode" id="cb386"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb386-1"><a href="#cb386-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb386-2"><a href="#cb386-2" aria-hidden="true"></a></span>
+<span id="cb386-3"><a href="#cb386-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb386-4"><a href="#cb386-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb386-5"><a href="#cb386-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb386-6"><a href="#cb386-6" aria-hidden="true"></a>)</span>
+<span id="cb386-7"><a href="#cb386-7" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
 <p>BenchmarkSprint tests the performance of using Sprint. All the code we want to benchmark need to be inside the b.N for loop. The first time the tool call it, b.N is equal to 1. It will keep increasing the value of N and run long enough based on our bench time. fmt.Sprint returns a value and we want to capture this value so it doesn’t look like dead code. We assign it to the global variable gs.</p>
-<div class="sourceCode" id="cb378"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb378-1"><a href="#cb378-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintBasic(b *testing.B) {</span>
-<span id="cb378-2"><a href="#cb378-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb378-3"><a href="#cb378-3" aria-hidden="true"></a></span>
-<span id="cb378-4"><a href="#cb378-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
-<span id="cb378-5"><a href="#cb378-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb378-6"><a href="#cb378-6" aria-hidden="true"></a>    }</span>
-<span id="cb378-7"><a href="#cb378-7" aria-hidden="true"></a>    gs = s</span>
-<span id="cb378-8"><a href="#cb378-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb387"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb387-1"><a href="#cb387-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintBasic(b *testing.B) {</span>
+<span id="cb387-2"><a href="#cb387-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb387-3"><a href="#cb387-3" aria-hidden="true"></a></span>
+<span id="cb387-4"><a href="#cb387-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
+<span id="cb387-5"><a href="#cb387-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb387-6"><a href="#cb387-6" aria-hidden="true"></a>    }</span>
+<span id="cb387-7"><a href="#cb387-7" aria-hidden="true"></a>    gs = s</span>
+<span id="cb387-8"><a href="#cb387-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p>BenchmarkSprint tests the performance of using Sprintf.</p>
-<div class="sourceCode" id="cb379"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb379-1"><a href="#cb379-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintfBasic(b *testing.B) {</span>
-<span id="cb379-2"><a href="#cb379-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb379-3"><a href="#cb379-3" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
-<span id="cb379-4"><a href="#cb379-4" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb379-5"><a href="#cb379-5" aria-hidden="true"></a>    }</span>
-<span id="cb379-6"><a href="#cb379-6" aria-hidden="true"></a>    gs = s</span>
-<span id="cb379-7"><a href="#cb379-7" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb388"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb388-1"><a href="#cb388-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintfBasic(b *testing.B) {</span>
+<span id="cb388-2"><a href="#cb388-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb388-3"><a href="#cb388-3" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
+<span id="cb388-4"><a href="#cb388-4" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb388-5"><a href="#cb388-5" aria-hidden="true"></a>    }</span>
+<span id="cb388-6"><a href="#cb388-6" aria-hidden="true"></a>    gs = s</span>
+<span id="cb388-7"><a href="#cb388-7" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>go test -run none -bench . -benchtime 3s -benchmem</code></p>
 <pre class="text"><code>goos: darwin
 goarch: amd64
@@ -2897,35 +2934,35 @@ PASS
 ok  command-line-arguments  6.637s</code></pre>
 <h4 id="sub-benchmark">Sub Benchmark</h4>
 <p>Like sub tests, we can also do sub benchmark.</p>
-<div class="sourceCode" id="cb381"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb381-1"><a href="#cb381-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb381-2"><a href="#cb381-2" aria-hidden="true"></a></span>
-<span id="cb381-3"><a href="#cb381-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb381-4"><a href="#cb381-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
-<span id="cb381-5"><a href="#cb381-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
-<span id="cb381-6"><a href="#cb381-6" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb390"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb390-1"><a href="#cb390-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb390-2"><a href="#cb390-2" aria-hidden="true"></a></span>
+<span id="cb390-3"><a href="#cb390-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb390-4"><a href="#cb390-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb390-5"><a href="#cb390-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb390-6"><a href="#cb390-6" aria-hidden="true"></a>)</span></code></pre></div>
 <p>BenchmarkSprint tests all the Sprint related benchmarks as sub benchmarks.</p>
-<div class="sourceCode" id="cb382"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb382-1"><a href="#cb382-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintSub(b *testing.B) {</span>
-<span id="cb382-2"><a href="#cb382-2" aria-hidden="true"></a>    b.Run(<span class="st">&quot;none&quot;</span>, benchSprint)</span>
-<span id="cb382-3"><a href="#cb382-3" aria-hidden="true"></a>    b.Run(<span class="st">&quot;format&quot;</span>, benchSprintf)</span>
-<span id="cb382-4"><a href="#cb382-4" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb391"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb391-1"><a href="#cb391-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintSub(b *testing.B) {</span>
+<span id="cb391-2"><a href="#cb391-2" aria-hidden="true"></a>    b.Run(<span class="st">&quot;none&quot;</span>, benchSprint)</span>
+<span id="cb391-3"><a href="#cb391-3" aria-hidden="true"></a>    b.Run(<span class="st">&quot;format&quot;</span>, benchSprintf)</span>
+<span id="cb391-4"><a href="#cb391-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p>benchSprint tests the performance of using Sprint.</p>
-<div class="sourceCode" id="cb383"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb383-1"><a href="#cb383-1" aria-hidden="true"></a><span class="kw">func</span> benchSprint(b *testing.B) {</span>
-<span id="cb383-2"><a href="#cb383-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb383-3"><a href="#cb383-3" aria-hidden="true"></a></span>
-<span id="cb383-4"><a href="#cb383-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
-<span id="cb383-5"><a href="#cb383-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb383-6"><a href="#cb383-6" aria-hidden="true"></a>    }</span>
-<span id="cb383-7"><a href="#cb383-7" aria-hidden="true"></a>    gs = s</span>
-<span id="cb383-8"><a href="#cb383-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb392"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb392-1"><a href="#cb392-1" aria-hidden="true"></a><span class="kw">func</span> benchSprint(b *testing.B) {</span>
+<span id="cb392-2"><a href="#cb392-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb392-3"><a href="#cb392-3" aria-hidden="true"></a></span>
+<span id="cb392-4"><a href="#cb392-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
+<span id="cb392-5"><a href="#cb392-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb392-6"><a href="#cb392-6" aria-hidden="true"></a>    }</span>
+<span id="cb392-7"><a href="#cb392-7" aria-hidden="true"></a>    gs = s</span>
+<span id="cb392-8"><a href="#cb392-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p>benchSprintf tests the performance of using Sprintf.</p>
-<div class="sourceCode" id="cb384"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb384-1"><a href="#cb384-1" aria-hidden="true"></a><span class="kw">func</span> benchSprintf(b *testing.B) {</span>
-<span id="cb384-2"><a href="#cb384-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb384-3"><a href="#cb384-3" aria-hidden="true"></a></span>
-<span id="cb384-4"><a href="#cb384-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i&lt;b.N; i++ {</span>
-<span id="cb384-5"><a href="#cb384-5" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb384-6"><a href="#cb384-6" aria-hidden="true"></a>    }</span>
-<span id="cb384-7"><a href="#cb384-7" aria-hidden="true"></a>    gs = s</span>
-<span id="cb384-8"><a href="#cb384-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb393"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb393-1"><a href="#cb393-1" aria-hidden="true"></a><span class="kw">func</span> benchSprintf(b *testing.B) {</span>
+<span id="cb393-2"><a href="#cb393-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb393-3"><a href="#cb393-3" aria-hidden="true"></a></span>
+<span id="cb393-4"><a href="#cb393-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i&lt;b.N; i++ {</span>
+<span id="cb393-5"><a href="#cb393-5" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb393-6"><a href="#cb393-6" aria-hidden="true"></a>    }</span>
+<span id="cb393-7"><a href="#cb393-7" aria-hidden="true"></a>    gs = s</span>
+<span id="cb393-8"><a href="#cb393-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>go test -run none -bench . -benchtime 3s -benchmem</code></p>
 <pre class="text"><code>goos: darwin
 goarch: amd64
@@ -2942,16 +2979,16 @@ ok command-line-arguments 7.131s</code></pre>
 <h4 id="stack-trace">Stack Trace</h4>
 <h5 id="review-stack-trace">Review Stack Trace</h5>
 <p>How to read stack traces?</p>
-<div class="sourceCode" id="cb386"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb386-1"><a href="#cb386-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb386-2"><a href="#cb386-2" aria-hidden="true"></a></span>
-<span id="cb386-3"><a href="#cb386-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<div class="sourceCode" id="cb395"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb395-1"><a href="#cb395-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb395-2"><a href="#cb395-2" aria-hidden="true"></a></span>
+<span id="cb395-3"><a href="#cb395-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>We are making a slice of length 2, capacity 4 and then passing that slice value into a function call example. example takes a slice, a string, and an integer.</p>
-<div class="sourceCode" id="cb387"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb387-1"><a href="#cb387-1" aria-hidden="true"></a>    example(<span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">2</span>, <span class="dv">4</span>), <span class="st">&quot;hello&quot;</span>, <span class="dv">10</span>)</span>
-<span id="cb387-2"><a href="#cb387-2" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb396"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb396-1"><a href="#cb396-1" aria-hidden="true"></a>    example(<span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">2</span>, <span class="dv">4</span>), <span class="st">&quot;hello&quot;</span>, <span class="dv">10</span>)</span>
+<span id="cb396-2"><a href="#cb396-2" aria-hidden="true"></a>}</span></code></pre></div>
 <p>examples call the built-in function panic to demonstrate the stack traces.</p>
-<div class="sourceCode" id="cb388"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb388-1"><a href="#cb388-1" aria-hidden="true"></a><span class="kw">func</span> example(slice []<span class="dt">string</span>, str <span class="dt">string</span>, i <span class="dt">int</span>) {</span>
-<span id="cb388-2"><a href="#cb388-2" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
-<span id="cb388-3"><a href="#cb388-3" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb397"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb397-1"><a href="#cb397-1" aria-hidden="true"></a><span class="kw">func</span> example(slice []<span class="dt">string</span>, str <span class="dt">string</span>, i <span class="dt">int</span>) {</span>
+<span id="cb397-2"><a href="#cb397-2" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
+<span id="cb397-3"><a href="#cb397-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>This is the output that we get:</p>
 <pre class="text"><code>panic: Want stack trace
 
@@ -2967,16 +3004,16 @@ exit status 2</code></pre>
 <p>If we ask for the data we need, this is a benefit that we can get just by looking at the stack traces and see the values that are going in. If we work with the error package from Dave, wrap it and add more context, and log package, we have more than enough information to debug a problem.</p>
 <h5 id="packing">Packing</h5>
 <p>Sample stack races that pack values.</p>
-<div class="sourceCode" id="cb390"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb390-1"><a href="#cb390-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb390-2"><a href="#cb390-2" aria-hidden="true"></a></span>
-<span id="cb390-3"><a href="#cb390-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<div class="sourceCode" id="cb399"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb399-1"><a href="#cb399-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb399-2"><a href="#cb399-2" aria-hidden="true"></a></span>
+<span id="cb399-3"><a href="#cb399-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>Passing values that are 1-byte values.</p>
-<div class="sourceCode" id="cb391"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb391-1"><a href="#cb391-1" aria-hidden="true"></a>    example(<span class="ot">true</span>, <span class="ot">false</span>, <span class="ot">true</span>, <span class="dv">25</span>)</span>
-<span id="cb391-2"><a href="#cb391-2" aria-hidden="true"></a>}</span>
-<span id="cb391-3"><a href="#cb391-3" aria-hidden="true"></a></span>
-<span id="cb391-4"><a href="#cb391-4" aria-hidden="true"></a><span class="kw">func</span> example(b1, b2, b3 <span class="dt">bool</span>, i <span class="dt">uint8</span>) {</span>
-<span id="cb391-5"><a href="#cb391-5" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
-<span id="cb391-6"><a href="#cb391-6" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb400"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb400-1"><a href="#cb400-1" aria-hidden="true"></a>    example(<span class="ot">true</span>, <span class="ot">false</span>, <span class="ot">true</span>, <span class="dv">25</span>)</span>
+<span id="cb400-2"><a href="#cb400-2" aria-hidden="true"></a>}</span>
+<span id="cb400-3"><a href="#cb400-3" aria-hidden="true"></a></span>
+<span id="cb400-4"><a href="#cb400-4" aria-hidden="true"></a><span class="kw">func</span> example(b1, b2, b3 <span class="dt">bool</span>, i <span class="dt">uint8</span>) {</span>
+<span id="cb400-5"><a href="#cb400-5" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
+<span id="cb400-6"><a href="#cb400-6" aria-hidden="true"></a>}</span></code></pre></div>
 <p>This is the output that we get:</p>
 <pre class="text"><code>panic: Want stack trace
 
@@ -3028,26 +3065,26 @@ exit status 2</code></pre>
 <h4 id="godebug">GODEBUG</h4>
 <h5 id="memory-tracing">Memory Tracing</h5>
 <p>Memory Tracing gives us a general idea if our software is healthy as related to the GC and memory in the heap that we are working with. Below is a sample program that causes memory leaks.</p>
-<div class="sourceCode" id="cb393"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb393-1"><a href="#cb393-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb393-2"><a href="#cb393-2" aria-hidden="true"></a></span>
-<span id="cb393-3"><a href="#cb393-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb393-4"><a href="#cb393-4" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
-<span id="cb393-5"><a href="#cb393-5" aria-hidden="true"></a>    <span class="st">&quot;os/signal&quot;</span></span>
-<span id="cb393-6"><a href="#cb393-6" aria-hidden="true"></a>)</span>
-<span id="cb393-7"><a href="#cb393-7" aria-hidden="true"></a></span>
-<span id="cb393-8"><a href="#cb393-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<div class="sourceCode" id="cb402"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb402-1"><a href="#cb402-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb402-2"><a href="#cb402-2" aria-hidden="true"></a></span>
+<span id="cb402-3"><a href="#cb402-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb402-4"><a href="#cb402-4" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
+<span id="cb402-5"><a href="#cb402-5" aria-hidden="true"></a>    <span class="st">&quot;os/signal&quot;</span></span>
+<span id="cb402-6"><a href="#cb402-6" aria-hidden="true"></a>)</span>
+<span id="cb402-7"><a href="#cb402-7" aria-hidden="true"></a></span>
+<span id="cb402-8"><a href="#cb402-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>Create a Goroutine that leaks memory. Dumping key-value pairs to put tons of allocation.</p>
-<div class="sourceCode" id="cb394"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb394-1"><a href="#cb394-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
-<span id="cb394-2"><a href="#cb394-2" aria-hidden="true"></a>        m := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">int</span>]<span class="dt">int</span>)</span>
-<span id="cb394-3"><a href="#cb394-3" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; ; i++ {</span>
-<span id="cb394-4"><a href="#cb394-4" aria-hidden="true"></a>            m[i] = i</span>
-<span id="cb394-5"><a href="#cb394-5" aria-hidden="true"></a>        }</span>
-<span id="cb394-6"><a href="#cb394-6" aria-hidden="true"></a>    }()</span></code></pre></div>
+<div class="sourceCode" id="cb403"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb403-1"><a href="#cb403-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
+<span id="cb403-2"><a href="#cb403-2" aria-hidden="true"></a>        m := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">int</span>]<span class="dt">int</span>)</span>
+<span id="cb403-3"><a href="#cb403-3" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; ; i++ {</span>
+<span id="cb403-4"><a href="#cb403-4" aria-hidden="true"></a>            m[i] = i</span>
+<span id="cb403-5"><a href="#cb403-5" aria-hidden="true"></a>        }</span>
+<span id="cb403-6"><a href="#cb403-6" aria-hidden="true"></a>    }()</span></code></pre></div>
 <p>Shutdown the program with Ctrl-C.</p>
-<div class="sourceCode" id="cb395"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb395-1"><a href="#cb395-1" aria-hidden="true"></a>    sig := <span class="bu">make</span>(<span class="kw">chan</span> os.Signal, <span class="dv">1</span>)</span>
-<span id="cb395-2"><a href="#cb395-2" aria-hidden="true"></a>    signal.Notify(sig)</span>
-<span id="cb395-3"><a href="#cb395-3" aria-hidden="true"></a>    &lt;-sig</span>
-<span id="cb395-4"><a href="#cb395-4" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb404"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb404-1"><a href="#cb404-1" aria-hidden="true"></a>    sig := <span class="bu">make</span>(<span class="kw">chan</span> os.Signal, <span class="dv">1</span>)</span>
+<span id="cb404-2"><a href="#cb404-2" aria-hidden="true"></a>    signal.Notify(sig)</span>
+<span id="cb404-3"><a href="#cb404-3" aria-hidden="true"></a>    &lt;-sig</span>
+<span id="cb404-4"><a href="#cb404-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p>We are using a special environmental variable called <code>GODEBUG</code>. It gives us the ability to do a memory trace and a scheduler trace. Here are the steps to build and run:</p>
 <p>Build the program by: <code>go build memory_tracing.go</code></p>
 <p>Run the binary: <code>GODEBUG=gctrace=1 ./memory_tracing</code></p>
