@@ -48,3 +48,26 @@
 - Original Repo: https://github.com/hoanhan101/ultimate-go
 - Download the book: https://gumroad.com/l/bpUYF
   - 번역 시점의 버전: `Hoanh An, The Ultimate Go Study Guide.pdf`(MD5: fb3e456e9ba62606f5318f386a8e6c3c)
+
+## Contributors
+
+좋은 의도를 이해하고 함께 하는 프로젝트 기여자 명단.
+혼자서는 버겁고 힘든 부분도 함께라면 서로 돕고 의지하고 자극이 되어 넘어설 수 있다.
+
+이름/깃헙계정의 순서로 표기한다.
+
+- 정현석/@nicewook
+- 최희재/@gmlwo530
+- 신정훈/@shin2jhoon
+- 정영훈/@aeuveritas
+- 이경석/@lee-kyungseok
+- 김지훈/@ghun2
+- 권경모/@kkweon
+- 권용민/@snowmerak
+- 강영주/@979156
+- 서병선/@famersbs
+- 배지원/@baewang
+- 조용래/@dreamgonfly
+- Mark Hahn/@TangoEnSkai
+- 조동헌/@davinnovation
+- 김준희/@juunini
