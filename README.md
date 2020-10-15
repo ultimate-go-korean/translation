@@ -56,18 +56,18 @@
 
 이름/깃헙계정의 순서로 표기한다.
 
-- 정현석/@nicewook
-- 최희재/@gmlwo530
-- 신정훈/@shin2jhoon
-- 정영훈/@aeuveritas
-- 이경석/@lee-kyungseok
-- 김지훈/@ghun2
+- 강영주/@979156
 - 권경모/@kkweon
 - 권용민/@snowmerak
-- 강영주/@979156
-- 서병선/@famersbs
-- 배지원/@baewang
-- 조용래/@dreamgonfly
-- Mark Hahn/@TangoEnSkai
-- 조동헌/@davinnovation
 - 김준희/@juunini
+- 김지훈/@ghun2
+- 배지원/@baewang
+- 서병선/@famersbs
+- 신정훈/@shin2jhoon
+- 이경석/@lee-kyungseok
+- 정영훈/@aeuveritas
+- 정현석/@nicewook
+- 조동헌/@davinnovation
+- 조용래/@dreamgonfly
+- 최희재/@gmlwo530
+- Mark Hahn/@TangoEnSkai
