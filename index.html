@@ -223,11 +223,11 @@ display: block;
 <li><a href="#context">Context</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#testing-and-profiling-173">Testing and Profiling 173</a>
+<li><a href="#testing-and-profiling">Testing and Profiling</a>
 <ul>
-<li><a href="#testing-173">Testing 173</a>
+<li><a href="#testing">Testing</a>
 <ul>
-<li><a href="#basic-unit-test-173">Basic Unit Test 173</a></li>
+<li><a href="#basic-unit-test">Basic Unit Test</a></li>
 </ul></li>
 <li><a href="#benchmarking">Benchmarking</a>
 <ul>
@@ -3377,40 +3377,528 @@ User Not Found</code></pre>
 2020/08/24 18:37:18 timeout, cancel work...
 2020/08/24 18:37:18 Get https://wwww.ardanlabs.com/blog/post/index.xml:
 net/http: request canceled while waiting for connection</code></pre>
-<h2 id="testing-and-profiling-173">Testing and Profiling 173</h2>
-<h3 id="testing-173">Testing 173</h3>
-<h4 id="basic-unit-test-173">Basic Unit Test 173</h4>
-<h5 id="table-test-176">Table Test 176</h5>
-<h5 id="sub-test-177">Sub Test 177</h5>
-<h5 id="web-server-181">Web Server 181</h5>
-<h5 id="mock-server-187">Mock Server 187</h5>
-<h3 id="benchmarking">Benchmarking</h3>
-<h4 id="basic-benchmark">Basic Benchmark</h4>
-<p>Benchmark file’s have to have <code>&lt;file_name&gt;_test.go</code> and use the Benchmark functions like below. The goal is to know what performs better and what allocate more or less between Sprint and Sprintf. Our guess is that Sprint is gonna be better because it doesn’t have any overhead doing the formatting. However, this is not true. Remember we have to optimize for correctness so we don’t want to guess.</p>
+<h2 id="testing-and-profiling">Testing and Profiling</h2>
+<h3 id="testing">Testing</h3>
+<h4 id="basic-unit-test">Basic Unit Test</h4>
+<p>All of our tests must have the format <code>&lt;filename&gt;_test.go</code>. Otherwise, the testing tool is not gonna find the tests. Test files are not compiled into our final binary. Test files should be in the same package as your code. We might also want to have afolder called test for more than unit test, say integration test. The package name can be the name only or name_test.</p>
+<p>If we go with name_test, it allows us to make sure these tests work with the package. The only reason that we don’t want to do this is when we have a function or method that is unexported.</p>
+<p>However, if we don’t use name_test, it will raise a red flag because if we cannot test the exported API to get the coverage for the unexported API then we know we are missing something. Therefore, 9/10 this is what we want.</p>
 <div class="sourceCode" id="cb476"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb476-1"><a href="#cb476-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb476-2"><a href="#cb476-2" aria-hidden="true"></a></span>
 <span id="cb476-3"><a href="#cb476-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb476-4"><a href="#cb476-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
-<span id="cb476-5"><a href="#cb476-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
-<span id="cb476-6"><a href="#cb476-6" aria-hidden="true"></a>)</span>
-<span id="cb476-7"><a href="#cb476-7" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
+<span id="cb476-4"><a href="#cb476-4" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb476-5"><a href="#cb476-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span> <span class="co">// This is Go testing package.</span></span>
+<span id="cb476-6"><a href="#cb476-6" aria-hidden="true"></a>)</span></code></pre></div>
+<p>These constants give us checkboxes for visualization.</p>
+<div class="sourceCode" id="cb477"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb477-1"><a href="#cb477-1" aria-hidden="true"></a><span class="kw">const</span> (</span>
+<span id="cb477-2"><a href="#cb477-2" aria-hidden="true"></a>    succeed = <span class="st">&quot;\u2713&quot;</span></span>
+<span id="cb477-3"><a href="#cb477-3" aria-hidden="true"></a>    failed = <span class="st">&quot;\u2717&quot;</span></span>
+<span id="cb477-4"><a href="#cb477-4" aria-hidden="true"></a>)</span></code></pre></div>
+<p>TestBasic validates the http.Get function can download content. Every test will be associated with the test function. It starts with the word Test and the first word after Test must be capitalized. It uses a testing.T pointer as its parameter. When writing test, we want to focus on usability first. We must write it the same way as we would write it in production. We also want the verbosity of tests so we are 3 different methods of t: Log or Logf, Fatal or Fatalf, Error or Error f. That is the core APIs for testing.</p>
+<p>Log: Write documentation out into the log output.</p>
+<p>Error: Write documentation and also say that this test is failed but we are continuing moving forward to execute code in this test</p>
+<p>Fatal: Similarly, document that this test is failed but we are done. We move on to the next test function.</p>
+<p><strong>Given, When, Should format.</strong></p>
+<p>Given: Why are we writing this test?</p>
+<p>When: What data are we using for this test?</p>
+<p>Should: When are we expected to see it happen or not happen?</p>
+<p>We are also using the artificial block between a long Log function. They help with readability.</p>
+<div class="sourceCode" id="cb478"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb478-1"><a href="#cb478-1" aria-hidden="true"></a><span class="kw">func</span> TestBasic(t *testing.T) {</span>
+<span id="cb478-2"><a href="#cb478-2" aria-hidden="true"></a>    url := <span class="st">&quot;https://www.google.com/&quot;</span></span>
+<span id="cb478-3"><a href="#cb478-3" aria-hidden="true"></a>    statusCode := <span class="dv">200</span></span>
+<span id="cb478-4"><a href="#cb478-4" aria-hidden="true"></a></span>
+<span id="cb478-5"><a href="#cb478-5" aria-hidden="true"></a>    t.Log(<span class="st">&quot;Given the need to test downloading content.&quot;</span>)</span>
+<span id="cb478-6"><a href="#cb478-6" aria-hidden="true"></a>    {</span>
+<span id="cb478-7"><a href="#cb478-7" aria-hidden="true"></a>        t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">Test 0:</span><span class="ch">\t</span><span class="st">When checking %q for status code %d&quot;</span>, url, statusCode)</span>
+<span id="cb478-8"><a href="#cb478-8" aria-hidden="true"></a>        {</span>
+<span id="cb478-9"><a href="#cb478-9" aria-hidden="true"></a>            resp, err := http.Get(url)</span>
+<span id="cb478-10"><a href="#cb478-10" aria-hidden="true"></a>            <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
+<span id="cb478-11"><a href="#cb478-11" aria-hidden="true"></a>                t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call : %v&quot;</span>, failed, err)</span>
+<span id="cb478-12"><a href="#cb478-12" aria-hidden="true"></a>            }</span>
+<span id="cb478-13"><a href="#cb478-13" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call.&quot;</span>, succeed)</span>
+<span id="cb478-14"><a href="#cb478-14" aria-hidden="true"></a></span>
+<span id="cb478-15"><a href="#cb478-15" aria-hidden="true"></a>            <span class="kw">defer</span> resp.Body.Close()</span>
+<span id="cb478-16"><a href="#cb478-16" aria-hidden="true"></a></span>
+<span id="cb478-17"><a href="#cb478-17" aria-hidden="true"></a>            <span class="kw">if</span> resp.StatusCode == statusCode {</span>
+<span id="cb478-18"><a href="#cb478-18" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code.&quot;</span>, succeed, statusCode)</span>
+<span id="cb478-19"><a href="#cb478-19" aria-hidden="true"></a>            } <span class="kw">else</span> {</span>
+<span id="cb478-20"><a href="#cb478-20" aria-hidden="true"></a>                t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code : %d&quot;</span>, failed, statusCode, resp.StatusCode)</span>
+<span id="cb478-21"><a href="#cb478-21" aria-hidden="true"></a>            }</span>
+<span id="cb478-22"><a href="#cb478-22" aria-hidden="true"></a>        }</span>
+<span id="cb478-23"><a href="#cb478-23" aria-hidden="true"></a>    }</span>
+<span id="cb478-24"><a href="#cb478-24" aria-hidden="true"></a>}</span></code></pre></div>
+<p>We can just say “go test” and the testing tool will find that function. We can also say “go test -v” for verbosity, we will get a full output of the logging. Suppose that we have a lot of test functions, “go test -run TestBasic” will only run the TestBasic function.</p>
+<pre class="text"><code>=== RUN TestBasic
+--- PASS: TestBasic (0.24s)
+    basic_test.go:58:   Given the need to test downloading content.
+    basic_test.go:60:   Test 0: When checking &quot;https://www.google.com/&quot; for status code 200
+    basic_test.go:66:   ✓      Should be able to make the Get call.
+    basic_test.go:71:   ✓      Should receive a 200 status code.
+PASS
+ok     command-line-arguments 0.316s</code></pre>
+<h5 id="table-test">Table Test</h5>
+<p>Set up a data structure of input to expected output. This way we don’t need a separate function for each one of these. We just have 1 test function. As we go along, we just add more to the table.</p>
+<div class="sourceCode" id="cb480"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb480-1"><a href="#cb480-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb480-2"><a href="#cb480-2" aria-hidden="true"></a></span>
+<span id="cb480-3"><a href="#cb480-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb480-4"><a href="#cb480-4" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb480-5"><a href="#cb480-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb480-6"><a href="#cb480-6" aria-hidden="true"></a>)</span></code></pre></div>
+<p>TestTable validates the http Get function can download content and handles different status conditions properly</p>
+<div class="sourceCode" id="cb481"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb481-1"><a href="#cb481-1" aria-hidden="true"></a><span class="kw">func</span> TestTable(t *testing.T) {</span></code></pre></div>
+<p>This table is a slice of anonymous struct type. It is the URL we are gonna call and statusCode is what we expect.</p>
+<div class="sourceCode" id="cb482"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb482-1"><a href="#cb482-1" aria-hidden="true"></a>    tests := []<span class="kw">struct</span> {</span>
+<span id="cb482-2"><a href="#cb482-2" aria-hidden="true"></a>        url         <span class="dt">string</span></span>
+<span id="cb482-3"><a href="#cb482-3" aria-hidden="true"></a>        statusCode  <span class="dt">int</span></span>
+<span id="cb482-4"><a href="#cb482-4" aria-hidden="true"></a>    }{</span>
+<span id="cb482-5"><a href="#cb482-5" aria-hidden="true"></a>        {<span class="st">&quot;https://www.google.com&quot;</span>, http.StatusOK},</span>
+<span id="cb482-6"><a href="#cb482-6" aria-hidden="true"></a>        {<span class="st">&quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot;</span>, http:StatusNotFound},</span>
+<span id="cb482-7"><a href="#cb482-7" aria-hidden="true"></a>    }</span>
+<span id="cb482-8"><a href="#cb482-8" aria-hidden="true"></a></span>
+<span id="cb482-9"><a href="#cb482-9" aria-hidden="true"></a>    t.Log(<span class="st">&quot;Given the need to test downloading different content.&quot;</span>)</span>
+<span id="cb482-10"><a href="#cb482-10" aria-hidden="true"></a>    {</span>
+<span id="cb482-11"><a href="#cb482-11" aria-hidden="true"></a>        <span class="kw">for</span> i, tt := ragne tests {</span>
+<span id="cb482-12"><a href="#cb482-12" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">Test: %d</span><span class="ch">\t</span><span class="st">When checking %q for status code %d&quot;</span>, i, tt.url, tt.statusCode)</span>
+<span id="cb482-13"><a href="#cb482-13" aria-hidden="true"></a>            {</span>
+<span id="cb482-14"><a href="#cb482-14" aria-hidden="true"></a>                resp, err := http.Get(tt.url)</span>
+<span id="cb482-15"><a href="#cb482-15" aria-hidden="true"></a>                <span class="kw">if</span> err != <span class="ot">nil</span>{</span>
+<span id="cb482-16"><a href="#cb482-16" aria-hidden="true"></a>                    t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call : %v&quot;</span>, failed, err)</span>
+<span id="cb482-17"><a href="#cb482-17" aria-hidden="true"></a>                }</span>
+<span id="cb482-18"><a href="#cb482-18" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call.&quot;</span>, succeed)</span>
+<span id="cb482-19"><a href="#cb482-19" aria-hidden="true"></a></span>
+<span id="cb482-20"><a href="#cb482-20" aria-hidden="true"></a>                <span class="kw">defer</span> resp.Body.Close()</span>
+<span id="cb482-21"><a href="#cb482-21" aria-hidden="true"></a></span>
+<span id="cb482-22"><a href="#cb482-22" aria-hidden="true"></a>                <span class="kw">if</span> resp.StatusCode == tt.statusCode {</span>
+<span id="cb482-23"><a href="#cb482-23" aria-hidden="true"></a>                    t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Sould receive a %d status code.&quot;</span>, succeed, tt.statusCode)</span>
+<span id="cb482-24"><a href="#cb482-24" aria-hidden="true"></a>                } <span class="kw">else</span> {</span>
+<span id="cb482-25"><a href="#cb482-25" aria-hidden="true"></a>                    t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code : %v&quot;</span>, failed, tt.statusCode, resp.StatusCode)</span>
+<span id="cb482-26"><a href="#cb482-26" aria-hidden="true"></a>                }</span>
+<span id="cb482-27"><a href="#cb482-27" aria-hidden="true"></a>            }</span>
+<span id="cb482-28"><a href="#cb482-28" aria-hidden="true"></a>        }</span>
+<span id="cb482-29"><a href="#cb482-29" aria-hidden="true"></a>    }</span>
+<span id="cb482-30"><a href="#cb482-30" aria-hidden="true"></a>}</span></code></pre></div>
+<pre class="text"><code>=== RUN TestTable
+--- PASS: TestTable (0.31s)
+    table_test.go:35:   Given the need to test downloading different content.
+    table_test.go:38:   Test: 0 When checking &quot;https://www.google.com/&quot; for status code 200
+    table_test.go:44:   ✓      Should be able to make the Get call.
+    table_test.go:49:   ✓      Should receive a 200 status code.
+    table_test.go:38:   Test: 1 When checking &quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot; for status code 404
+    table_test.go:44:   ✓      Should be able to make the Get call.
+    table_test.go:49:   ✓      Should receive a 404 status code.
+PASS
+ok      command-line-arguments 0.472s</code></pre>
+<h5 id="sub-test">Sub Test</h5>
+<p>Sub test helps us streamline our test functions, filters out command-line level big tests into smaller sub tests.</p>
+<div class="sourceCode" id="cb484"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb484-1"><a href="#cb484-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb484-2"><a href="#cb484-2" aria-hidden="true"></a></span>
+<span id="cb484-3"><a href="#cb484-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb484-4"><a href="#cb484-4" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb484-5"><a href="#cb484-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb484-6"><a href="#cb484-6" aria-hidden="true"></a>)</span></code></pre></div>
+<p>TestSub validates the http Get function can download content and handles different status conditions properly.</p>
+<div class="sourceCode" id="cb485"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb485-1"><a href="#cb485-1" aria-hidden="true"></a><span class="kw">func</span> TestSub(t *testing.T) {</span>
+<span id="cb485-2"><a href="#cb485-2" aria-hidden="true"></a>    tests := []<span class="kw">struct</span> {</span>
+<span id="cb485-3"><a href="#cb485-3" aria-hidden="true"></a>        name <span class="dt">string</span></span>
+<span id="cb485-4"><a href="#cb485-4" aria-hidden="true"></a>        url <span class="dt">string</span></span>
+<span id="cb485-5"><a href="#cb485-5" aria-hidden="true"></a>        statusCode <span class="dt">int</span></span>
+<span id="cb485-6"><a href="#cb485-6" aria-hidden="true"></a>    }{</span>
+<span id="cb485-7"><a href="#cb485-7" aria-hidden="true"></a>        {<span class="st">&quot;statusok&quot;</span>, <span class="st">&quot;https://www.google.com/&quot;</span>, http.StatusOK},</span>
+<span id="cb485-8"><a href="#cb485-8" aria-hidden="true"></a>        {<span class="st">&quot;statusnotfound&quot;</span>, <span class="st">&quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot;</span>, http.StatusNotFound},</span>
+<span id="cb485-9"><a href="#cb485-9" aria-hidden="true"></a>    }</span>
+<span id="cb485-10"><a href="#cb485-10" aria-hidden="true"></a>    t.Log(<span class="st">&quot;Given the need to test downloading different content.&quot;</span>)</span>
+<span id="cb485-11"><a href="#cb485-11" aria-hidden="true"></a>    {</span></code></pre></div>
+<p>Range over our table but this time, create an anonymous function that takes a testing T parameter. This is a test function inside a test function. What’s nice about it is that we are gonna have a new function for each set of data that we have in our table. Therefore, we will end up with 2 different functions here.</p>
+<div class="sourceCode" id="cb486"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb486-1"><a href="#cb486-1" aria-hidden="true"></a>        <span class="kw">for</span> i, tt := <span class="kw">range</span> tests {</span>
+<span id="cb486-2"><a href="#cb486-2" aria-hidden="true"></a>            tf := <span class="kw">func</span>(t *testing.T) {</span>
+<span id="cb486-3"><a href="#cb486-3" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">Test: %d</span><span class="ch">\t</span><span class="st">When checking %q for status code %d&quot;</span>, i, tt.url, tt.statusCode)</span>
+<span id="cb486-4"><a href="#cb486-4" aria-hidden="true"></a>                {</span>
+<span id="cb486-5"><a href="#cb486-5" aria-hidden="true"></a>                    resp, err := http.Get(tt.url)</span>
+<span id="cb486-6"><a href="#cb486-6" aria-hidden="true"></a>                    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
+<span id="cb486-7"><a href="#cb486-7" aria-hidden="true"></a>                        t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call : %v&quot;</span>, failed, err)</span>
+<span id="cb486-8"><a href="#cb486-8" aria-hidden="true"></a>                    }</span>
+<span id="cb486-9"><a href="#cb486-9" aria-hidden="true"></a>                    t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call.&quot;</span>, succeed)</span>
+<span id="cb486-10"><a href="#cb486-10" aria-hidden="true"></a></span>
+<span id="cb486-11"><a href="#cb486-11" aria-hidden="true"></a>                    <span class="kw">defer</span> resp.Body.Close()</span>
+<span id="cb486-12"><a href="#cb486-12" aria-hidden="true"></a></span>
+<span id="cb486-13"><a href="#cb486-13" aria-hidden="true"></a>                    <span class="kw">if</span> resp.StatusCode == tt.statusCode {</span>
+<span id="cb486-14"><a href="#cb486-14" aria-hidden="true"></a>                        t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code.&quot;</span>, succeed, tt.statusCode)</span>
+<span id="cb486-15"><a href="#cb486-15" aria-hidden="true"></a>                    } <span class="kw">else</span> {</span>
+<span id="cb486-16"><a href="#cb486-16" aria-hidden="true"></a>                        t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code : %v&quot;</span>, failed, tt.statusCode, resp.StatusCode)</span>
+<span id="cb486-17"><a href="#cb486-17" aria-hidden="true"></a>                    }</span>
+<span id="cb486-18"><a href="#cb486-18" aria-hidden="true"></a>                }</span>
+<span id="cb486-19"><a href="#cb486-19" aria-hidden="true"></a>            }</span></code></pre></div>
+<p>Once we declare this function, we tell the testing tool to register it as a sub test under the test name.</p>
+<div class="sourceCode" id="cb487"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb487-1"><a href="#cb487-1" aria-hidden="true"></a>            t.Run(tt.name, tf)</span>
+<span id="cb487-2"><a href="#cb487-2" aria-hidden="true"></a>        }</span>
+<span id="cb487-3"><a href="#cb487-3" aria-hidden="true"></a>    }</span>
+<span id="cb487-4"><a href="#cb487-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p>TestParallelize validates the http Get function can download content and handles different status conditions properly but runs the tests in parallel.</p>
+<div class="sourceCode" id="cb488"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb488-1"><a href="#cb488-1" aria-hidden="true"></a><span class="kw">func</span> TestParallelize(t *testing.T) {</span>
+<span id="cb488-2"><a href="#cb488-2" aria-hidden="true"></a>    tests := []<span class="kw">struct</span> {</span>
+<span id="cb488-3"><a href="#cb488-3" aria-hidden="true"></a>        name <span class="dt">string</span></span>
+<span id="cb488-4"><a href="#cb488-4" aria-hidden="true"></a>        url <span class="dt">string</span></span>
+<span id="cb488-5"><a href="#cb488-5" aria-hidden="true"></a>        statusCode <span class="dt">int</span></span>
+<span id="cb488-6"><a href="#cb488-6" aria-hidden="true"></a>    }{</span>
+<span id="cb488-7"><a href="#cb488-7" aria-hidden="true"></a>        {<span class="st">&quot;statusok&quot;</span>, <span class="st">&quot;https://www.goinggo.net/post/index.xml&quot;</span>, http.StatusOK},</span>
+<span id="cb488-8"><a href="#cb488-8" aria-hidden="true"></a>        {<span class="st">&quot;statusnotfound&quot;</span>, <span class="st">&quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot;</span>, http.StatusNotFound},</span>
+<span id="cb488-9"><a href="#cb488-9" aria-hidden="true"></a>    }</span>
+<span id="cb488-10"><a href="#cb488-10" aria-hidden="true"></a></span>
+<span id="cb488-11"><a href="#cb488-11" aria-hidden="true"></a>    t.Log(<span class="st">&quot;Given the need to test downloading different content.&quot;</span>)</span>
+<span id="cb488-12"><a href="#cb488-12" aria-hidden="true"></a>    {</span>
+<span id="cb488-13"><a href="#cb488-13" aria-hidden="true"></a>        <span class="kw">for</span> i, tt := <span class="kw">range</span> tests {</span>
+<span id="cb488-14"><a href="#cb488-14" aria-hidden="true"></a>            tf := <span class="kw">func</span>(t *testing.T) {</span></code></pre></div>
+<p>The only difference here is that we call Parallel function inside each of these individual sub test functions.</p>
+<div class="sourceCode" id="cb489"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb489-1"><a href="#cb489-1" aria-hidden="true"></a>                t.Parallel()</span>
+<span id="cb489-2"><a href="#cb489-2" aria-hidden="true"></a></span>
+<span id="cb489-3"><a href="#cb489-3" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">Test: %d</span><span class="ch">\t</span><span class="st">When checking %q for status code %d&quot;</span>, i, tt.url, tt.statusCode)</span>
+<span id="cb489-4"><a href="#cb489-4" aria-hidden="true"></a>                {</span>
+<span id="cb489-5"><a href="#cb489-5" aria-hidden="true"></a>                    resp, err := http.Get(tt.url)</span>
+<span id="cb489-6"><a href="#cb489-6" aria-hidden="true"></a>                    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
+<span id="cb489-7"><a href="#cb489-7" aria-hidden="true"></a>                        t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call : %v&quot;</span>, failed, err)</span>
+<span id="cb489-8"><a href="#cb489-8" aria-hidden="true"></a>                    }</span>
+<span id="cb489-9"><a href="#cb489-9" aria-hidden="true"></a>                    t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call.&quot;</span>, succeed)</span>
+<span id="cb489-10"><a href="#cb489-10" aria-hidden="true"></a></span>
+<span id="cb489-11"><a href="#cb489-11" aria-hidden="true"></a>                    <span class="kw">defer</span> resp.Body.Close()</span>
+<span id="cb489-12"><a href="#cb489-12" aria-hidden="true"></a></span>
+<span id="cb489-13"><a href="#cb489-13" aria-hidden="true"></a>                    <span class="kw">if</span> resp.StatusCode == tt.statusCode {</span>
+<span id="cb489-14"><a href="#cb489-14" aria-hidden="true"></a>                        t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code.&quot;</span>, succeed, tt.statusCode)</span>
+<span id="cb489-15"><a href="#cb489-15" aria-hidden="true"></a>                    } <span class="kw">else</span> {</span>
+<span id="cb489-16"><a href="#cb489-16" aria-hidden="true"></a>                        t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code : %v&quot;</span>, failed, tt.statusCode, resp.StatusCode)</span>
+<span id="cb489-17"><a href="#cb489-17" aria-hidden="true"></a>                    }</span>
+<span id="cb489-18"><a href="#cb489-18" aria-hidden="true"></a>                }</span>
+<span id="cb489-19"><a href="#cb489-19" aria-hidden="true"></a>            }</span>
+<span id="cb489-20"><a href="#cb489-20" aria-hidden="true"></a></span>
+<span id="cb489-21"><a href="#cb489-21" aria-hidden="true"></a>            t.Run(tt.name, tf)</span>
+<span id="cb489-22"><a href="#cb489-22" aria-hidden="true"></a>        }</span>
+<span id="cb489-23"><a href="#cb489-23" aria-hidden="true"></a>    }</span>
+<span id="cb489-24"><a href="#cb489-24" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Because we have sub tests, we can run the following to separate them: “go test -run TestSub -v” “go test -run TestSub/statusok -v” “go test -run TestSub/statusnotfound -v” “go test -run TestParallelize -v”</p>
+<pre class="text"><code>=== RUN TestSub
+=== RUN TestSub/statusok
+=== RUN TestSub/statusnotfound
+--- PASS: TestSub (0.32s)
+    sub_test.go:32: Given the need to test downloading different content.
+    --- PASS: TestSub/statusok (0.24s)
+        sub_test.go:40:     Test: 0 When checking &quot;https://www.google.com/&quot; for status code 200
+        sub_test.go:46:     ✓      Should be able to make the Get call.
+        sub_test.go:51:     ✓      Should receive a 200 status code.
+    --- PASS: TestSub/statusnotfound (0.08s)
+        sub_test.go:40:     Test: 1 When checking &quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot; for status code 404
+        sub_test.go:46:     ✓      Should be able to make the Get call.
+        sub_test.go:51:     ✓      Should receive a 404 status code.
+=== RUN TestParallelize
+=== RUN TestParallelize/statusok
+=== PAUSE TestParallelize/statusok
+=== RUN TestParallelize/statusnotfound
+=== PAUSE TestParallelize/statusnotfound
+=== CONT TestParallelize/statusok
+=== CONT TestParallelize/statusnotfound
+--- PASS: TestParallelize (0.00s)
+    sub_test.go:77: Given the need to test downloading different content.
+    --- PASS: TestParallelize/statusok (0.09s)
+        sub_test.go:85:     Test: 1 When checking &quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot; for status code 404
+        sub_test.go:91:     ✓      Should be able to make the Get call.
+        sub_test.go:96:     ✓      Should receive a 404 status code.
+    --- PASS: TestParallelize/statusnotfound (0.09s)
+        sub_test.go:85:     Test: 1 When checking &quot;http://rss.cnn.com/rss/cnn_topstorie.rss&quot; for status code 404
+        sub_test.go:91:     ✓      Should be able to make the Get call.
+        sub_test.go:96:     ✓      Should receive a 404 status code.
+PASS
+ok      command-line-arguments 0.618s</code></pre>
+<h5 id="web-server">Web Server</h5>
+<h6 id="web-server-1">Web Server</h6>
+<p>If we write our own web server, we would like to test it as well without manually having to stand up a server. The Go standard library also supports this.</p>
+<p>Below is our simple web server.</p>
+<div class="sourceCode" id="cb491"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb491-1"><a href="#cb491-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb491-2"><a href="#cb491-2" aria-hidden="true"></a></span>
+<span id="cb491-3"><a href="#cb491-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb491-4"><a href="#cb491-4" aria-hidden="true"></a>    <span class="st">&quot;log&quot;</span></span>
+<span id="cb491-5"><a href="#cb491-5" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span></code></pre></div>
+<p>Import handler package that has a set of routes that we are gonna work with.</p>
+<div class="sourceCode" id="cb492"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb492-1"><a href="#cb492-1" aria-hidden="true"></a>    <span class="st">&quot;github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers&quot;</span></span>
+<span id="cb492-2"><a href="#cb492-2" aria-hidden="true"></a>)</span>
+<span id="cb492-3"><a href="#cb492-3" aria-hidden="true"></a></span>
+<span id="cb492-4"><a href="#cb492-4" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
+<span id="cb492-5"><a href="#cb492-5" aria-hidden="true"></a>    handlers.Routes()</span>
+<span id="cb492-6"><a href="#cb492-6" aria-hidden="true"></a></span>
+<span id="cb492-7"><a href="#cb492-7" aria-hidden="true"></a>    log.Println(<span class="st">&quot;listener : Started : Listening on: http://localhost:4000&quot;</span>)</span>
+<span id="cb492-8"><a href="#cb492-8" aria-hidden="true"></a>    http.ListenAndServe(<span class="st">&quot;:4000&quot;</span>, <span class="ot">nil</span>)</span>
+<span id="cb492-9"><a href="#cb492-9" aria-hidden="true"></a>}</span></code></pre></div>
+<h6 id="handlers">Handlers</h6>
+<p>Package handlers provides the endpoints for the web service.</p>
+<div class="sourceCode" id="cb493"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb493-1"><a href="#cb493-1" aria-hidden="true"></a><span class="kw">package</span> handlers</span>
+<span id="cb493-2"><a href="#cb493-2" aria-hidden="true"></a></span>
+<span id="cb493-3"><a href="#cb493-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb493-4"><a href="#cb493-4" aria-hidden="true"></a>    <span class="st">&quot;encoding/json&quot;</span></span>
+<span id="cb493-5"><a href="#cb493-5" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb493-6"><a href="#cb493-6" aria-hidden="true"></a>)</span></code></pre></div>
+<p>Routes sets the routes for the web service. It has 1 route call <code>/sendjson</code>. When that route is executed, it wil lcall the SendJSON function</p>
+<div class="sourceCode" id="cb494"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb494-1"><a href="#cb494-1" aria-hidden="true"></a><span class="kw">func</span> Routes() {</span>
+<span id="cb494-2"><a href="#cb494-2" aria-hidden="true"></a>    http.HandleFunc(<span class="st">&quot;/sendjson&quot;</span>, SendJSON)</span>
+<span id="cb494-3"><a href="#cb494-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>SendJSON returns a simple JSON document. This has the same signature that we had before using ResponseWriter and Request. We create an anonymous struct, initialize it and unmarshall it into JSON and pass it down the line.</p>
+<div class="sourceCode" id="cb495"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb495-1"><a href="#cb495-1" aria-hidden="true"></a><span class="kw">func</span> SendJSON(rw http.ResponseWriter, r *http.Request) {</span>
+<span id="cb495-2"><a href="#cb495-2" aria-hidden="true"></a>    u := <span class="kw">struct</span> {</span>
+<span id="cb495-3"><a href="#cb495-3" aria-hidden="true"></a>        Name <span class="dt">string</span></span>
+<span id="cb495-4"><a href="#cb495-4" aria-hidden="true"></a>        Email <span class="dt">string</span></span>
+<span id="cb495-5"><a href="#cb495-5" aria-hidden="true"></a>    }{</span>
+<span id="cb495-6"><a href="#cb495-6" aria-hidden="true"></a>        Name: <span class="st">&quot;Hoanh An&quot;</span>,</span>
+<span id="cb495-7"><a href="#cb495-7" aria-hidden="true"></a>        Email: <span class="st">&quot;hoanhan101@gmail.com&quot;</span>,</span>
+<span id="cb495-8"><a href="#cb495-8" aria-hidden="true"></a>    }</span>
+<span id="cb495-9"><a href="#cb495-9" aria-hidden="true"></a></span>
+<span id="cb495-10"><a href="#cb495-10" aria-hidden="true"></a>    rw.Header().Set(<span class="st">&quot;Content-Type&quot;</span>, <span class="st">&quot;application/json&quot;</span>)</span>
+<span id="cb495-11"><a href="#cb495-11" aria-hidden="true"></a>    rw.WriteHeader(<span class="dv">200</span>)</span>
+<span id="cb495-12"><a href="#cb495-12" aria-hidden="true"></a>    json.NewEncoder(rw).Encode(&amp;u)</span>
+<span id="cb495-13"><a href="#cb495-13" aria-hidden="true"></a>}</span></code></pre></div>
+<h6 id="example-test">Example Test</h6>
+<p>This is another type of test in Go. Examples are both tests and documentations. If we execute “godoc -http :3000”, Go will generate for us a server that presents the documentation of our code. The interface will look like the official golang interface, but then inside the Packages section are our local packages.</p>
+<p>Example functions are a little bit more concrete in terms of showing people how to use our API. More interestingly, Examples are not only for documentation but they can also be tests.</p>
+<p>For them to be tested, we need to add a comment at the end of the functions: one is Output and one is expected output. If we change the expected output to be something wrong then, the compiler will tell us when we run the test. Below is an example.</p>
+<p>Example tests are really powerful. They give users examples how to use the API and validate that the APIs and examples are working.</p>
+<div class="sourceCode" id="cb496"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb496-1"><a href="#cb496-1" aria-hidden="true"></a><span class="kw">package</span> handlers_test</span>
+<span id="cb496-2"><a href="#cb496-2" aria-hidden="true"></a></span>
+<span id="cb496-3"><a href="#cb496-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb496-4"><a href="#cb496-4" aria-hidden="true"></a>    <span class="st">&quot;encoding/json&quot;</span></span>
+<span id="cb496-5"><a href="#cb496-5" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb496-6"><a href="#cb496-6" aria-hidden="true"></a>    <span class="st">&quot;log&quot;</span></span>
+<span id="cb496-7"><a href="#cb496-7" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb496-8"><a href="#cb496-8" aria-hidden="true"></a>    <span class="st">&quot;net/http/httptest&quot;</span></span>
+<span id="cb496-9"><a href="#cb496-9" aria-hidden="true"></a>)</span></code></pre></div>
+<p>ExampleSendJSON provides a basic example. Notice that we are binding that Example to our SendJSON function.</p>
+<div class="sourceCode" id="cb497"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb497-1"><a href="#cb497-1" aria-hidden="true"></a><span class="kw">func</span> ExampleSendJSON() {</span>
+<span id="cb497-2"><a href="#cb497-2" aria-hidden="true"></a>    r := httptest.NewRequest(<span class="st">&quot;GET&quot;</span>, <span class="st">&quot;/sendjson&quot;</span>, <span class="ot">nil</span>)</span>
+<span id="cb497-3"><a href="#cb497-3" aria-hidden="true"></a>    w := httptest.NewRecorder()</span>
+<span id="cb497-4"><a href="#cb497-4" aria-hidden="true"></a>    http.DefaultServeMux.ServeHTTP(w, r)</span>
+<span id="cb497-5"><a href="#cb497-5" aria-hidden="true"></a></span>
+<span id="cb497-6"><a href="#cb497-6" aria-hidden="true"></a>    <span class="kw">var</span> u <span class="kw">struct</span> {</span>
+<span id="cb497-7"><a href="#cb497-7" aria-hidden="true"></a>        Name <span class="dt">string</span></span>
+<span id="cb497-8"><a href="#cb497-8" aria-hidden="true"></a>        Email <span class="dt">string</span></span>
+<span id="cb497-9"><a href="#cb497-9" aria-hidden="true"></a>    }</span>
+<span id="cb497-10"><a href="#cb497-10" aria-hidden="true"></a></span>
+<span id="cb497-11"><a href="#cb497-11" aria-hidden="true"></a>    <span class="kw">if</span> err := json.NewDecoder(w.Body).Decode(&amp;u); err != <span class="ot">nil</span> {</span>
+<span id="cb497-12"><a href="#cb497-12" aria-hidden="true"></a>        log.Println(<span class="st">&quot;ERROR:&quot;</span>, err)</span>
+<span id="cb497-13"><a href="#cb497-13" aria-hidden="true"></a>    }</span>
+<span id="cb497-14"><a href="#cb497-14" aria-hidden="true"></a></span>
+<span id="cb497-15"><a href="#cb497-15" aria-hidden="true"></a>    fmt.Println(u)</span>
+<span id="cb497-16"><a href="#cb497-16" aria-hidden="true"></a>    <span class="co">// Output:</span></span>
+<span id="cb497-17"><a href="#cb497-17" aria-hidden="true"></a>    <span class="co">// {Hoanh An hoanhan101@gmail.com}</span></span>
+<span id="cb497-18"><a href="#cb497-18" aria-hidden="true"></a>}</span></code></pre></div>
+<pre class="text"><code>=== RUN ExampleSendJSON
+--- PASS: ExampleSendJSON (0.00s)
+PASS
+ok      github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers 0.096s</code></pre>
+<h6 id="internal-test">Internal Test</h6>
+<p>Below is how to test the execution of an internal endpoint without having to stand up the server. Run test using “go test -v -run TestSendJSON”</p>
+<p>We are using handlers_test for package name because we want to make sure we only touch the exported API.</p>
+<div class="sourceCode" id="cb499"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb499-1"><a href="#cb499-1" aria-hidden="true"></a><span class="kw">package</span> handlers_test</span>
+<span id="cb499-2"><a href="#cb499-2" aria-hidden="true"></a></span>
+<span id="cb499-3"><a href="#cb499-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb499-4"><a href="#cb499-4" aria-hidden="true"></a>    <span class="st">&quot;encoding/json&quot;</span></span>
+<span id="cb499-5"><a href="#cb499-5" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb499-6"><a href="#cb499-6" aria-hidden="true"></a>    <span class="st">&quot;net/http/httptest&quot;</span></span>
+<span id="cb499-7"><a href="#cb499-7" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb499-8"><a href="#cb499-8" aria-hidden="true"></a>    <span class="st">&quot;github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers&quot;</span></span>
+<span id="cb499-9"><a href="#cb499-9" aria-hidden="true"></a>)</span>
+<span id="cb499-10"><a href="#cb499-10" aria-hidden="true"></a></span>
+<span id="cb499-11"><a href="#cb499-11" aria-hidden="true"></a><span class="kw">const</span> (</span>
+<span id="cb499-12"><a href="#cb499-12" aria-hidden="true"></a>    succeed = <span class="st">&quot;\u2713&quot;</span></span>
+<span id="cb499-13"><a href="#cb499-13" aria-hidden="true"></a>    failed  = <span class="st">&quot;\u2717&quot;</span></span>
+<span id="cb499-14"><a href="#cb499-14" aria-hidden="true"></a>)</span></code></pre></div>
+<p>This is very critical. If we forget to do this then nothing will work.</p>
+<div class="sourceCode" id="cb500"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb500-1"><a href="#cb500-1" aria-hidden="true"></a><span class="kw">func</span> init() {</span>
+<span id="cb500-2"><a href="#cb500-2" aria-hidden="true"></a>    handlers.Routes()</span>
+<span id="cb500-3"><a href="#cb500-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>TestSendJSON testing the sendjson internal endpoint. In order to mock this call, we don’t need the network. What we need to do is create a request and run it through the Mux so we are gonna bypass the network call together, run the request directly through the Mux to test the route and the handler.</p>
+<div class="sourceCode" id="cb501"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb501-1"><a href="#cb501-1" aria-hidden="true"></a><span class="kw">func</span> TestSendJSON(t *testing.T) {</span>
+<span id="cb501-2"><a href="#cb501-2" aria-hidden="true"></a>    url := <span class="st">&quot;/sendjson&quot;</span></span>
+<span id="cb501-3"><a href="#cb501-3" aria-hidden="true"></a>    statusCode := <span class="dv">200</span></span>
+<span id="cb501-4"><a href="#cb501-4" aria-hidden="true"></a></span>
+<span id="cb501-5"><a href="#cb501-5" aria-hidden="true"></a>    t.Log(<span class="st">&quot;Given the need to test the SendJSON endpoint.&quot;</span>)</span>
+<span id="cb501-6"><a href="#cb501-6" aria-hidden="true"></a>    {</span></code></pre></div>
+<p>Create a nil request GET for the URL.</p>
+<div class="sourceCode" id="cb502"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb502-1"><a href="#cb502-1" aria-hidden="true"></a>        r := httptest.NewRequest(<span class="st">&quot;GET&quot;</span>, url, <span class="ot">nil</span>)</span></code></pre></div>
+<p>NewRecorder gives us a pointer to its concrete type called ResponseRecorder that already implements the ResponseWriter interface.</p>
+<div class="sourceCode" id="cb503"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb503-1"><a href="#cb503-1" aria-hidden="true"></a>        w := httptest.NewRecorder()</span></code></pre></div>
+<p>ServerHTTP asks for a ResonseWriter and a Request. This call will perform the Mux and call that handler to test it without network. When his call comes back, the recorder value w has the result of the entire execution. Now we can use that to validate.</p>
+<div class="sourceCode" id="cb504"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb504-1"><a href="#cb504-1" aria-hidden="true"></a>        http.DefaultServeMux.ServeHTTP(w, r)</span>
+<span id="cb504-2"><a href="#cb504-2" aria-hidden="true"></a></span>
+<span id="cb504-3"><a href="#cb504-3" aria-hidden="true"></a>        t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">Test 0:</span><span class="ch">\t</span><span class="st">When checking %q for status code %d&quot;</span>, url, statusCode)</span>
+<span id="cb504-4"><a href="#cb504-4" aria-hidden="true"></a>        {</span>
+<span id="cb504-5"><a href="#cb504-5" aria-hidden="true"></a>            <span class="kw">if</span> w.Code != <span class="dv">200</span> {</span>
+<span id="cb504-6"><a href="#cb504-6" aria-hidden="true"></a>                t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a status code of %d for the response. Received[%d]&quot;</span>, failed, statusCode, w.Code)</span>
+<span id="cb504-7"><a href="#cb504-7" aria-hidden="true"></a>            }</span>
+<span id="cb504-8"><a href="#cb504-8" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a status code of %d for the response.&quot;</span>, succeed, statusCode)</span></code></pre></div>
+<p>If we got the 200, we try to unmarshal and validate it.</p>
+<div class="sourceCode" id="cb505"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb505-1"><a href="#cb505-1" aria-hidden="true"></a>            <span class="kw">var</span> u <span class="kw">struct</span> {</span>
+<span id="cb505-2"><a href="#cb505-2" aria-hidden="true"></a>                Name  <span class="dt">string</span></span>
+<span id="cb505-3"><a href="#cb505-3" aria-hidden="true"></a>                Email <span class="dt">string</span></span>
+<span id="cb505-4"><a href="#cb505-4" aria-hidden="true"></a>            }</span>
+<span id="cb505-5"><a href="#cb505-5" aria-hidden="true"></a></span>
+<span id="cb505-6"><a href="#cb505-6" aria-hidden="true"></a>            <span class="kw">if</span> err := json.NewDecoder(w.Body).Decode(&amp;u); err != <span class="ot">nil</span> {</span>
+<span id="cb505-7"><a href="#cb505-7" aria-hidden="true"></a>                t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to decode the response.&quot;</span>, failed)</span>
+<span id="cb505-8"><a href="#cb505-8" aria-hidden="true"></a>            }</span>
+<span id="cb505-9"><a href="#cb505-9" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to decode the response.&quot;</span>, succeed)</span>
+<span id="cb505-10"><a href="#cb505-10" aria-hidden="true"></a></span>
+<span id="cb505-11"><a href="#cb505-11" aria-hidden="true"></a>            <span class="kw">if</span> u.Name == <span class="st">&quot;Hoanh An&quot;</span> {</span>
+<span id="cb505-12"><a href="#cb505-12" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should have </span><span class="ch">\&quot;</span><span class="st">Hoanh An</span><span class="ch">\&quot;</span><span class="st"> for Name in the response.&quot;</span>, succeed)</span>
+<span id="cb505-13"><a href="#cb505-13" aria-hidden="true"></a>            } <span class="kw">else</span> {</span>
+<span id="cb505-14"><a href="#cb505-14" aria-hidden="true"></a>                t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should have </span><span class="ch">\&quot;</span><span class="st">Hoanh An</span><span class="ch">\&quot;</span><span class="st"> for Name in the response : %q&quot;</span>, failed, u.Name)</span>
+<span id="cb505-15"><a href="#cb505-15" aria-hidden="true"></a>            }</span>
+<span id="cb505-16"><a href="#cb505-16" aria-hidden="true"></a></span>
+<span id="cb505-17"><a href="#cb505-17" aria-hidden="true"></a>            <span class="kw">if</span> u.Email == <span class="st">&quot;hoanhan101@gmail.com&quot;</span> {</span>
+<span id="cb505-18"><a href="#cb505-18" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should have </span><span class="ch">\&quot;</span><span class="st">hoanhan101@gmail.com</span><span class="ch">\&quot;</span><span class="st"> for Email in the response.&quot;</span>, succeed)</span>
+<span id="cb505-19"><a href="#cb505-19" aria-hidden="true"></a>            } <span class="kw">else</span> {</span>
+<span id="cb505-20"><a href="#cb505-20" aria-hidden="true"></a>                t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should have </span><span class="ch">\&quot;</span><span class="st">hoanhan101@gmail.com</span><span class="ch">\&quot;</span><span class="st"> for Email in the response : %q&quot;</span>, failed, u.Email)</span>
+<span id="cb505-21"><a href="#cb505-21" aria-hidden="true"></a>            }</span>
+<span id="cb505-22"><a href="#cb505-22" aria-hidden="true"></a>        }</span>
+<span id="cb505-23"><a href="#cb505-23" aria-hidden="true"></a>    }</span>
+<span id="cb505-24"><a href="#cb505-24" aria-hidden="true"></a>}</span></code></pre></div>
+<pre class="text"><code>=== RUN TestSendJSON
+--- PASS: TestSendJSON (0.00s)
+    handlers_test.go:41:    Given the need to test the SendJSON endpoint.
+    handlers_test.go:55:    Test 0: When checking &quot;/sendjson&quot; for status code 200
+    handlers_test.go:60:    ✓     Should receive a status code of 200 for the response.
+    handlers_test.go:71:    ✓     Should be able to decode the response.
+    handlers_test.go:74:    ✓     Should have &quot;Hoanh An&quot; for Name in the response.
+    handlers_test.go:80:    ✓     Should have &quot;hoanhan@bennington.edu&quot; for Email in the response.
+PASS
+ok      github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers
+0.151s</code></pre>
+<h5 id="mock-server">Mock Server</h5>
+<p>Those basic tests that we just went through were cool but had a flaw: they require the use of the Internet. We cannot assume that we always have access to the resources we need. Therefore, mocking becomes an important part of testing in many cases. (Mocking databases if not the case here because it is hard to do so but other networking related things, we surely can do that).</p>
+<p>The standard library already has the http test package that let us mock different http stuff right out of the box. Below is how to mock an http GET call internally.</p>
+<div class="sourceCode" id="cb507"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb507-1"><a href="#cb507-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb507-2"><a href="#cb507-2" aria-hidden="true"></a></span>
+<span id="cb507-3"><a href="#cb507-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb507-4"><a href="#cb507-4" aria-hidden="true"></a>    <span class="st">&quot;encoding/xml&quot;</span></span>
+<span id="cb507-5"><a href="#cb507-5" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb507-6"><a href="#cb507-6" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
+<span id="cb507-7"><a href="#cb507-7" aria-hidden="true"></a>    <span class="st">&quot;net/http/httptest&quot;</span></span>
+<span id="cb507-8"><a href="#cb507-8" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb507-9"><a href="#cb507-9" aria-hidden="true"></a>)</span></code></pre></div>
+<p>feed is mocking the XML document we expect to receive. Noteice that we are using backtick ` instead of double quotes &quot; so we can reservce special characters.</p>
+<div class="sourceCode" id="cb508"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb508-1"><a href="#cb508-1" aria-hidden="true"></a><span class="kw">var</span> feed = <span class="st">`&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span></span>
+<span id="cb508-2"><a href="#cb508-2" aria-hidden="true"></a><span class="st">&lt;rss&gt;</span></span>
+<span id="cb508-3"><a href="#cb508-3" aria-hidden="true"></a><span class="st">&lt;channel&gt;</span></span>
+<span id="cb508-4"><a href="#cb508-4" aria-hidden="true"></a><span class="st">    &lt;title&gt;Going Go Programming&lt;/title&gt;</span></span>
+<span id="cb508-5"><a href="#cb508-5" aria-hidden="true"></a><span class="st">    &lt;description&gt;Golang : https://github.com/goinggo&lt;/description&gt;</span></span>
+<span id="cb508-6"><a href="#cb508-6" aria-hidden="true"></a><span class="st">    &lt;link&gt;http://www.goinggo.net/&lt;/link&gt;</span></span>
+<span id="cb508-7"><a href="#cb508-7" aria-hidden="true"></a><span class="st">    &lt;item&gt;</span></span>
+<span id="cb508-8"><a href="#cb508-8" aria-hidden="true"></a><span class="st">        &lt;pubDate&gt;Sun, 15 Mar 2015 15:04:00 +0000&lt;/pubDate&gt;</span></span>
+<span id="cb508-9"><a href="#cb508-9" aria-hidden="true"></a><span class="st">        &lt;title&gt;Object Oriented Programming Mechanics&lt;/title&gt;</span></span>
+<span id="cb508-10"><a href="#cb508-10" aria-hidden="true"></a><span class="st">        &lt;description&gt;Go is an object oriented language.&lt;/description&gt;</span></span>
+<span id="cb508-11"><a href="#cb508-11" aria-hidden="true"></a><span class="st">        &lt;link&gt;http://www.goinggo.net/2015/03/object-oriented&lt;/link&gt;</span></span>
+<span id="cb508-12"><a href="#cb508-12" aria-hidden="true"></a><span class="st">    &lt;/item&gt;</span></span>
+<span id="cb508-13"><a href="#cb508-13" aria-hidden="true"></a><span class="st">    &lt;/channel&gt;</span></span>
+<span id="cb508-14"><a href="#cb508-14" aria-hidden="true"></a><span class="st">&lt;/rss&gt;`</span></span></code></pre></div>
+<p>Item defines the fields associated with the item tag in the mock RSS document.</p>
+<div class="sourceCode" id="cb509"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb509-1"><a href="#cb509-1" aria-hidden="true"></a><span class="kw">type</span> Item <span class="kw">struct</span> {</span>
+<span id="cb509-2"><a href="#cb509-2" aria-hidden="true"></a>    XMLName     xml.Name <span class="st">`xml:&quot;item&quot;`</span></span>
+<span id="cb509-3"><a href="#cb509-3" aria-hidden="true"></a>    Title       <span class="dt">string</span>   <span class="st">`xml:&quot;title&quot;`</span></span>
+<span id="cb509-4"><a href="#cb509-4" aria-hidden="true"></a>    Description <span class="dt">string</span>   <span class="st">`xml:&quot;description&quot;`</span></span>
+<span id="cb509-5"><a href="#cb509-5" aria-hidden="true"></a>    Link        <span class="dt">string</span>   <span class="st">`xml:&quot;link&quot;`</span></span>
+<span id="cb509-6"><a href="#cb509-6" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Channel defince the fields associated with the channel tag in the mock RSS document</p>
+<div class="sourceCode" id="cb510"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb510-1"><a href="#cb510-1" aria-hidden="true"></a><span class="kw">type</span> Channel <span class="kw">struct</span> {</span>
+<span id="cb510-2"><a href="#cb510-2" aria-hidden="true"></a>    XMLName     xml.Name <span class="st">`xml:&quot;channel&quot;`</span></span>
+<span id="cb510-3"><a href="#cb510-3" aria-hidden="true"></a>    Title       <span class="dt">string</span>   <span class="st">`xml:&quot;title&quot;`</span></span>
+<span id="cb510-4"><a href="#cb510-4" aria-hidden="true"></a>    Description <span class="dt">string</span>   <span class="st">`xml:&quot;description&quot;`</span></span>
+<span id="cb510-5"><a href="#cb510-5" aria-hidden="true"></a>    Link        <span class="dt">string</span>   <span class="st">`xml:&quot;link&quot;`</span></span>
+<span id="cb510-6"><a href="#cb510-6" aria-hidden="true"></a>    PubDate     <span class="dt">string</span>   <span class="st">`xml:&quot;pubDate&quot;`</span></span>
+<span id="cb510-7"><a href="#cb510-7" aria-hidden="true"></a>    Items       []Item   <span class="st">`xml:&quot;item&quot;`</span></span>
+<span id="cb510-8"><a href="#cb510-8" aria-hidden="true"></a>}</span></code></pre></div>
+<p>Document defines the fields associated with teh mock RSS document.</p>
+<div class="sourceCode" id="cb511"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb511-1"><a href="#cb511-1" aria-hidden="true"></a><span class="kw">type</span> Document <span class="kw">struct</span> {</span>
+<span id="cb511-2"><a href="#cb511-2" aria-hidden="true"></a>    XMLName xml.Name <span class="st">`xml:&quot;rss&quot;`</span></span>
+<span id="cb511-3"><a href="#cb511-3" aria-hidden="true"></a>    Channel Channel  <span class="st">`xml:&quot;channel&quot;`</span></span>
+<span id="cb511-4"><a href="#cb511-4" aria-hidden="true"></a>    URI     <span class="dt">string</span></span>
+<span id="cb511-5"><a href="#cb511-5" aria-hidden="true"></a>}</span></code></pre></div>
+<p>mockServer returns a pointer of type httptest.Server to handle the mock get call. This mock function calls NewServer function that is gonna stand up a web server for us automatically. All we have to give NewServer is a function of the Handler type, which is f. f creates an anonymous function with the signature of ResponseWriter and Request. This is the core signature of everything related to http in Go. ResponseWriter is an interface that allows us to write the response out. Normally when we get this interface value, there is already a concrete type value stored inside of it that supports what we are doing.</p>
+<p>Request is a concrete type that we are gonna get with the request. This is how it’s gonna work. We are gonna get a mock server started by making a NewServer call. When the request comes into it, execute f. Therefore, f is doing the entire mock. We are gonna send 200 down the line, set the header to XML and use Fprintln to take the Response Writer interface value and feed it with the raw string we defined above.</p>
+<div class="sourceCode" id="cb512"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb512-1"><a href="#cb512-1" aria-hidden="true"></a><span class="kw">func</span> mockServer() *httptest.Server {</span>
+<span id="cb512-2"><a href="#cb512-2" aria-hidden="true"></a>    f := <span class="kw">func</span>(w http.ResponseWriter, r *http.Request) {</span>
+<span id="cb512-3"><a href="#cb512-3" aria-hidden="true"></a>        w.WriteHeader(<span class="dv">200</span>)</span>
+<span id="cb512-4"><a href="#cb512-4" aria-hidden="true"></a>        w.Header().Set(<span class="st">&quot;Content-Type&quot;</span>, <span class="st">&quot;application/xml&quot;</span>)</span>
+<span id="cb512-5"><a href="#cb512-5" aria-hidden="true"></a>        fmt.Fprintln(w, feed)</span>
+<span id="cb512-6"><a href="#cb512-6" aria-hidden="true"></a>    }</span>
+<span id="cb512-7"><a href="#cb512-7" aria-hidden="true"></a>    <span class="kw">return</span> httptest.NewServer(http.HandlerFunc(f))</span>
+<span id="cb512-8"><a href="#cb512-8" aria-hidden="true"></a>}</span></code></pre></div>
+<p>TestWeb validates the http Get function can download content and the content can be unmarshalled and clean.</p>
+<div class="sourceCode" id="cb513"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb513-1"><a href="#cb513-1" aria-hidden="true"></a><span class="kw">func</span> TestWeb(t *testing.T) {</span>
+<span id="cb513-2"><a href="#cb513-2" aria-hidden="true"></a>    statusCode := http.StatusOK</span></code></pre></div>
+<p>Call the mock server and defer close to shut it down cleanly</p>
+<div class="sourceCode" id="cb514"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb514-1"><a href="#cb514-1" aria-hidden="true"></a>    server := mockServer()</span>
+<span id="cb514-2"><a href="#cb514-2" aria-hidden="true"></a>    <span class="kw">defer</span> server.Close()</span></code></pre></div>
+<p>Now, it’s just the matter of using server value to know what URL we need to use to run this mock. From the http.Get point of view, it is making an URL call. It has no idea that it’s hitting the mock server. We have mocked out a perfect response.</p>
+<div class="sourceCode" id="cb515"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb515-1"><a href="#cb515-1" aria-hidden="true"></a>    t.Log(<span class="st">&quot;Given the need to test downloading content.&quot;</span>)</span>
+<span id="cb515-2"><a href="#cb515-2" aria-hidden="true"></a>    {</span>
+<span id="cb515-3"><a href="#cb515-3" aria-hidden="true"></a>        t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">Test 0:</span><span class="ch">\t</span><span class="st">When checking %q for status code %d&quot;</span>, server.URL, statusCode)</span>
+<span id="cb515-4"><a href="#cb515-4" aria-hidden="true"></a>        {</span>
+<span id="cb515-5"><a href="#cb515-5" aria-hidden="true"></a>            resp, err := http.Get(server.URL)</span>
+<span id="cb515-6"><a href="#cb515-6" aria-hidden="true"></a>            <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
+<span id="cb515-7"><a href="#cb515-7" aria-hidden="true"></a>                t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call : %v&quot;</span>, failed, err)</span>
+<span id="cb515-8"><a href="#cb515-8" aria-hidden="true"></a>            }</span>
+<span id="cb515-9"><a href="#cb515-9" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to make the Get call.&quot;</span>, succeed)</span>
+<span id="cb515-10"><a href="#cb515-10" aria-hidden="true"></a></span>
+<span id="cb515-11"><a href="#cb515-11" aria-hidden="true"></a>            <span class="kw">defer</span> resp.Body.Close()</span>
+<span id="cb515-12"><a href="#cb515-12" aria-hidden="true"></a></span>
+<span id="cb515-13"><a href="#cb515-13" aria-hidden="true"></a>            <span class="kw">if</span> resp.StatusCode != statusCode {</span>
+<span id="cb515-14"><a href="#cb515-14" aria-hidden="true"></a>                t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code : %v&quot;</span>, failed, statusCode, resp.StatusCode)</span>
+<span id="cb515-15"><a href="#cb515-15" aria-hidden="true"></a>            }</span>
+<span id="cb515-16"><a href="#cb515-16" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should receive a %d status code.&quot;</span>, succeed, statusCode)</span></code></pre></div>
+<p>When we get the response back, we are unmarshaling it from XML to our struct type and do some extra validation with that as we go.</p>
+<div class="sourceCode" id="cb516"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb516-1"><a href="#cb516-1" aria-hidden="true"></a>            <span class="kw">var</span> d Document</span>
+<span id="cb516-2"><a href="#cb516-2" aria-hidden="true"></a>            <span class="kw">if</span> err := xml.NewDecoder(resp.Body).Decode(&amp;d); err != <span class="ot">nil</span> {</span>
+<span id="cb516-3"><a href="#cb516-3" aria-hidden="true"></a>                t.Fatalf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to unmarshal the response : %v&quot;</span>, failed, err)</span>
+<span id="cb516-4"><a href="#cb516-4" aria-hidden="true"></a>            }</span>
+<span id="cb516-5"><a href="#cb516-5" aria-hidden="true"></a>            t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should be able to unmarshal the response.&quot;</span>, succeed)</span>
+<span id="cb516-6"><a href="#cb516-6" aria-hidden="true"></a></span>
+<span id="cb516-7"><a href="#cb516-7" aria-hidden="true"></a>            <span class="kw">if</span> <span class="bu">len</span>(d.Channel.Items) == <span class="dv">1</span> {</span>
+<span id="cb516-8"><a href="#cb516-8" aria-hidden="true"></a>                t.Logf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should have 1 item in the feed.&quot;</span>, succeed)</span>
+<span id="cb516-9"><a href="#cb516-9" aria-hidden="true"></a>            } <span class="kw">else</span> {</span>
+<span id="cb516-10"><a href="#cb516-10" aria-hidden="true"></a>                t.Errorf(<span class="st">&quot;</span><span class="ch">\t</span><span class="st">%s</span><span class="ch">\t</span><span class="st">Should have 1 item in the feed : %d&quot;</span>, failed, <span class="bu">len</span>(d.Channel.Items))</span>
+<span id="cb516-11"><a href="#cb516-11" aria-hidden="true"></a>            }</span>
+<span id="cb516-12"><a href="#cb516-12" aria-hidden="true"></a>        }</span>
+<span id="cb516-13"><a href="#cb516-13" aria-hidden="true"></a>    }</span>
+<span id="cb516-14"><a href="#cb516-14" aria-hidden="true"></a>}</span></code></pre></div>
+<pre class="text"><code>=== RUN TestWeb
+--- PASS: TestWeb (0.00s)
+    web_test.go:109:    Given the need to test downloading content.
+    web_test.go:111:    Test 0: When checking &quot;http://127.0.0.1:58548&quot; for status code 200
+    web_test.go:117:    ✓     Should be able to make the Get call.
+    web_test.go:124:    ✓     Should receive a 200 status code.
+    web_test.go:132:    ✓     Should be able to unmarshal the response.
+    web_test.go:135:    ✓     Should have 1 item in the feed.
+PASS
+ok      command-line-arguments 0.191s</code></pre>
+<h3 id="benchmarking">Benchmarking</h3>
+<h4 id="basic-benchmark">Basic Benchmark</h4>
+<p>Benchmark file’s have to have <code>&lt;file_name&gt;_test.go</code> and use the Benchmark functions like below. The goal is to know what performs better and what allocate more or less between Sprint and Sprintf. Our guess is that Sprint is gonna be better because it doesn’t have any overhead doing the formatting. However, this is not true. Remember we have to optimize for correctness so we don’t want to guess.</p>
+<div class="sourceCode" id="cb518"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb518-1"><a href="#cb518-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb518-2"><a href="#cb518-2" aria-hidden="true"></a></span>
+<span id="cb518-3"><a href="#cb518-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb518-4"><a href="#cb518-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb518-5"><a href="#cb518-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb518-6"><a href="#cb518-6" aria-hidden="true"></a>)</span>
+<span id="cb518-7"><a href="#cb518-7" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
 <p>BenchmarkSprint tests the performance of using Sprint. All the code we want to benchmark need to be inside the b.N for loop. The first time the tool call it, b.N is equal to 1. It will keep increasing the value of N and run long enough based on our bench time. fmt.Sprint returns a value and we want to capture this value so it doesn’t look like dead code. We assign it to the global variable gs.</p>
-<div class="sourceCode" id="cb477"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb477-1"><a href="#cb477-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintBasic(b *testing.B) {</span>
-<span id="cb477-2"><a href="#cb477-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb477-3"><a href="#cb477-3" aria-hidden="true"></a></span>
-<span id="cb477-4"><a href="#cb477-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
-<span id="cb477-5"><a href="#cb477-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb477-6"><a href="#cb477-6" aria-hidden="true"></a>    }</span>
-<span id="cb477-7"><a href="#cb477-7" aria-hidden="true"></a>    gs = s</span>
-<span id="cb477-8"><a href="#cb477-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb519"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb519-1"><a href="#cb519-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintBasic(b *testing.B) {</span>
+<span id="cb519-2"><a href="#cb519-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb519-3"><a href="#cb519-3" aria-hidden="true"></a></span>
+<span id="cb519-4"><a href="#cb519-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
+<span id="cb519-5"><a href="#cb519-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb519-6"><a href="#cb519-6" aria-hidden="true"></a>    }</span>
+<span id="cb519-7"><a href="#cb519-7" aria-hidden="true"></a>    gs = s</span>
+<span id="cb519-8"><a href="#cb519-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p>BenchmarkSprint tests the performance of using Sprintf.</p>
-<div class="sourceCode" id="cb478"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb478-1"><a href="#cb478-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintfBasic(b *testing.B) {</span>
-<span id="cb478-2"><a href="#cb478-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb478-3"><a href="#cb478-3" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
-<span id="cb478-4"><a href="#cb478-4" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb478-5"><a href="#cb478-5" aria-hidden="true"></a>    }</span>
-<span id="cb478-6"><a href="#cb478-6" aria-hidden="true"></a>    gs = s</span>
-<span id="cb478-7"><a href="#cb478-7" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb520"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb520-1"><a href="#cb520-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintfBasic(b *testing.B) {</span>
+<span id="cb520-2"><a href="#cb520-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb520-3"><a href="#cb520-3" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
+<span id="cb520-4"><a href="#cb520-4" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb520-5"><a href="#cb520-5" aria-hidden="true"></a>    }</span>
+<span id="cb520-6"><a href="#cb520-6" aria-hidden="true"></a>    gs = s</span>
+<span id="cb520-7"><a href="#cb520-7" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>go test -run none -bench . -benchtime 3s -benchmem</code></p>
 <pre class="text"><code>goos: darwin
 goarch: amd64
@@ -3420,35 +3908,35 @@ PASS
 ok  command-line-arguments  6.637s</code></pre>
 <h4 id="sub-benchmark">Sub Benchmark</h4>
 <p>Like sub tests, we can also do sub benchmark.</p>
-<div class="sourceCode" id="cb480"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb480-1"><a href="#cb480-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb480-2"><a href="#cb480-2" aria-hidden="true"></a></span>
-<span id="cb480-3"><a href="#cb480-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb480-4"><a href="#cb480-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
-<span id="cb480-5"><a href="#cb480-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
-<span id="cb480-6"><a href="#cb480-6" aria-hidden="true"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb522"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb522-1"><a href="#cb522-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb522-2"><a href="#cb522-2" aria-hidden="true"></a></span>
+<span id="cb522-3"><a href="#cb522-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb522-4"><a href="#cb522-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
+<span id="cb522-5"><a href="#cb522-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
+<span id="cb522-6"><a href="#cb522-6" aria-hidden="true"></a>)</span></code></pre></div>
 <p>BenchmarkSprint tests all the Sprint related benchmarks as sub benchmarks.</p>
-<div class="sourceCode" id="cb481"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb481-1"><a href="#cb481-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintSub(b *testing.B) {</span>
-<span id="cb481-2"><a href="#cb481-2" aria-hidden="true"></a>    b.Run(<span class="st">&quot;none&quot;</span>, benchSprint)</span>
-<span id="cb481-3"><a href="#cb481-3" aria-hidden="true"></a>    b.Run(<span class="st">&quot;format&quot;</span>, benchSprintf)</span>
-<span id="cb481-4"><a href="#cb481-4" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb523"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb523-1"><a href="#cb523-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintSub(b *testing.B) {</span>
+<span id="cb523-2"><a href="#cb523-2" aria-hidden="true"></a>    b.Run(<span class="st">&quot;none&quot;</span>, benchSprint)</span>
+<span id="cb523-3"><a href="#cb523-3" aria-hidden="true"></a>    b.Run(<span class="st">&quot;format&quot;</span>, benchSprintf)</span>
+<span id="cb523-4"><a href="#cb523-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p>benchSprint tests the performance of using Sprint.</p>
-<div class="sourceCode" id="cb482"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb482-1"><a href="#cb482-1" aria-hidden="true"></a><span class="kw">func</span> benchSprint(b *testing.B) {</span>
-<span id="cb482-2"><a href="#cb482-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb482-3"><a href="#cb482-3" aria-hidden="true"></a></span>
-<span id="cb482-4"><a href="#cb482-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
-<span id="cb482-5"><a href="#cb482-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb482-6"><a href="#cb482-6" aria-hidden="true"></a>    }</span>
-<span id="cb482-7"><a href="#cb482-7" aria-hidden="true"></a>    gs = s</span>
-<span id="cb482-8"><a href="#cb482-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb524"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb524-1"><a href="#cb524-1" aria-hidden="true"></a><span class="kw">func</span> benchSprint(b *testing.B) {</span>
+<span id="cb524-2"><a href="#cb524-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb524-3"><a href="#cb524-3" aria-hidden="true"></a></span>
+<span id="cb524-4"><a href="#cb524-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
+<span id="cb524-5"><a href="#cb524-5" aria-hidden="true"></a>        s = fmt.Sprint(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb524-6"><a href="#cb524-6" aria-hidden="true"></a>    }</span>
+<span id="cb524-7"><a href="#cb524-7" aria-hidden="true"></a>    gs = s</span>
+<span id="cb524-8"><a href="#cb524-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p>benchSprintf tests the performance of using Sprintf.</p>
-<div class="sourceCode" id="cb483"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb483-1"><a href="#cb483-1" aria-hidden="true"></a><span class="kw">func</span> benchSprintf(b *testing.B) {</span>
-<span id="cb483-2"><a href="#cb483-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
-<span id="cb483-3"><a href="#cb483-3" aria-hidden="true"></a></span>
-<span id="cb483-4"><a href="#cb483-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i&lt;b.N; i++ {</span>
-<span id="cb483-5"><a href="#cb483-5" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
-<span id="cb483-6"><a href="#cb483-6" aria-hidden="true"></a>    }</span>
-<span id="cb483-7"><a href="#cb483-7" aria-hidden="true"></a>    gs = s</span>
-<span id="cb483-8"><a href="#cb483-8" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb525"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb525-1"><a href="#cb525-1" aria-hidden="true"></a><span class="kw">func</span> benchSprintf(b *testing.B) {</span>
+<span id="cb525-2"><a href="#cb525-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
+<span id="cb525-3"><a href="#cb525-3" aria-hidden="true"></a></span>
+<span id="cb525-4"><a href="#cb525-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i&lt;b.N; i++ {</span>
+<span id="cb525-5"><a href="#cb525-5" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb525-6"><a href="#cb525-6" aria-hidden="true"></a>    }</span>
+<span id="cb525-7"><a href="#cb525-7" aria-hidden="true"></a>    gs = s</span>
+<span id="cb525-8"><a href="#cb525-8" aria-hidden="true"></a>}</span></code></pre></div>
 <p><code>go test -run none -bench . -benchtime 3s -benchmem</code></p>
 <pre class="text"><code>goos: darwin
 goarch: amd64
@@ -3465,16 +3953,16 @@ ok command-line-arguments 7.131s</code></pre>
 <h4 id="stack-trace">Stack Trace</h4>
 <h5 id="review-stack-trace">Review Stack Trace</h5>
 <p>How to read stack traces?</p>
-<div class="sourceCode" id="cb485"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb485-1"><a href="#cb485-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb485-2"><a href="#cb485-2" aria-hidden="true"></a></span>
-<span id="cb485-3"><a href="#cb485-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<div class="sourceCode" id="cb527"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb527-1"><a href="#cb527-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb527-2"><a href="#cb527-2" aria-hidden="true"></a></span>
+<span id="cb527-3"><a href="#cb527-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>We are making a slice of length 2, capacity 4 and then passing that slice value into a function call example. example takes a slice, a string, and an integer.</p>
-<div class="sourceCode" id="cb486"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb486-1"><a href="#cb486-1" aria-hidden="true"></a>    example(<span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">2</span>, <span class="dv">4</span>), <span class="st">&quot;hello&quot;</span>, <span class="dv">10</span>)</span>
-<span id="cb486-2"><a href="#cb486-2" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb528"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb528-1"><a href="#cb528-1" aria-hidden="true"></a>    example(<span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">2</span>, <span class="dv">4</span>), <span class="st">&quot;hello&quot;</span>, <span class="dv">10</span>)</span>
+<span id="cb528-2"><a href="#cb528-2" aria-hidden="true"></a>}</span></code></pre></div>
 <p>examples call the built-in function panic to demonstrate the stack traces.</p>
-<div class="sourceCode" id="cb487"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb487-1"><a href="#cb487-1" aria-hidden="true"></a><span class="kw">func</span> example(slice []<span class="dt">string</span>, str <span class="dt">string</span>, i <span class="dt">int</span>) {</span>
-<span id="cb487-2"><a href="#cb487-2" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
-<span id="cb487-3"><a href="#cb487-3" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb529"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb529-1"><a href="#cb529-1" aria-hidden="true"></a><span class="kw">func</span> example(slice []<span class="dt">string</span>, str <span class="dt">string</span>, i <span class="dt">int</span>) {</span>
+<span id="cb529-2"><a href="#cb529-2" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
+<span id="cb529-3"><a href="#cb529-3" aria-hidden="true"></a>}</span></code></pre></div>
 <p>This is the output that we get:</p>
 <pre class="text"><code>panic: Want stack trace
 
@@ -3490,16 +3978,16 @@ exit status 2</code></pre>
 <p>If we ask for the data we need, this is a benefit that we can get just by looking at the stack traces and see the values that are going in. If we work with the error package from Dave, wrap it and add more context, and log package, we have more than enough information to debug a problem.</p>
 <h5 id="packing">Packing</h5>
 <p>Sample stack races that pack values.</p>
-<div class="sourceCode" id="cb489"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb489-1"><a href="#cb489-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb489-2"><a href="#cb489-2" aria-hidden="true"></a></span>
-<span id="cb489-3"><a href="#cb489-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<div class="sourceCode" id="cb531"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb531-1"><a href="#cb531-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb531-2"><a href="#cb531-2" aria-hidden="true"></a></span>
+<span id="cb531-3"><a href="#cb531-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>Passing values that are 1-byte values.</p>
-<div class="sourceCode" id="cb490"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb490-1"><a href="#cb490-1" aria-hidden="true"></a>    example(<span class="ot">true</span>, <span class="ot">false</span>, <span class="ot">true</span>, <span class="dv">25</span>)</span>
-<span id="cb490-2"><a href="#cb490-2" aria-hidden="true"></a>}</span>
-<span id="cb490-3"><a href="#cb490-3" aria-hidden="true"></a></span>
-<span id="cb490-4"><a href="#cb490-4" aria-hidden="true"></a><span class="kw">func</span> example(b1, b2, b3 <span class="dt">bool</span>, i <span class="dt">uint8</span>) {</span>
-<span id="cb490-5"><a href="#cb490-5" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
-<span id="cb490-6"><a href="#cb490-6" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb532"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb532-1"><a href="#cb532-1" aria-hidden="true"></a>    example(<span class="ot">true</span>, <span class="ot">false</span>, <span class="ot">true</span>, <span class="dv">25</span>)</span>
+<span id="cb532-2"><a href="#cb532-2" aria-hidden="true"></a>}</span>
+<span id="cb532-3"><a href="#cb532-3" aria-hidden="true"></a></span>
+<span id="cb532-4"><a href="#cb532-4" aria-hidden="true"></a><span class="kw">func</span> example(b1, b2, b3 <span class="dt">bool</span>, i <span class="dt">uint8</span>) {</span>
+<span id="cb532-5"><a href="#cb532-5" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
+<span id="cb532-6"><a href="#cb532-6" aria-hidden="true"></a>}</span></code></pre></div>
 <p>This is the output that we get:</p>
 <pre class="text"><code>panic: Want stack trace
 
@@ -3551,26 +4039,26 @@ exit status 2</code></pre>
 <h4 id="godebug">GODEBUG</h4>
 <h5 id="memory-tracing">Memory Tracing</h5>
 <p>Memory Tracing gives us a general idea if our software is healthy as related to the GC and memory in the heap that we are working with. Below is a sample program that causes memory leaks.</p>
-<div class="sourceCode" id="cb492"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb492-1"><a href="#cb492-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb492-2"><a href="#cb492-2" aria-hidden="true"></a></span>
-<span id="cb492-3"><a href="#cb492-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb492-4"><a href="#cb492-4" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
-<span id="cb492-5"><a href="#cb492-5" aria-hidden="true"></a>    <span class="st">&quot;os/signal&quot;</span></span>
-<span id="cb492-6"><a href="#cb492-6" aria-hidden="true"></a>)</span>
-<span id="cb492-7"><a href="#cb492-7" aria-hidden="true"></a></span>
-<span id="cb492-8"><a href="#cb492-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<div class="sourceCode" id="cb534"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb534-1"><a href="#cb534-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb534-2"><a href="#cb534-2" aria-hidden="true"></a></span>
+<span id="cb534-3"><a href="#cb534-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb534-4"><a href="#cb534-4" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
+<span id="cb534-5"><a href="#cb534-5" aria-hidden="true"></a>    <span class="st">&quot;os/signal&quot;</span></span>
+<span id="cb534-6"><a href="#cb534-6" aria-hidden="true"></a>)</span>
+<span id="cb534-7"><a href="#cb534-7" aria-hidden="true"></a></span>
+<span id="cb534-8"><a href="#cb534-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
 <p>Create a Goroutine that leaks memory. Dumping key-value pairs to put tons of allocation.</p>
-<div class="sourceCode" id="cb493"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb493-1"><a href="#cb493-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
-<span id="cb493-2"><a href="#cb493-2" aria-hidden="true"></a>        m := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">int</span>]<span class="dt">int</span>)</span>
-<span id="cb493-3"><a href="#cb493-3" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; ; i++ {</span>
-<span id="cb493-4"><a href="#cb493-4" aria-hidden="true"></a>            m[i] = i</span>
-<span id="cb493-5"><a href="#cb493-5" aria-hidden="true"></a>        }</span>
-<span id="cb493-6"><a href="#cb493-6" aria-hidden="true"></a>    }()</span></code></pre></div>
+<div class="sourceCode" id="cb535"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb535-1"><a href="#cb535-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
+<span id="cb535-2"><a href="#cb535-2" aria-hidden="true"></a>        m := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">int</span>]<span class="dt">int</span>)</span>
+<span id="cb535-3"><a href="#cb535-3" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; ; i++ {</span>
+<span id="cb535-4"><a href="#cb535-4" aria-hidden="true"></a>            m[i] = i</span>
+<span id="cb535-5"><a href="#cb535-5" aria-hidden="true"></a>        }</span>
+<span id="cb535-6"><a href="#cb535-6" aria-hidden="true"></a>    }()</span></code></pre></div>
 <p>Shutdown the program with Ctrl-C.</p>
-<div class="sourceCode" id="cb494"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb494-1"><a href="#cb494-1" aria-hidden="true"></a>    sig := <span class="bu">make</span>(<span class="kw">chan</span> os.Signal, <span class="dv">1</span>)</span>
-<span id="cb494-2"><a href="#cb494-2" aria-hidden="true"></a>    signal.Notify(sig)</span>
-<span id="cb494-3"><a href="#cb494-3" aria-hidden="true"></a>    &lt;-sig</span>
-<span id="cb494-4"><a href="#cb494-4" aria-hidden="true"></a>}</span></code></pre></div>
+<div class="sourceCode" id="cb536"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb536-1"><a href="#cb536-1" aria-hidden="true"></a>    sig := <span class="bu">make</span>(<span class="kw">chan</span> os.Signal, <span class="dv">1</span>)</span>
+<span id="cb536-2"><a href="#cb536-2" aria-hidden="true"></a>    signal.Notify(sig)</span>
+<span id="cb536-3"><a href="#cb536-3" aria-hidden="true"></a>    &lt;-sig</span>
+<span id="cb536-4"><a href="#cb536-4" aria-hidden="true"></a>}</span></code></pre></div>
 <p>We are using a special environmental variable called <code>GODEBUG</code>. It gives us the ability to do a memory trace and a scheduler trace. Here are the steps to build and run:</p>
 <p>Build the program by: <code>go build memory_tracing.go</code></p>
 <p>Run the binary: <code>GODEBUG=gctrace=1 ./memory_tracing</code></p>
