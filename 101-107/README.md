@@ -2,8 +2,8 @@
 
 Assigned to
 
-- 권용민/@snowmerak
 - 강영주/@979156
+- 권용민/@snowmerak
 
 Mandatory reviewer
 
@@ -19,9 +19,3 @@ Mandatory reviewer
 > #### Error variables 103
 >
 > #### Type as context 105
->
-> #### Behavior as context 107
->
-> #### Finding the bug 110
->
-> #### Wrapping Errors 111
