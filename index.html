@@ -3199,7 +3199,7 @@ Terminating Program</code></pre>
 <pre class="terminal"><code>User Hoanh
 User Not Found</code></pre>
 <h5 id="withcancel">WithCancel</h5>
-<p>Different ways we can do cancellation, timeout in Go.</p>
+<p>Go에서는 취소(cancellation)와 타임아웃(timeout)을 다른 방법으로도 할 수 있다.</p>
 <div class="sourceCode" id="cb438"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb438-1"><a href="#cb438-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb438-2"><a href="#cb438-2" aria-hidden="true"></a></span>
 <span id="cb438-3"><a href="#cb438-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -3209,18 +3209,18 @@ User Not Found</code></pre>
 <span id="cb438-7"><a href="#cb438-7" aria-hidden="true"></a>)</span>
 <span id="cb438-8"><a href="#cb438-8" aria-hidden="true"></a></span>
 <span id="cb438-9"><a href="#cb438-9" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Create a context that is cancellable only manually. The cancel function must be called regardless of the outcome. <code>WithCancel</code> allows us to create a context and provides us a <code>cancel</code> function that can be called in order to report a signal, a signal without data, that we want to whatever that Goroutine is doing to stop right away. Again, we are using <code>Background</code> as our parents context.</p>
+<p>수동으로만 취소할 수 있는 context를 만들어 보자. <code>cancel</code> 함수는 결과와 상관없이 호출 해야 한다. <code>WithCancel</code>을 사용하면, context를 생성 할 수 있으며, 고루틴(goroutine)이 실행하는 모든 작업을 즉시 중단하기를 원하는 신호(데이터 없는 신호)를 전달하기 위해 호출 할 수 있는 <code>cancel</code> 함수를 제공한다. 다시 강조하지만, 여기서도 <code>Background</code>를 상위 context (parent context)로 사용하고 있다.</p>
 <div class="sourceCode" id="cb439"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb439-1"><a href="#cb439-1" aria-hidden="true"></a>    ctx, cancel := context.WithCancel(context.Background())</span></code></pre></div>
-<p>The cancel function must be called regardless of the outcome. The Goroutine that creates the context must always call <code>cancel</code>. These are things that have to be cleaned up. It’s the responsibility that the Goroutine creates the context the first time to make sure to call <code>cancel</code> after everything is done. The use of the <code>defer</code> keyword is prefect here for this use case.</p>
+<p><code>cancel</code> 함수는 결과와 상관없이 반드시 호출해야 한다. context를 생성하는 고루틴은 항상 <code>cancel</code> 함수를 호출해야 한다. 이러한 것들은 깔끔하게 정리해 주어야 한다. (역주: <code>cancel</code> 함수를 반드시 호출할 수 있게 정리 해 주어야 함) 고루틴이 모든 작업이 완료된 이후, <code>cancel</code> 함수를 호출하도록 context를 생성하는 당시에 확인하는 것이 필요하다. <code>defer</code> 키워드는 위와 같은 사용사례(use case)에 적합하다.</p>
 <div class="sourceCode" id="cb440"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb440-1"><a href="#cb440-1" aria-hidden="true"></a>    <span class="kw">defer</span> cancel()</span></code></pre></div>
-<p>We launch a Goroutine to do some work for us. It is going to sleep for 50 milliseconds and then call <code>cancel</code>. It is reporting that it wants to signal a <code>cancel</code> without data.</p>
+<p>몇몇 작업을 수행하기 위해서 고루틴을 사용하고자 한다. 데이터 없이 50ms 정도 지연을 한 이후, <code>cancel</code> 함수를 호출하려 한다. 데이터 없이 <code>cancel</code> 신호를 보내고 싶다고 전달하고 있다.</p>
 <div class="sourceCode" id="cb441"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb441-1"><a href="#cb441-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span></code></pre></div>
-<p>Simulate work. If we run the program using 50ms, we expect the work to be complete. But if it is 150ms, then we move on.</p>
+<p>작업을 시뮬레이션 해 보자. 50ms 만큼의 시간을 사용하여 프로그램을 실행할 경우, 해당 작업이 완료될 것으로 예상 해 본다. 그러나 만약, 150ms 정도의 시간이 소요된다면, 계속 진행하고자 한다.</p>
 <div class="sourceCode" id="cb442"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb442-1"><a href="#cb442-1" aria-hidden="true"></a>        time.Sleep(<span class="dv">50</span> * time.Millisecond)</span></code></pre></div>
-<p>Report the work is done.</p>
+<p>작업이 종료됨을 보고하자.</p>
 <div class="sourceCode" id="cb443"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb443-1"><a href="#cb443-1" aria-hidden="true"></a>        cancel()</span>
 <span id="cb443-2"><a href="#cb443-2" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>The original Goroutine that creates that channel is in its select case. It is going to receive after <code>time.After</code>. We are going to wait 100 milliseconds for something to happen. We are also waiting on <code>context.Done</code>. We are just going to sit here, and if we are told to <code>Done</code>, we know that work up there is complete.</p>
+<p>해당 채널을 만든 원래의 고루틴은 <code>select case</code> 구문에 있다. <code>time.After</code> 이후, 값을 전달받게 될 것이다. 100ms 동안 대기하거나 <code>context.Done</code>이 완료되기를 기다린다. 이렇게 계속 기다리다 <code>Done</code>을 받게 된다면, 해당 작업이 완료되었음을 알 수 있다.</p>
 <div class="sourceCode" id="cb444"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb444-1"><a href="#cb444-1" aria-hidden="true"></a>    <span class="kw">select</span> {</span>
 <span id="cb444-2"><a href="#cb444-2" aria-hidden="true"></a>    <span class="kw">case</span> &lt;-time.After(<span class="dv">100</span> * time.Millisecond):</span>
 <span id="cb444-3"><a href="#cb444-3" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;moving on&quot;</span>)</span>
