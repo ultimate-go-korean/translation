@@ -1,0 +1,5 @@
+operation system : 운영체제
+operation system thread : 운영체제 스레드
+Less is more : 과유불급(?), 적은 것으로 많은 것을 한다(?)
+path of execution : 실행 경로(?)
+Mental Model : 멘탈모델 - 심성모형 - 
