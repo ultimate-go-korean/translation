@@ -181,9 +181,9 @@ display: block;
 <li><a href="#slice">Slice</a></li>
 <li><a href="#map">Map</a></li>
 </ul></li>
-<li><a href="#decoupling">Decoupling</a>
+<li><a href="#디커플링">디커플링</a>
 <ul>
-<li><a href="#method">Method</a></li>
+<li><a href="#메서드method">메서드(method)</a></li>
 <li><a href="#interface">Interface</a></li>
 <li><a href="#embedding">Embedding</a></li>
 <li><a href="#exporting">Exporting</a></li>
@@ -194,7 +194,7 @@ display: block;
 <li><a href="#composition">Composition</a>
 <ul>
 <li><a href="#grouping-types">Grouping types</a></li>
-<li><a href="#decoupling-1">Decoupling</a></li>
+<li><a href="#decoupling">Decoupling</a></li>
 <li><a href="#변환conversion">변환(Conversion)</a></li>
 <li><a href="#interface-pollution">Interface Pollution</a></li>
 <li><a href="#mocking">Mocking</a></li>
@@ -1004,74 +1004,74 @@ Ford true {Henry Ford}</code></pre>
 <div class="sourceCode" id="cb109"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true"></a><span class="kw">type</span> users []user</span></code></pre></div>
 <p>Using this syntax, we can define a set of users This is a second way we can define users. We can use an existing type and use it as a base for another type. These are two different types. There is no relationship here. However, when we try use it as a key, like: u := make(map[users]int) the compiler says we cannot use that: “invalid map key type users”</p>
 <p>The reason is: whatever we use for the key, the value must be comparable. We have to use it in some sort of boolean expression in order for the map to create a hash value for it.</p>
-<h3 id="decoupling">Decoupling</h3>
-<h4 id="method">Method</h4>
-<h5 id="value-and-pointer-receiver-call">Value and Pointer Receiver Call</h5>
+<h3 id="디커플링">디커플링</h3>
+<h4 id="메서드method">메서드(method)</h4>
+<h5 id="값-리시버와-포인터-리시버를-이용한-호출value-and-pointer-receiver-call">값 리시버와 포인터 리시버를 이용한 호출(Value and Pointer Receiver Call)</h5>
 <div class="sourceCode" id="cb110"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true"></a><span class="kw">type</span> user <span class="kw">struct</span> {</span>
 <span id="cb110-2"><a href="#cb110-2" aria-hidden="true"></a>    name  <span class="dt">string</span></span>
 <span id="cb110-3"><a href="#cb110-3" aria-hidden="true"></a>    email <span class="dt">string</span></span>
 <span id="cb110-4"><a href="#cb110-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>notify implements a method with a value receiver: u of type user In Go, a function is called a method if that function has a receiver declared within itself. It looks and feels like a parameter but it is exactly what it is. Using the value receiver, the method operates on its own copy of the value that is used to make the call.</p>
+<p><code>notify</code>는 값 리시버를 가지는 메서드(method)이다. <code>u</code>는 <code>user</code>타입으로, Go에서는 함수가 리시버와 함께 선언된다면 이를 메서드라고 한다. 리시버는 파라미터와 비슷하게 보이지만, 이는 자신만의 역할이 있다. 값 리시버를 사용하면, 메서드는 자신을 호출한 변수를 복사하고, 그 복사본을 가지고 동작한다.</p>
 <div class="sourceCode" id="cb111"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true"></a><span class="kw">func</span> (u user) notify() {</span>
 <span id="cb111-2"><a href="#cb111-2" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Sending User Email To %s&lt;%s&gt;</span><span class="ch">\n</span><span class="st">&quot;</span>, u.name, u.email)</span>
 <span id="cb111-3"><a href="#cb111-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>changeEmail implements a method with a pointer receiver: u of type pointer user, Using the pointer receiver, the method operates on shared access.</p>
+<p><code>changeEmail</code>은 포인터 리시버를 가지는 메서드이다: <code>u</code>는 <code>user</code>의 포인터 타입으로, 포인터 리시버를 이용하면 메서드를 호출한 변수를 공유하면서 바로 접근이 가능하다.</p>
 <div class="sourceCode" id="cb112"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true"></a><span class="kw">func</span> (u *user) changeEmail(email <span class="dt">string</span>) {</span>
 <span id="cb112-2"><a href="#cb112-2" aria-hidden="true"></a>    u.email = email</span>
 <span id="cb112-3"><a href="#cb112-3" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Changed User Email To %s</span><span class="ch">\n</span><span class="st">&quot;</span>, email)</span>
 <span id="cb112-4"><a href="#cb112-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>These 2 methods above are just for studying the difference between a value receiver and a pointer receiver. In production, we will have to ask yourself why we choose to use inconsistent receiver’s type. We will talk about this later on.</p>
-<p><strong>Value and pointer receiver call</strong></p>
-<p>Values of type user can be used to call methods declared with both value and pointer receivers.</p>
+<p>위의 두 메서드들은 값 리시버와 포인터 리시버의 차이를 이해하기 위해서 같이 사용되었다. 하지만 실제 개발에서는 하나의 리시버를 사용하는 것을 권장한다. 이에 대해서는 나중에 다시 살펴볼 것이다.</p>
+<p><strong>값 리시버와 포인터 리시버를 이용한 호출</strong></p>
+<p><code>user</code> 타입의 변수는 값 리시버와 포인터 리시버를 사용하는 모든 메서드를 호출할 수 있다.</p>
 <div class="sourceCode" id="cb113"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true"></a>bill := user{<span class="st">&quot;Bill&quot;</span>, <span class="st">&quot;bill@email.com&quot;</span>}</span>
 <span id="cb113-2"><a href="#cb113-2" aria-hidden="true"></a>bill.notify()</span>
 <span id="cb113-3"><a href="#cb113-3" aria-hidden="true"></a>bill.changeEmail(<span class="st">&quot;bill@hotmail.com&quot;</span>)</span></code></pre></div>
 <pre><code>Sending User Email To Bill&lt;bill@email.com&gt;
 Changed User Email To bill@hotmail.com</code></pre>
-<p>Pointers of type user can also be used to call methods declared with both value and pointer receiver.</p>
+<p><code>user</code>의 포인터 타입 변수 역시 값 리시버와 포인터 리시버를 사용하는 모든 메서드를 호출할 수 있다.</p>
 <div class="sourceCode" id="cb115"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true"></a>hoanh := &amp;user{<span class="st">&quot;Hoanh&quot;</span>, <span class="st">&quot;hoanhan@email.com&quot;</span>}</span>
 <span id="cb115-2"><a href="#cb115-2" aria-hidden="true"></a>hoanh.notify()</span>
 <span id="cb115-3"><a href="#cb115-3" aria-hidden="true"></a>hoanh.changeEmail(<span class="st">&quot;hoanhan101@gmail.com&quot;</span>)</span></code></pre></div>
 <pre><code>Sending User Email To Hoanh&lt;hoanhan@email.com&gt;
 Changed User Email To hoanhan101@gmail.com</code></pre>
-<p>hoanh in this example is a pointer that has the type <em>user. We are still able to call notify. This is still correct. As long as we deal with the type user, Go can adjust to make the call. Behind the scene, we have something like (</em>hoanh).notify(). Go will take the value that hoanh points to and make sure that notify leverages its value semantic and works on its own copy. Similarly, bill has the type user but still be able to call changeEmail. Go will take the address of bill and do the rest for you: (&amp;bill).changeEmail().</p>
-<p>Create a slice of user values with two users.</p>
+<p>이 예제에서 <code>hoanh</code>은 <code>user</code> 타입을 가리키는 포인터 변수이다. 하지만 값 리시버로 구현된 <code>notify</code>를 호출할 수 있다. <code>user</code> 타입의 변수로 메서드를 호출하지만, Go는 내부적으로 이를 <code>(*hoanh).notify()</code>로 호출한다. Go는 <code>hoanh</code>이 가리키는 값을 찾고, 이 값을 복사하여 <code>notify</code>를 값에 의한 호출(value semantic)이 가능하도록 한다. 이와 유사하게 <code>bill</code>은 <code>user</code> 타입의 변수이지만, 포인터 리시버로 구현된 <code>changeEmail</code>을 호출할 수 있다. Go는 <code>bill</code>의 주소를 찾고, 내부적으로 <code>(&amp;bill).changeEmail()</code>을 호출한다.</p>
+<p>두 개의 <code>user</code> 타입 원소를 가진 슬라이스를 만들자.</p>
 <div class="sourceCode" id="cb117"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true"></a>users := []user{</span>
 <span id="cb117-2"><a href="#cb117-2" aria-hidden="true"></a>    {<span class="st">&quot;bill&quot;</span>, <span class="st">&quot;bill@email.com&quot;</span>},</span>
 <span id="cb117-3"><a href="#cb117-3" aria-hidden="true"></a>    {<span class="st">&quot;hoanh&quot;</span>, <span class="st">&quot;hoanh@email.com&quot;</span>},</span>
 <span id="cb117-4"><a href="#cb117-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>We are ranging over this slice of values, making a copy of each value and call notify to make another copy.</p>
+<p>이 슬라이스에 <code>for ... range</code>를 사용하면, 각 원소의 복사본을 만들고, <code>notify</code> 호출을 위해 또 다른 복사본을 만들게 된다.</p>
 <div class="sourceCode" id="cb118"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true"></a><span class="kw">for</span> _, u := <span class="kw">range</span> users {</span>
 <span id="cb118-2"><a href="#cb118-2" aria-hidden="true"></a>    u.notify()</span>
 <span id="cb118-3"><a href="#cb118-3" aria-hidden="true"></a>}</span></code></pre></div>
 <pre><code>Sending User Email To bill&lt;bill@email.com&gt;
 Sending User Email To Hoanh&lt;hoanhan@email.com&gt;</code></pre>
-<p>Iterate over the slice of users switching semantics. This is not a good practice.</p>
+<p>포인터 리시버를 사용하는 <code>changeEmail</code>을 <code>for ... range</code> 안에서 사용해보자. 이는 복사본의 값을 변경하는 것으로 이렇게 사용하면 안 된다.</p>
 <div class="sourceCode" id="cb120"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true"></a><span class="kw">for</span> _, u := <span class="kw">range</span> users {</span>
 <span id="cb120-2"><a href="#cb120-2" aria-hidden="true"></a>    u.changeEmail(<span class="st">&quot;it@wontmatter.com&quot;</span>)</span>
 <span id="cb120-3"><a href="#cb120-3" aria-hidden="true"></a>}</span></code></pre></div>
 <pre><code>Changed User Email To it@wontmatter.com
 Changed User Email To it@wontmatter.com</code></pre>
-<h5 id="value-and-pointer-semantics">Value and Pointer Semantics</h5>
-<p>When it comes to using built-in type (numeric, string, bool), we should always be using value semantics. When a piece of code that takes an address of an integer or a bool, this raises a big flag. It’s hard to say because it depends on the context. But in general, why should these values end up on the heap creating garbage? These should be on the stack. There is an exception to everything. However, until we know it is okay to take the exception, we should follow the guideline.</p>
-<p>The reference type (slice, map, channel, interface) also focuses on using value semantics. The only time we want to take the address of a slice is when we are sharing it down the call stack to the Unmarshal function since it always requires the address of a value.</p>
-<p>Examples below are from the standard library. By studying them, we learn how important it is to use value or pointer semantics in a consistent way. When we declare a type, we must ask ourselves immediately:</p>
+<h5 id="값에-의한-호출과-참조에-의한-호출value-and-pointer-semantics">값에 의한 호출과 참조에 의한 호출(Value and Pointer Semantics)</h5>
+<p>숫자, 문자열, 불과 같은 기본 타입을 사용하는 경우, 값에 의한 호출을 사용하는 것을 권장한다. 만약 정수 또는 불 타입 변수의 주소 값을 사용해야 한다면 주의해야 한다. 상황에 따라, 이 방법이 맞을 수도 있고, 아닐 수도 있기 때문이다. 하지만 일반적으로, 메모리 누수의 위험이 있는 힙 메모리 영역에 이 변수들을 만들 필요는 없다. 그래서 이 타입의 변수들은 stack에 생성하는 것을 더 권장한다. 모든 것에는 예외가 있을 수 있지만, 그 예외를 적용하는 것이 적합하다고 판단하기 전에는 규칙을 따를 필요가 있다.</p>
+<p>슬라이스, 맵, 채널, 인터페이스와 같이 참조 타입의 변수들 역시 기본적으로 값에 의한 호출을 사용하는 것을 권장한다. 다만 변수의 주소 값을 파라미터로 받는 <code>Unmarshal</code>같은 함수를 사용하기 위한 경우라면, 이 타입들의 주소 값을 사용해야 한다.</p>
+<p>아래 예제들은 실제 Go의 표준 라이브러리에서 사용하는 코드들이다. 이들을 공부해보면, 값에 의한 호출과 참조에 의한 호출(pointer semantic) 중 하나를 일관되게 사용하는 것이 얼마나 중요한지 알 수 있다. 따라서 변수의 타입을 정할 때, 다음의 질문에 스스로 답해보자.</p>
 <ul>
-<li>Does this type require value semantic or pointer semantic?</li>
-<li>If I need to modify this value, should we create a new value or should we modify the value itself so everyone can see it?</li>
+<li>이 타입은 값에 의한 호출과 참조에 의한 호출 중 어느 것이 더 적합한가?</li>
+<li>만약 이 변수의 값을 변경해야 한다면, 새로운 값을 가지는 복사본을 만드는 것과, 다른 곳에서도 이 변경된 값을 확인할 수 있게 이 변수의 값을 직접 변경하는 것 중 어느 것이 더 적합한가?</li>
 </ul>
-<p>It needs to be consistent. It is okay to guess it wrong the first time and refactor it later.</p>
+<p>가장 중요한 것은 일관성이다. 처음에 한 결정이 잘못되었다고 판단되면, 그때 이를 변경하면 된다.</p>
 <div class="sourceCode" id="cb122"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb122-2"><a href="#cb122-2" aria-hidden="true"></a></span>
 <span id="cb122-3"><a href="#cb122-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
 <span id="cb122-4"><a href="#cb122-4" aria-hidden="true"></a>    <span class="st">&quot;sync/atomic&quot;</span></span>
 <span id="cb122-5"><a href="#cb122-5" aria-hidden="true"></a>    <span class="st">&quot;syscall&quot;</span></span>
 <span id="cb122-6"><a href="#cb122-6" aria-hidden="true"></a>)</span></code></pre></div>
-<p><strong>Value semantic</strong></p>
-<p>These are named types from the net package called IP and IPMask with base types that are slices of bytes. Since we use value semantics for reference types, the implementation is using value semantics for both.</p>
+<p><strong>값에 의한 호출</strong></p>
+<p>Go의 <code>net</code> 패키지는 <code>IP</code>와 <code>IPMask</code> 타입을 제공하는데, 이들은 바이트 형 슬라이스이다. 아래의 예제들은 이 참조 타입들을 값에 의한 호출을 통해 사용하는 것을 보여준다.</p>
 <div class="sourceCode" id="cb123"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb123-1"><a href="#cb123-1" aria-hidden="true"></a><span class="kw">type</span> IP []<span class="dt">byte</span></span>
 <span id="cb123-2"><a href="#cb123-2" aria-hidden="true"></a><span class="kw">type</span> IPMask []<span class="dt">byte</span></span></code></pre></div>
-<p>Mask is using a value receiver and returning a value of type IP. This method is using value semantics for type IP.</p>
+<p><code>Mask</code>는 <code>IP</code> 타입의 값 리시버를 사용하며, <code>IP</code> 타입의 값을 반환한다. 이 메서드는 <code>IP</code> 타입에 대해서 값에 의한 호출을 사용하는 것이다.</p>
 <div class="sourceCode" id="cb124"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true"></a><span class="kw">func</span> (ip IP) Mask(mask IPMask) IP {</span>
 <span id="cb124-2"><a href="#cb124-2" aria-hidden="true"></a>    <span class="kw">if</span> <span class="bu">len</span>(mask) == IPv6len &amp;&amp; <span class="bu">len</span>(ip) == IPv4len &amp;&amp; allFF(mask[:<span class="dv">12</span>]) {</span>
 <span id="cb124-3"><a href="#cb124-3" aria-hidden="true"></a>        mask = mask[<span class="dv">12</span>:]</span>
@@ -1090,27 +1090,27 @@ Changed User Email To it@wontmatter.com</code></pre>
 <span id="cb124-16"><a href="#cb124-16" aria-hidden="true"></a>    }</span>
 <span id="cb124-17"><a href="#cb124-17" aria-hidden="true"></a>    <span class="kw">return</span> out</span>
 <span id="cb124-18"><a href="#cb124-18" aria-hidden="true"></a>}</span></code></pre></div>
-<p>ipEmptyString accepts a value of type IP and returns a value of type string. The function is using value semantics for type IP.</p>
+<p><code>ipEmptyString</code>은 <code>IP</code> 타입의 값을 파라미터로 받고, 문자열 타입의 값을 반환한다. 이 함수는 <code>IP</code> 타입에 대해서 값에 의한 호출을 사용하는 것이다.</p>
 <div class="sourceCode" id="cb125"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb125-1"><a href="#cb125-1" aria-hidden="true"></a><span class="kw">func</span> ipEmptyString(ip IP) <span class="dt">string</span> {</span>
 <span id="cb125-2"><a href="#cb125-2" aria-hidden="true"></a>    <span class="kw">if</span> <span class="bu">len</span>(ip) == <span class="dv">0</span> {</span>
 <span id="cb125-3"><a href="#cb125-3" aria-hidden="true"></a>        <span class="kw">return</span> <span class="st">&quot;&quot;</span></span>
 <span id="cb125-4"><a href="#cb125-4" aria-hidden="true"></a>    }</span>
 <span id="cb125-5"><a href="#cb125-5" aria-hidden="true"></a>    <span class="kw">return</span> ip.String()</span>
 <span id="cb125-6"><a href="#cb125-6" aria-hidden="true"></a>}</span></code></pre></div>
-<p><strong>Pointer semantic</strong></p>
-<p>Should Time use value or pointer semantics? If you need to modify a Time value, should you mutate the value or create a new one?</p>
+<p><strong>참조에 의한 호출</strong></p>
+<p><code>Time</code> 타입은 값에 의한 호출과 참조에 의한 호출 중 어떤 것을 사용해야 할까? 만약 <code>Time</code> 타입 변수의 값을 변경해야 한다면, 이 값을 직접 변경해야 할까? 아니면 복사본을 만들어서 값을 변경하는 것이 좋을까?</p>
 <div class="sourceCode" id="cb126"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true"></a><span class="kw">type</span> Time <span class="kw">struct</span> {</span>
 <span id="cb126-2"><a href="#cb126-2" aria-hidden="true"></a>    sec  <span class="dt">int64</span></span>
 <span id="cb126-3"><a href="#cb126-3" aria-hidden="true"></a>    nsec <span class="dt">int32</span></span>
 <span id="cb126-4"><a href="#cb126-4" aria-hidden="true"></a>    loc  *Location</span>
 <span id="cb126-5"><a href="#cb126-5" aria-hidden="true"></a>}</span></code></pre></div>
-<p>The best way to understand what semantic is going to be used is to look at the factory function for type. It dictates the semantics that will be used. In this example, the Now function returns a value of type Time. It is making a copy of its Time value and passing it back up. This means Time value can be on the stack. We should be using value semantic all the way through.</p>
+<p>타입에 대해 어떤 호출을 사용할지를 결정하는 가장 좋은 방법은 타입의 생성 함수를 확인하는 것이다. 이 생성 함수는 어떤 호출을 사용해야 하는지 알려준다. 이 예제에서, <code>Now</code> 함수는 <code>Time</code> 타입의 값을 반환한다. <code>Time</code> 타입의 값은 한번 복사가 이루어지고, 이 복사된 값은 이 함수를 호출한 곳으로 반환된다. 즉, 이 <code>Time</code> 타입의 값은 스택(stack)에 저장된다. 따라서 값에 의한 호출을 사용하는 것이 좋다.</p>
 <div class="sourceCode" id="cb127"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb127-1"><a href="#cb127-1" aria-hidden="true"></a><span class="kw">func</span> Now() Time {</span>
 <span id="cb127-2"><a href="#cb127-2" aria-hidden="true"></a>    sec, nsec := now()</span>
 <span id="cb127-3"><a href="#cb127-3" aria-hidden="true"></a>    <span class="kw">return</span> Time{sec + unixToInternal, nsec, Local}</span>
 <span id="cb127-4"><a href="#cb127-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Add is a mutation operation. If we go with the idea that we should be using pointer semantic when we mutate something and value semantic when we don’t then Add is implemented wrong. However, it has not been wrong because it is the type that has to drive the semantic, not the implementation of the method. The method must adhere to the semantic that we choose.</p>
-<p>Add is using a value receiver and returning a value of type Time. It is mutating its local copy and returning to us something new.</p>
+<p><code>Add</code>는 기존의 <code>Time</code> 타입의 값과는 다른 값을 얻기 위한 메서드다. 만약 값을 변경할 때는 무조건 참조에 의한 호출을 사용하고, 그렇지 않을 때는 값에 의한 호출을 사용해야 한다면 이 <code>Add</code>의 구현은 잘못되었다고 생각할 수 있다. 하지만, 타입은 어떤 호출을 사용할지를 책임지는 것이지, 메서드의 구현을 책임지는 것은 아니다. 메서드는 반드시 선택된 호출을 따라야 하고, 그래서 <code>Add</code>의 구현은 틀리지 않았다.</p>
+<p><code>Add</code>는 값 리시버를 사용하고, <code>Time</code> 타입의 값을 반환한다. 즉, 이 메서드는 실제로 <code>Time</code> 타입 변수의 복사본을 변경하며, 완전히 새로운 값을 반환하는 것이다.</p>
 <div class="sourceCode" id="cb128"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true"></a><span class="kw">func</span> (t Time) Add(d Duration) Time {</span>
 <span id="cb128-2"><a href="#cb128-2" aria-hidden="true"></a>    t.sec += <span class="dt">int64</span>(d / <span class="fl">1e9</span>)</span>
 <span id="cb128-3"><a href="#cb128-3" aria-hidden="true"></a>    nsec := <span class="dt">int32</span>(t.nsec) + <span class="dt">int32</span>(d%<span class="fl">1e9</span>)</span>
@@ -1124,20 +1124,20 @@ Changed User Email To it@wontmatter.com</code></pre>
 <span id="cb128-11"><a href="#cb128-11" aria-hidden="true"></a>    t.nsec = nsec</span>
 <span id="cb128-12"><a href="#cb128-12" aria-hidden="true"></a>    <span class="kw">return</span> t</span>
 <span id="cb128-13"><a href="#cb128-13" aria-hidden="true"></a>}</span></code></pre></div>
-<p>div accepts a value of type Time and returns values of built-in types. The function is using value semantics for type Time.</p>
+<p><code>div</code>는 <code>Time</code> 타입의 파라미터를 받고, 기본 타입의 값들을 반환한다. 이 함수는 <code>Time</code> 타입에 대해 값에 의한 호출을 사용하는 것이다.</p>
 <div class="sourceCode" id="cb129"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb129-1"><a href="#cb129-1" aria-hidden="true"></a><span class="kw">func</span> div(t Time, d Duration) (qmod2 <span class="dt">int</span>, r Duration) {}</span></code></pre></div>
-<p>The only use of pointer semantics for the Time API are these Unmarshal-related functions:</p>
+<p><code>Time</code> 타입에 대한 참조에 의한 호출은, 오직 주어진 데이터를 <code>Time</code> 타입으로 변환해 이 메서드를 호출한 변수를 수정할 할 때만 사용한다:</p>
 <div class="sourceCode" id="cb130"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true"></a><span class="kw">func</span> (t *Time) UnmarshalBinary(data []<span class="dt">byte</span>) <span class="dt">error</span> {}</span>
 <span id="cb130-2"><a href="#cb130-2" aria-hidden="true"></a><span class="kw">func</span> (t *Time) GobDecode(data []<span class="dt">byte</span>) <span class="dt">error</span> {}</span>
 <span id="cb130-3"><a href="#cb130-3" aria-hidden="true"></a><span class="kw">func</span> (t *Time) UnmarshalJSON(data []<span class="dt">byte</span>) <span class="dt">error</span> {}</span>
 <span id="cb130-4"><a href="#cb130-4" aria-hidden="true"></a><span class="kw">func</span> (t *Time) UnmarshalText(data []<span class="dt">byte</span>) <span class="dt">error</span> {}</span></code></pre></div>
-<p>Most struct types are not going to be able to leverage value semantic. Most struct types are probably gonna be data that should be shared or more efficient to be shared. For example, an User type. Regardless, it is possible to copy an User type but it is not a proper thing to do in the real world.</p>
-<p>Other examples:</p>
-<p>Factory functions dictate the semantics that will be used. The Open function returns a pointer of type File. This means we should be using pointer semantics and share File values.</p>
+<p>대부분의 구조체(struct) 타입들은 값에 의한 호출을 잘 사용하지 않는다. 이는 다른 코드에서 함께 공유하거나 또는 공유하면 좋은 데이터들이기 때문이다. <code>User</code> 타입이 대표적인 예이다. <code>User</code> 타입의 변수를 복사하는 것은 가능은 하지만, 이는 실제로 좋은 구현이 아니다.</p>
+<p>다른 예제를 살펴보자:</p>
+<p>앞서 이야기했듯이, 생성 함수는 어떤 호출을 사용해야 하는지를 알려준다. <code>Open</code> 함수는 <code>File</code> 타입 데이터의 주소 값, 즉 <code>File</code> 타입 포인터를 반환한다. 이는 <code>File</code> 타입에 대해, 참조에 의한 호출을 사용해서 이 <code>File</code> 타입의 값을 공유할 수 있다는 것을 뜻한다.</p>
 <div class="sourceCode" id="cb131"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb131-1"><a href="#cb131-1" aria-hidden="true"></a><span class="kw">func</span> Open(name <span class="dt">string</span>) (file *File, err <span class="dt">error</span>) {</span>
 <span id="cb131-2"><a href="#cb131-2" aria-hidden="true"></a>    <span class="kw">return</span> OpenFile(name, O_RDONLY, <span class="dv">0</span>)</span>
 <span id="cb131-3"><a href="#cb131-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Chdir is using a pointer receiver. This method is using pointer semantics for File.</p>
+<p><code>Chdir</code>은 <code>File</code> 타입의 포인터 리시버를 사용한다. 즉, 이 메서드는 <code>File</code> 타입에 대해 참조에 의한 호출을 사용하는 것이다.</p>
 <div class="sourceCode" id="cb132"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true"></a><span class="kw">func</span> (f *File) Chdir() <span class="dt">error</span> {</span>
 <span id="cb132-2"><a href="#cb132-2" aria-hidden="true"></a>    <span class="kw">if</span> f == <span class="ot">nil</span> {</span>
 <span id="cb132-3"><a href="#cb132-3" aria-hidden="true"></a>        <span class="kw">return</span> ErrInvalid</span>
@@ -1147,7 +1147,7 @@ Changed User Email To it@wontmatter.com</code></pre>
 <span id="cb132-7"><a href="#cb132-7" aria-hidden="true"></a>    }</span>
 <span id="cb132-8"><a href="#cb132-8" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb132-9"><a href="#cb132-9" aria-hidden="true"></a>}</span></code></pre></div>
-<p>epipecheck accepts a pointer of type File. The function is using pointer semantics for type File.</p>
+<p><code>epipecheck</code>는 <code>File</code> 타입의 포인터를 파라미터로 받는다. 따라서 이 함수는 <code>File</code> 타입에 대해 참조에 의한 호출을 사용하는 것이다.</p>
 <div class="sourceCode" id="cb133"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb133-1"><a href="#cb133-1" aria-hidden="true"></a><span class="kw">func</span> epipecheck(file *File, e <span class="dt">error</span>) {</span>
 <span id="cb133-2"><a href="#cb133-2" aria-hidden="true"></a>    <span class="kw">if</span> e == syscall.EPIPE {</span>
 <span id="cb133-3"><a href="#cb133-3" aria-hidden="true"></a>        <span class="kw">if</span> atomic.AddInt32(&amp;file.nepipe, <span class="dv">1</span>) &gt;= <span class="dv">10</span> {</span>
@@ -1763,7 +1763,7 @@ Meow! My name is Milo , it is true I am a mammal with a climb factor of 4</code>
 <li>Question types that are aliases or abstraction for an existing type.</li>
 <li>Question types whose sole purpose is to share common state.</li>
 </ul>
-<h4 id="decoupling-1">Decoupling</h4>
+<h4 id="decoupling">Decoupling</h4>
 <h5 id="struct-composition">Struct Composition</h5>
 <p>Prototyping is important, as well as writing proof of concept and solving problems in the concrete first. Then we can ask ourselves: What can change? What change is coming? so we can start decoupling and refactor. Refactoring needs to become a part of the development cycle.</p>
 <p>Here is the problem that we are trying to solve in this section. We have a system called Xenia that has a database. There is another system called Pillar, which is a web server with some front-end that consumes it. It has a database too. Our goal is to move Xenia’s data into Pillar’s system.</p>
