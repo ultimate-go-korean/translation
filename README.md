@@ -65,6 +65,7 @@
 - 서병선/@famersbs
 - 신정훈/@shin2jhoon
 - 이경석/@lee-kyungseok
+- 이재원/@mumunuu
 - 정영훈/@aeuveritas
 - 정현석/@nicewook
 - 조동헌/@davinnovation
