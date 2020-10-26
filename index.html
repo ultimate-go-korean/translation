@@ -194,7 +194,7 @@ display: block;
 <li><a href="#composition">Composition</a>
 <ul>
 <li><a href="#grouping-types">Grouping types</a></li>
-<li><a href="#decoupling">Decoupling</a></li>
+<li><a href="#디커플링-1">디커플링</a></li>
 <li><a href="#변환conversion">변환(Conversion)</a></li>
 <li><a href="#interface-pollution">Interface Pollution</a></li>
 <li><a href="#mocking">Mocking</a></li>
@@ -1763,14 +1763,14 @@ Meow! My name is Milo , it is true I am a mammal with a climb factor of 4</code>
 <li>Question types that are aliases or abstraction for an existing type.</li>
 <li>Question types whose sole purpose is to share common state.</li>
 </ul>
-<h4 id="decoupling">Decoupling</h4>
-<h5 id="struct-composition">Struct Composition</h5>
-<p>Prototyping is important, as well as writing proof of concept and solving problems in the concrete first. Then we can ask ourselves: What can change? What change is coming? so we can start decoupling and refactor. Refactoring needs to become a part of the development cycle.</p>
-<p>Here is the problem that we are trying to solve in this section. We have a system called Xenia that has a database. There is another system called Pillar, which is a web server with some front-end that consumes it. It has a database too. Our goal is to move Xenia’s data into Pillar’s system.</p>
-<p>How long is it gonna take? How do we know when a piece of code is done so we can move on the next piece of code? If you are a technical manager, how do you know whether your debt is “wasting effort” or “not putting enough effort”?</p>
-<p>To answer, being done has 2 parts. One is test coverage, 80% in general and 100% on the happy path. Second is about changes. By asking what can change, from a technical perspective and business perspective, we make sure that we refactor the code to be able to handle that change.</p>
-<p>One example is, we can give you a concrete version in 2 days but we need 2 weeks to be able to refactor this code to deal with the change that we know it’s coming. The plan is to solve one problem at a time. Don’t be overwhelmed by everything. Write a little code, write some tests and refactor. Write a layer of APIs that work on top of each other, knowing that each layer is a strong foundation to the next.</p>
-<p>Do not pay too much attention to the implementation detail. It’s the mechanics here that are important. We are optimizing for correctness, not performance. We can always go back if it doesn’t perform well enough to speed things up.</p>
+<h4 id="디커플링-1">디커플링</h4>
+<h5 id="구조체-구성-struct-composition">구조체 구성 (Struct Composition)</h5>
+<p>프로토타이핑은 개념 증명(proof of concept) 작성이나 구체적 문제 해결 못지않게 중요하다. 디커플링과 리팩터링을 시작하기 전에 무엇을 바꿀 수 있는지, 어떤 변경을 해줘야 할지를 생각해야 한다. 리팩터링은 개발 주기의 일부가 되어야 한다.</p>
+<p>다음과 같은 문제를 풀어보자. <code>Xenia</code> 라는 시스템은 데이테베이스를 가지고 있다. <code>Pillar</code>라는 또 다른 시스템은 프론트엔드를 가진 웹서버이며 <code>Xenia</code>를 이용한다. <code>Pillar</code> 역시 데이터베이스가 있다. <code>Xenia</code>의 데이터를 <code>Pillar</code>에 옮겨보자.</p>
+<p>이 작업은 얼마나 걸릴까? 코드 한 부분이 완료 되었고, 다음 코드 구현을 해도 되는지를 어떻게 알 수 있을까? 기술 책임자라면, 작업에 시간을 “지나치게 낭비”한 것인지, “좀 더 시간을 들여야” 하는 지 어떻게 알 수 있을까?</p>
+<p>완료 여부는 다음 두 가지를 확인하고 판단하자. 첫 번째는 테스트 커버리지이다. 100%면 더할 나위 없고 80% 이상을 커버하고 있다면 충분하다. 두 번째는 변경 가능 여부이다. 기술적 관점, 그리고 사업적 관점에서 무엇이 변할 수 있는지를 생각해보고, 리팩터링으로 대응이 가능하다면 된 것이다.</p>
+<p>예를 들어, 이틀만에 작동하도록 구현을 완료하지만, 변경이 있을 거라는 것, 리팩터링을 통해 2주 정도 대응하면 된다는 것을 알고 있는 것이다. 한 번에 하나씩만 풀어나가면 된다. 모든 것을 완벽하게 할 필요는 없다. 코드와 테스트를 짠 다음에 리팩터링을 하는 것이다. 각 계층이 다음 계층을 위한 단단한 기초라는 것을 알고, 각자의 위에서 동작하는 API 계층을 만들자. [재방문]</p>
+<p>세부적인 구현에 너무 신경을 쓸 필요는 없다. 중요한 것은 메커니즘(mechanics)이다. 우리는 올바르게 동작하도록 최적화하는 것이다. 성능은 언제든 개선할 수 있다.</p>
 <div class="sourceCode" id="cb250"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb250-1"><a href="#cb250-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb250-2"><a href="#cb250-2" aria-hidden="true"></a></span>
 <span id="cb250-3"><a href="#cb250-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -1780,20 +1780,20 @@ Meow! My name is Milo , it is true I am a mammal with a climb factor of 4</code>
 <span id="cb250-7"><a href="#cb250-7" aria-hidden="true"></a>    <span class="st">&quot;math/rand&quot;</span></span>
 <span id="cb250-8"><a href="#cb250-8" aria-hidden="true"></a>    <span class="st">&quot;time&quot;</span></span>
 <span id="cb250-9"><a href="#cb250-9" aria-hidden="true"></a>)</span></code></pre></div>
-<p>The first problem that we have to solve is that we need software that runs on a timer. It needs to connect to Xenia, read that database, identify all the data we haven’t moved and pull it in.</p>
+<p>우선, 타이머로 작동하는 소프트웨어가 필요하다. 소프트웨어는 <code>Xenia</code>에 접속해서, 데이터베이스를 읽고, 아직 옮기지 않은 모든 데이터를 찾아내고, 그것을 추출해야 한다.</p>
 <div class="sourceCode" id="cb251"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb251-1"><a href="#cb251-1" aria-hidden="true"></a><span class="kw">func</span> init() {</span>
 <span id="cb251-2"><a href="#cb251-2" aria-hidden="true"></a>    rand.Seed(time.Now().UnixNano())</span>
 <span id="cb251-3"><a href="#cb251-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Data is the structure of the data we are copying. For simplicity, just pretend it is a string data.</p>
+<p><code>Data</code>는 우리가 복사하는 데이터 구조이다. 단순하게, 문자열 데이터라고 생각하면 된다.</p>
 <div class="sourceCode" id="cb252"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb252-1"><a href="#cb252-1" aria-hidden="true"></a><span class="kw">type</span> Data <span class="kw">struct</span> {</span>
 <span id="cb252-2"><a href="#cb252-2" aria-hidden="true"></a>    Line <span class="dt">string</span></span>
 <span id="cb252-3"><a href="#cb252-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Xenia is a system we need to pull data from.</p>
+<p><code>Xenia</code>는 우리가 데이터를 추출 해야하는 시스템이다.</p>
 <div class="sourceCode" id="cb253"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb253-1"><a href="#cb253-1" aria-hidden="true"></a><span class="kw">type</span> Xenia <span class="kw">struct</span> {</span>
 <span id="cb253-2"><a href="#cb253-2" aria-hidden="true"></a>    Host    <span class="dt">string</span></span>
 <span id="cb253-3"><a href="#cb253-3" aria-hidden="true"></a>    Timeout time.Duration</span>
 <span id="cb253-4"><a href="#cb253-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Pull knows how to pull data out of Xenia. We could do func (<em>Xenia) Pull() (</em>Data, error) that return the data and error. However, this would cost an allocation on every call and we don’t want that. Using the function below, we know data is a struct type and its size ahead of time. Therefore they could be on the stack.</p>
+<p><code>Pull</code>은 <code>Xenia</code>의 데이터를 추출하는 메서드이다. <code>func(*Xenia) Pull()(*Data, error)</code>와 같이 선언하여 데이터와 에러를 반환하도록 할 수도 있다. 하지만 이렇게 하면 호출을 할 때마다 할당 비용이 들 게 된다. 아래와 같이 메서드의 파라미터로 <code>d *Data</code>를 선언하면 <code>Data</code>의 타입과 크기를 미리 알 수 있다. 따라서 스택에 저장할 수 있게 된다.</p>
 <div class="sourceCode" id="cb254"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb254-1"><a href="#cb254-1" aria-hidden="true"></a><span class="kw">func</span> (*Xenia) Pull(d *Data) <span class="dt">error</span> {</span>
 <span id="cb254-2"><a href="#cb254-2" aria-hidden="true"></a>    <span class="kw">switch</span> rand.Intn(<span class="dv">10</span>) {</span>
 <span id="cb254-3"><a href="#cb254-3" aria-hidden="true"></a>    <span class="kw">case</span> <span class="dv">1</span>, <span class="dv">9</span>:</span>
@@ -1806,27 +1806,27 @@ Meow! My name is Milo , it is true I am a mammal with a climb factor of 4</code>
 <span id="cb254-10"><a href="#cb254-10" aria-hidden="true"></a>        <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb254-11"><a href="#cb254-11" aria-hidden="true"></a>    }</span>
 <span id="cb254-12"><a href="#cb254-12" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Pillar is a system we need to store data into.</p>
+<p><code>Pillar</code>는 데이터를 저장할 시스템이다.</p>
 <div class="sourceCode" id="cb255"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb255-1"><a href="#cb255-1" aria-hidden="true"></a><span class="kw">type</span> Pillar <span class="kw">struct</span> {</span>
 <span id="cb255-2"><a href="#cb255-2" aria-hidden="true"></a>    Host    <span class="dt">string</span></span>
 <span id="cb255-3"><a href="#cb255-3" aria-hidden="true"></a>    Timeout time.Duration</span>
 <span id="cb255-4"><a href="#cb255-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Store knows how to store data into Pillar. We are using pointer semantics for consistency.</p>
+<p><code>Store</code> 메서드로 <code>d *Data</code>를 <code>Piller</code>에 저장할 수 있다. 일관되도록 포인터 <code>*Pillar</code>를 사용하였다.</p>
 <div class="sourceCode" id="cb256"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb256-1"><a href="#cb256-1" aria-hidden="true"></a><span class="kw">func</span> (*Pillar) Store(d *Data) <span class="dt">error</span> {</span>
 <span id="cb256-2"><a href="#cb256-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Out:&quot;</span>, d.Line)</span>
 <span id="cb256-3"><a href="#cb256-3" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb256-4"><a href="#cb256-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>System wraps Xenia and Pillar together into a single system. We have the API based on Xenia and Pillar. We want to build another API on top of this and use it as a foundation. One way is to have a type that has the behavior of being able to pull and store. We can do that through composition. System is based on the embedded value of Xenia and Pillar. And because of inner type promotion, System knows how to pull and store.</p>
+<p><code>System</code>은 <code>Xenia</code>와 <code>Piller</code>를 하나의 시스템으로 결합한다. 우리는 <code>Xenia</code>와 <code>Piller</code>를 기반으로 한 API를 가지고 있다. 여기에 또 다른 API를 구축해 그것을 기반으로 활용하려고 한다. 한 가지 방법은 추출 하거나 저장할 수 있는 행동을 하는 타입을 갖는 것이다. 우리는 구성(composition)을 통해 그것을 할 수 있다. <code>System</code>은 <code>Xenia</code>와 <code>Piller</code>의 내장된 요소를 기반으로 한다. 그리고 내부 타입 승격(inner type promotion) 때문에 <code>System</code>에서는 추출과 저장하는 방법을 알고 있다.</p>
 <div class="sourceCode" id="cb257"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb257-1"><a href="#cb257-1" aria-hidden="true"></a><span class="kw">type</span> System <span class="kw">struct</span> {</span>
 <span id="cb257-2"><a href="#cb257-2" aria-hidden="true"></a>    Xenia</span>
 <span id="cb257-3"><a href="#cb257-3" aria-hidden="true"></a>    Pillar</span>
 <span id="cb257-4"><a href="#cb257-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>pull knows how to pull bulks of data from Xenia, leveraging the foundation that we have built.</p>
-<p>We don’t need to add a method to System to do this. There is no state inside System that we want the System to maintain. Instead, we want the System to understand the behavior.</p>
-<p>Functions are a great way of writing API because functions can be more readable than any method can. We always want to start with an idea of writing API from the package level with functions.</p>
-<p>When we write a function, all the input must be passed in. When we use a method, its signature doesn’t indicate any level, what field or state that we are using on that value that we use to make the call.</p>
+<p><code>pull</code>은 우리가 구축한 기반을 활용하여 <code>Xenia</code>로 부터 많은 양의 데이터를 추출할 수 있다.</p>
+<p>이를 위해 <code>System</code>에 메서드를 추가할 필요는 없다. <code>System</code> 내부에 <code>System</code>이 관리할 상태(state)는 없다. 대신에, <code>System</code>이 무엇을 할 수 있는지를 이해하기만 하면 된다.</p>
+<p>함수는 API를 만드는 좋은 방법이다. 함수가 대체로 메서드보다 읽기 쉽기 때문이다. 패키지 레벨에서 함수로 API 를 구현해 보는걸로 구현을 시작해보자.</p>
+<p>함수를 작성할 때 모든 입력은 반드시 전달되어야 한다. 메서드를 사용할 때에, 메서드 시그니처(signature)만으로는 우리가 호출할 때에 사용하는 값이 어떤 레벨, 어떤 필드나 상태인지 알 수 없다.</p>
 <div class="sourceCode" id="cb258"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb258-1"><a href="#cb258-1" aria-hidden="true"></a><span class="kw">func</span> pull(x *Xenia, data []Data) (<span class="dt">int</span>, <span class="dt">error</span>) {</span></code></pre></div>
-<p>Range over the slice of data and share each element with the Xenial’s Pull method.</p>
+<p>데이터 슬라이스를 순회하면서 각각의 원소를 <code>Xenia</code>의 <code>Pull</code> 메서드에 전달하자.</p>
 <div class="sourceCode" id="cb259"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb259-1"><a href="#cb259-1" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="kw">range</span> data {</span>
 <span id="cb259-2"><a href="#cb259-2" aria-hidden="true"></a>        <span class="kw">if</span> err := x.Pull(&amp;data[i]); err != <span class="ot">nil</span> {</span>
 <span id="cb259-3"><a href="#cb259-3" aria-hidden="true"></a>            <span class="kw">return</span> i, err</span>
@@ -1835,7 +1835,7 @@ Meow! My name is Milo , it is true I am a mammal with a climb factor of 4</code>
 <span id="cb259-6"><a href="#cb259-6" aria-hidden="true"></a></span>
 <span id="cb259-7"><a href="#cb259-7" aria-hidden="true"></a>    <span class="kw">return</span> <span class="bu">len</span>(data), <span class="ot">nil</span></span>
 <span id="cb259-8"><a href="#cb259-8" aria-hidden="true"></a>}</span></code></pre></div>
-<p>store knows how to store bulks of data into Pillar. Similar to the function above. We might wonder if it is efficient. However, we are optimizing for correctness, not performance. When it is done, we will test it. If it is not fast enough, we will add more complexities to make it run faster.</p>
+<p><code>store</code>를 이용하여 많은 양의 데이터를 <code>Pillar</code>에 저장할 수 있다. 위의 기능과 유사하다. 효율적인지 의문이 들지도 모른다. 하지만 정확성(correctness)을 목표로 최적화 하고 있다. 성능(performance)은 그 다음 문제이다. 구현이 완료되면 테스트를 할 것이고, 속도가 충분히 빠르지 않다면, 복잡해지더라도 성능을 개선할 것이다.</p>
 <div class="sourceCode" id="cb260"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb260-1"><a href="#cb260-1" aria-hidden="true"></a><span class="kw">func</span> store(p *Pillar, data []Data) (<span class="dt">int</span>, <span class="dt">error</span>) {</span>
 <span id="cb260-2"><a href="#cb260-2" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="kw">range</span> data {</span>
 <span id="cb260-3"><a href="#cb260-3" aria-hidden="true"></a>        <span class="kw">if</span> err := p.Store(&amp;data[i]); err != <span class="ot">nil</span> {</span>
@@ -1845,7 +1845,7 @@ Meow! My name is Milo , it is true I am a mammal with a climb factor of 4</code>
 <span id="cb260-7"><a href="#cb260-7" aria-hidden="true"></a></span>
 <span id="cb260-8"><a href="#cb260-8" aria-hidden="true"></a>    <span class="kw">return</span> <span class="bu">len</span>(data), <span class="ot">nil</span></span>
 <span id="cb260-9"><a href="#cb260-9" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Copy knows how to pull and store data from the System. Now we can call the pull and store functions, passing Xenia and Pillar through.</p>
+<p><code>Copy</code>를 이용하여 <code>System</code>의 데이터를 추출할 수 있다. 이제 <code>pull</code>과 <code>store</code> 함수를 호출하여 <code>Xenia</code>에서 <code>Piller</code>로 데이터를 전달할 수 있다.</p>
 <div class="sourceCode" id="cb261"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb261-1"><a href="#cb261-1" aria-hidden="true"></a><span class="kw">func</span> Copy(sys *System, batch <span class="dt">int</span>) <span class="dt">error</span> {</span>
 <span id="cb261-2"><a href="#cb261-2" aria-hidden="true"></a>    data := <span class="bu">make</span>([]Data, batch)</span>
 <span id="cb261-3"><a href="#cb261-3" aria-hidden="true"></a></span>
