@@ -204,8 +204,8 @@ display: block;
 <li><a href="#default-error-values">Default error values</a></li>
 <li><a href="#error-variables">Error variables</a></li>
 <li><a href="#type-as-context">Type as context</a></li>
-<li><a href="#behavior-as-context">Behavior as context</a></li>
-<li><a href="#finding-the-bug">Finding the bug</a></li>
+<li><a href="#컨텍스트로서의-기능behavior-as-context">컨텍스트로서의 기능(Behavior as context)</a></li>
+<li><a href="#버그-사냥finding-the-bug">버그 사냥(Finding the bug)</a></li>
 <li><a href="#wrapping-errors">Wrapping Errors</a></li>
 </ul></li>
 </ul></li>
@@ -2715,8 +2715,8 @@ Got Unlucky</code></pre>
 <span id="cb380-7"><a href="#cb380-7" aria-hidden="true"></a>}</span></code></pre></div>
 <p>There is one flaw when using type as context here. In this case, we are now going back to the concrete. We walk away from the decoupling because our code is now bound to these concrete types. If the developer who wrote the json package makes any changes to these concrete types, that’s gonna create a cascading effect all the way through our code. We are no longer protected by the decoupling of the error interface.</p>
 <p>This sometimes has to happen. Can we do something different not to lose the decoupling. This is where the idea of behavior as context comes in.</p>
-<h4 id="behavior-as-context">Behavior as context</h4>
-<p>Behavior as context allows us to use a custom error type as our context but avoid that type assertion back to the concrete. We get to maintain a level of decoupling in our code.</p>
+<h4 id="컨텍스트로서의-기능behavior-as-context">컨텍스트로서의 기능(Behavior as context)</h4>
+<p>컨텍스트로서의 기능은 사용자 정의 오류를 마치 컨텍스트처럼 다룰 수 있게 해준다. 하지만 타입 단언이 구체인 것으로 돌아가는 건 막는다. 이로써 디커플링(decoupling)의 레벨에서 코드를 유지보수할 수 있게 되었다.</p>
 <div class="sourceCode" id="cb381"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb381-1"><a href="#cb381-1" aria-hidden="true"></a>package​ main</span>
 <span id="cb381-2"><a href="#cb381-2" aria-hidden="true"></a>import​ (</span>
 <span id="cb381-3"><a href="#cb381-3" aria-hidden="true"></a>    <span class="st">&quot;bufio&quot;</span></span>
@@ -2725,18 +2725,18 @@ Got Unlucky</code></pre>
 <span id="cb381-6"><a href="#cb381-6" aria-hidden="true"></a>    <span class="st">&quot;log&quot;</span></span>
 <span id="cb381-7"><a href="#cb381-7" aria-hidden="true"></a>    <span class="st">&quot;net&quot;</span></span>
 <span id="cb381-8"><a href="#cb381-8" aria-hidden="true"></a>)</span></code></pre></div>
-<p>client represents a single connection in the room.</p>
+<p><code>client</code>는 하나의 연결성을 가진다.</p>
 <div class="sourceCode" id="cb382"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb382-1"><a href="#cb382-1" aria-hidden="true"></a>type​ client ​struct​ {</span>
 <span id="cb382-2"><a href="#cb382-2" aria-hidden="true"></a>    name ​string</span>
 <span id="cb382-3"><a href="#cb382-3" aria-hidden="true"></a>    reader *bufio.Reader</span>
 <span id="cb382-4"><a href="#cb382-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>TypeAsContext shows how to check multiple types of possible custom error types that can be returned from the net package.</p>
+<p><code>TypeAsContext</code>는 <code>net</code> 패키지가 반환하는 여러 사용자 정의 오류들을 확인하는 방법을 보여준다.</p>
 <div class="sourceCode" id="cb383"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb383-1"><a href="#cb383-1" aria-hidden="true"></a>func​ (c *client) ​TypeAsContext​() {</span>
 <span id="cb383-2"><a href="#cb383-2" aria-hidden="true"></a>    for​ {</span></code></pre></div>
-<p>We are using reader interface value to decouple ourselves from the network read.</p>
+<p>네트워크에서 받아온 데이터를 <code>reader</code>를 통해 분리한다.</p>
 <div class="sourceCode" id="cb384"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb384-1"><a href="#cb384-1" aria-hidden="true"></a>        line, err := c.reader.ReadString(​<span class="ch">&#39;\n&#39;</span>​)</span>
 <span id="cb384-2"><a href="#cb384-2" aria-hidden="true"></a>        if​ err != ​nil​ {</span></code></pre></div>
-<p>This is using type as context like the previous example. What special here is the method named Temporary. If it is, we can keep going but if not, we have to break things down and build things back up. Every one of these cases care only about 1 thing: the behavior of Temporary. This is what important. We can switch here, from type as context to type as behavior if we do this type assertion and only ask about the potential behavior of that concrete type itself. We can go ahead and declare our own interface called temporary like below.</p>
+<p>이 예제는 이전 예제와 마찬가지로 타입을 컨텍스트처럼 쓴다. 여기서 <code>Temporary</code>라는 메서드가 중요하다. 만약 이 메서드가 정상적으로 작동한다면 계속 작업을 수행하고 그렇지 않다면 일단 멈춘 후에 다시 시작한다. 아래 모든 케이스는 오직 <code>Temporary</code>만을 위한 것이다. 이게 왜 중요한가? 만약 타입 단언을 한다거나 구현된 타입의 잠재적인 기능만 요구한다면, 이것을 컨텍스트로서의 타입을 기능으로서의 타입으로 바꿀 수 있다. 그렇기에 아래의 <code>temporary</code>라는 사용자 정의 인터페이스를 만들 수 있다.</p>
 <div class="sourceCode" id="cb385"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb385-1"><a href="#cb385-1" aria-hidden="true"></a>            switch​ e := err.(​type​) {</span>
 <span id="cb385-2"><a href="#cb385-2" aria-hidden="true"></a>            case​ *net.OpError:</span>
 <span id="cb385-3"><a href="#cb385-3" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
@@ -2764,17 +2764,17 @@ Got Unlucky</code></pre>
 <span id="cb385-25"><a href="#cb385-25" aria-hidden="true"></a>    fmt.Println(line)</span>
 <span id="cb385-26"><a href="#cb385-26" aria-hidden="true"></a>    }</span>
 <span id="cb385-27"><a href="#cb385-27" aria-hidden="true"></a>}</span></code></pre></div>
-<p>temporary is declared to test for the existence of the method coming from the net package. Because Temporary is the only behavior we care about. If the concrete type has the method named temporary then this is what we want. We get to stay decoupled and continue to work at the interface level.</p>
+<p><code>temporary</code>는 net 패키지에서 <code>Temporary</code>라는 메서드가 반환되는 지 확인한다. 왜냐하면 그 중 <code>Temporary</code>라는 메서드를 가진 구조체만 있으면 되기때문이다. 그러면 여전히 디커플링 단계에 있으며 계속 인터페이스 레벨에서 작업할 수 있다.</p>
 <div class="sourceCode" id="cb386"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb386-1"><a href="#cb386-1" aria-hidden="true"></a>type​ temporary ​interface​ {</span>
 <span id="cb386-2"><a href="#cb386-2" aria-hidden="true"></a>    Temporary() ​bool</span>
 <span id="cb386-3"><a href="#cb386-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>BehaviorAsContext shows how to check for the behavior of an interface that can be returned from the net package.</p>
+<p><code>BehaviorAsContext</code>는 <code>net</code> 패키지가 반환할 지도 모르는 있는 인터페이스를 어떻게 확인하는 지 보여준다.</p>
 <div class="sourceCode" id="cb387"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb387-1"><a href="#cb387-1" aria-hidden="true"></a>func​ (c *client) ​BehaviorAsContext​() {</span>
 <span id="cb387-2"><a href="#cb387-2" aria-hidden="true"></a>    for​ {</span>
 <span id="cb387-3"><a href="#cb387-3" aria-hidden="true"></a>        line, err := c.reader.ReadString(​<span class="ch">&#39;\n&#39;</span>​)</span>
 <span id="cb387-4"><a href="#cb387-4" aria-hidden="true"></a>        if​ err != ​nil​ {</span>
 <span id="cb387-5"><a href="#cb387-5" aria-hidden="true"></a>            switch​ e := err.(​type​) {</span></code></pre></div>
-<p>We can reduce 3 cases into 1 by asking in the case here during type assertion: Does the concrete type stored inside the error interface also implement this interface. We can declare and leverage that interface ourselves.</p>
+<p>타입 단언을 통해 세가지 경우를 한가지 경우로 줄일 수 있다: 이 구현 타입은 해당 인터페이스를 구현하고 있는 <code>error</code> 인터페이스를 가지고 있으며 해당 인터페이스를 정의하고 이용할 수 있다.</p>
 <div class="sourceCode" id="cb388"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb388-1"><a href="#cb388-1" aria-hidden="true"></a>            case​ temporary:</span>
 <span id="cb388-2"><a href="#cb388-2" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
 <span id="cb388-3"><a href="#cb388-3" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;Temporary: Client leaving return chat&quot;</span>)</span>
@@ -2792,23 +2792,23 @@ Got Unlucky</code></pre>
 <span id="cb388-15"><a href="#cb388-15" aria-hidden="true"></a>    }</span>
 <span id="cb388-16"><a href="#cb388-16" aria-hidden="true"></a>}</span></code></pre></div>
 <p><strong>Lesson:</strong></p>
-<p>Thank to Go Implicit Conversion. We can maintain a level of decoupling by creating an interface with methods or behaviors that we only want, and use it instead of concrete type for type assertion switch.</p>
-<h4 id="finding-the-bug">Finding the bug</h4>
+<p>Go의 암시적 형변환 덕분에, 원하는 메서드나 기능을 가진 인터페이스를 구현함으로 디커플링 단계에서 유지보수할 수 있고 타입 단언을 이용하는 <code>switch</code> 문법에서 구현 타입 대신에 사용할 수 있다.</p>
+<h4 id="버그-사냥finding-the-bug">버그 사냥(Finding the bug)</h4>
 <div class="sourceCode" id="cb389"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb389-1"><a href="#cb389-1" aria-hidden="true"></a>package​ main</span>
 <span id="cb389-2"><a href="#cb389-2" aria-hidden="true"></a>import​ ​<span class="st">&quot;log&quot;</span></span></code></pre></div>
-<p>customError is just an empty struct.</p>
+<p><code>customError</code>는 빈 구조체이다.</p>
 <div class="sourceCode" id="cb390"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb390-1"><a href="#cb390-1" aria-hidden="true"></a>type​ customError ​struct​{}</span></code></pre></div>
-<p>Error implements the error interface.</p>
+<p><code>Error</code>는 <code>error</code> 인터페이스를 구현한다.</p>
 <div class="sourceCode" id="cb391"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb391-1"><a href="#cb391-1" aria-hidden="true"></a>func​ (c *customError) ​Error​() ​string​ {</span>
 <span id="cb391-2"><a href="#cb391-2" aria-hidden="true"></a>    return​ ​<span class="st">&quot;Find the bug.&quot;</span></span>
 <span id="cb391-3"><a href="#cb391-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>fail returns nil values for both return types.</p>
+<p><code>fail</code> 함수는 둘 다 <code>nil</code> 값을 반환한다.</p>
 <div class="sourceCode" id="cb392"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb392-1"><a href="#cb392-1" aria-hidden="true"></a>func​ ​fail​() ([]​byte​, *customError) {</span>
 <span id="cb392-2"><a href="#cb392-2" aria-hidden="true"></a>    return​ ​nil​, ​nil</span>
 <span id="cb392-3"><a href="#cb392-3" aria-hidden="true"></a>}</span></code></pre></div>
 <div class="sourceCode" id="cb393"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb393-1"><a href="#cb393-1" aria-hidden="true"></a>func​ ​main​() {</span>
 <span id="cb393-2"><a href="#cb393-2" aria-hidden="true"></a>    var​ err <span class="dt">error</span></span></code></pre></div>
-<p>When we call fail, it returns the value of nil. However, we have the nil value of type *customError. We always want to use the error interface as the return value. The customError type is just an artifact, a value that we store inside. We cannot use the custom type directly. We must use the error interface, like so func fail() ([]byte, error)</p>
+<p>만약 <code>fail</code>을 호출하면 <code>nil</code> 값을 반환할 것이다. 하지만 <code>error</code> 인터페이스로써 반환하고 싶지만 <code>customError</code> 타입의 <code>nil</code> 값을 가질 뿐이다. <code>customError</code> 타입은 그저 만들어진 것에 불과하다. 그렇기에 사용자 정의 타입을 직접 사용할 수는 없고 오직 <code>func fail() ([]byte, error)</code> 처럼만 사용할 수 있다.</p>
 <div class="sourceCode" id="cb394"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb394-1"><a href="#cb394-1" aria-hidden="true"></a>    if​ _, err = fail(); err != ​nil​ {</span>
 <span id="cb394-2"><a href="#cb394-2" aria-hidden="true"></a>        log.Fatal(​<span class="st">&quot;Why did this fail?&quot;</span>​)</span>
 <span id="cb394-3"><a href="#cb394-3" aria-hidden="true"></a>    }</span>
