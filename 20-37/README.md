@@ -8,7 +8,7 @@ Assigned to
 Mandatory reviewer
 
 - 권용민/@snowmerak
-- 서병선/@famersbs
+- 이재원/@mumunuu
 
 ---
 
