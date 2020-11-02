@@ -231,16 +231,16 @@ display: block;
 </ul></li>
 <li><a href="#benchmarking">Benchmarking</a>
 <ul>
-<li><a href="#basic-benchmark">Basic Benchmark</a></li>
-<li><a href="#sub-benchmark">Sub Benchmark</a></li>
+<li><a href="#기본-벤치마크">기본 벤치마크</a></li>
+<li><a href="#하위-벤치마크">하위 벤치마크</a></li>
 </ul></li>
-<li><a href="#profiling">Profiling</a>
+<li><a href="#프로파일링profiling">프로파일링(Profiling)</a>
 <ul>
-<li><a href="#stack-trace">Stack Trace</a></li>
+<li><a href="#스택-트레이스stack-trace">스택 트레이스(Stack Trace)</a></li>
 <li><a href="#godebug">GODEBUG</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#keep-in-touch">Keep in touch</a></li>
+<li><a href="#소통하기">소통하기</a></li>
 </ul>
 </nav>
 <h2 id="서문introduction">서문(Introduction)</h2>
@@ -4747,16 +4747,17 @@ ok      github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers
 PASS
 ok      command-line-arguments 0.191s</code></pre>
 <h3 id="benchmarking">Benchmarking</h3>
-<h4 id="basic-benchmark">Basic Benchmark</h4>
-<p>Benchmark file’s have to have <code>&lt;file_name&gt;_test.go</code> and use the Benchmark functions like below. The goal is to know what performs better and what allocate more or less between Sprint and Sprintf. Our guess is that Sprint is gonna be better because it doesn’t have any overhead doing the formatting. However, this is not true. Remember we have to optimize for correctness so we don’t want to guess.</p>
+<h4 id="기본-벤치마크">기본 벤치마크</h4>
+<p>벤치마크 함수를 가진 <code>&lt;file_name&gt;_test.go</code> 파일로 벤치마크를 할 수 있다. <code>Sprint</code>와 <code>Sprintf</code> 중 어느 것이 더 성능이 좋고, 효율적으로 자원을 할당하는지 벤치마크 해보자. 언뜻 <code>Sprint</code>가 문자열 포맷을 하는 동안 오버헤드가 없기 때문에 더 나을 것 같아 보이지만 그렇지 않다. 추측보다는 실제 확인한 결과로 판단하자.</p>
 <div class="sourceCode" id="cb673"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb673-1"><a href="#cb673-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb673-2"><a href="#cb673-2" aria-hidden="true"></a></span>
 <span id="cb673-3"><a href="#cb673-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
 <span id="cb673-4"><a href="#cb673-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
 <span id="cb673-5"><a href="#cb673-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
 <span id="cb673-6"><a href="#cb673-6" aria-hidden="true"></a>)</span>
-<span id="cb673-7"><a href="#cb673-7" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
-<p>BenchmarkSprint tests the performance of using Sprint. All the code we want to benchmark need to be inside the b.N for loop. The first time the tool call it, b.N is equal to 1. It will keep increasing the value of N and run long enough based on our bench time. fmt.Sprint returns a value and we want to capture this value so it doesn’t look like dead code. We assign it to the global variable gs.</p>
+<span id="cb673-7"><a href="#cb673-7" aria-hidden="true"></a></span>
+<span id="cb673-8"><a href="#cb673-8" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
+<p><code>BenchmarkSprintBasic</code>은 <code>Sprint</code> 성능을 테스트한다. 벤치마크 하려는 모든 코드는 <code>b.N</code> 반복문 안에 있어야 한다. 벤치마크 도구가 처음 호출 할 때 <code>b.N</code>은 1이고, 충분히 테스트가 진행될 때 까지 <code>b.N</code>값은 지속적으로 증가한다. 전역변수 <code>gs</code>에 <code>fmt.Sprint</code>의 값을 반환하기 때문에 dead code<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 처럼 보이지 않게 된다.</p>
 <div class="sourceCode" id="cb674"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb674-1"><a href="#cb674-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintBasic(b *testing.B) {</span>
 <span id="cb674-2"><a href="#cb674-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
 <span id="cb674-3"><a href="#cb674-3" aria-hidden="true"></a></span>
@@ -4765,7 +4766,7 @@ ok      command-line-arguments 0.191s</code></pre>
 <span id="cb674-6"><a href="#cb674-6" aria-hidden="true"></a>    }</span>
 <span id="cb674-7"><a href="#cb674-7" aria-hidden="true"></a>    gs = s</span>
 <span id="cb674-8"><a href="#cb674-8" aria-hidden="true"></a>}</span></code></pre></div>
-<p>BenchmarkSprint tests the performance of using Sprintf.</p>
+<p><code>BenchmarkSprintfBasic</code>은 <code>Sprintf</code>의 성능을 테스트한다.</p>
 <div class="sourceCode" id="cb675"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb675-1"><a href="#cb675-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintfBasic(b *testing.B) {</span>
 <span id="cb675-2"><a href="#cb675-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
 <span id="cb675-3"><a href="#cb675-3" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
@@ -4780,20 +4781,20 @@ BenchmarkSprintBasic-16     52997451    56.9 ns/op    5 B/op    1 allocs/op
 BenchmarkSprintfBasic-16    72737234    45.7 ns/op    5 B/op    1 allocs/op
 PASS
 ok  command-line-arguments  6.637s</code></pre>
-<h4 id="sub-benchmark">Sub Benchmark</h4>
-<p>Like sub tests, we can also do sub benchmark.</p>
+<h4 id="하위-벤치마크">하위 벤치마크</h4>
+<p>하위 테스트를 하듯이, 하위 벤치마크도 할 수 있다.</p>
 <div class="sourceCode" id="cb677"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb677-1"><a href="#cb677-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb677-2"><a href="#cb677-2" aria-hidden="true"></a></span>
 <span id="cb677-3"><a href="#cb677-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
 <span id="cb677-4"><a href="#cb677-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
 <span id="cb677-5"><a href="#cb677-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span></span>
 <span id="cb677-6"><a href="#cb677-6" aria-hidden="true"></a>)</span></code></pre></div>
-<p>BenchmarkSprint tests all the Sprint related benchmarks as sub benchmarks.</p>
+<p><code>BenchmarkSprintSub</code> 는 <code>Sprint</code>와 관련한 모든 하위 벤치마크를 한다.</p>
 <div class="sourceCode" id="cb678"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb678-1"><a href="#cb678-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintSub(b *testing.B) {</span>
 <span id="cb678-2"><a href="#cb678-2" aria-hidden="true"></a>    b.Run(<span class="st">&quot;none&quot;</span>, benchSprint)</span>
 <span id="cb678-3"><a href="#cb678-3" aria-hidden="true"></a>    b.Run(<span class="st">&quot;format&quot;</span>, benchSprintf)</span>
 <span id="cb678-4"><a href="#cb678-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>benchSprint tests the performance of using Sprint.</p>
+<p><code>benchSprint</code>는 <code>Sprint</code>의 성능을 테스트한다.</p>
 <div class="sourceCode" id="cb679"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb679-1"><a href="#cb679-1" aria-hidden="true"></a><span class="kw">func</span> benchSprint(b *testing.B) {</span>
 <span id="cb679-2"><a href="#cb679-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
 <span id="cb679-3"><a href="#cb679-3" aria-hidden="true"></a></span>
@@ -4802,11 +4803,11 @@ ok  command-line-arguments  6.637s</code></pre>
 <span id="cb679-6"><a href="#cb679-6" aria-hidden="true"></a>    }</span>
 <span id="cb679-7"><a href="#cb679-7" aria-hidden="true"></a>    gs = s</span>
 <span id="cb679-8"><a href="#cb679-8" aria-hidden="true"></a>}</span></code></pre></div>
-<p>benchSprintf tests the performance of using Sprintf.</p>
+<p><code>benchSprintf</code>는 <code>Sprintf</code>의 성능을 테스트한다.</p>
 <div class="sourceCode" id="cb680"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb680-1"><a href="#cb680-1" aria-hidden="true"></a><span class="kw">func</span> benchSprintf(b *testing.B) {</span>
 <span id="cb680-2"><a href="#cb680-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
 <span id="cb680-3"><a href="#cb680-3" aria-hidden="true"></a></span>
-<span id="cb680-4"><a href="#cb680-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i&lt;b.N; i++ {</span>
+<span id="cb680-4"><a href="#cb680-4" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; b.N; i++ {</span>
 <span id="cb680-5"><a href="#cb680-5" aria-hidden="true"></a>        s = fmt.Sprintf(<span class="st">&quot;hello&quot;</span>)</span>
 <span id="cb680-6"><a href="#cb680-6" aria-hidden="true"></a>    }</span>
 <span id="cb680-7"><a href="#cb680-7" aria-hidden="true"></a>    gs = s</span>
@@ -4818,26 +4819,26 @@ BenchmarkSprintSub/none-16    54088082    60.6 ns/op    5 B/op    1 allocs/op
 BenchmarkSprintSub/format-16  67906119    52.3 ns/op    5 B/op    1 allocs/op
 PASS
 ok command-line-arguments 7.131s</code></pre>
-<p>Other running subtests like so:</p>
+<p>하위 벤치마크를 실행할 수 있는 다른 방법들:</p>
 <ul>
 <li><code>go test -run none -bench BenchmarkSprintSub/none -benchtime 3s -benchmem</code></li>
 <li><code>go test -run none -bench BenchmarkSprintSub/format -benchtime 3s -benchmem</code></li>
 </ul>
-<h3 id="profiling">Profiling</h3>
-<h4 id="stack-trace">Stack Trace</h4>
-<h5 id="review-stack-trace">Review Stack Trace</h5>
-<p>How to read stack traces?</p>
+<h3 id="프로파일링profiling">프로파일링(Profiling)</h3>
+<h4 id="스택-트레이스stack-trace">스택 트레이스(Stack Trace)</h4>
+<h5 id="스택-트레이스-리뷰review-stack-trace">스택 트레이스 리뷰(Review Stack Trace)</h5>
+<p>어떻게 스택 트레이스를 할 수 있을까?</p>
 <div class="sourceCode" id="cb682"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb682-1"><a href="#cb682-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb682-2"><a href="#cb682-2" aria-hidden="true"></a></span>
 <span id="cb682-3"><a href="#cb682-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>We are making a slice of length 2, capacity 4 and then passing that slice value into a function call example. example takes a slice, a string, and an integer.</p>
+<p>이 예제는 배열, 문자열, 정수를 사용한다. 길이 2, 용량 4의 배열을 만들고 그 배열 값을 예제 함수에 전달한다.</p>
 <div class="sourceCode" id="cb683"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb683-1"><a href="#cb683-1" aria-hidden="true"></a>    example(<span class="bu">make</span>([]<span class="dt">string</span>, <span class="dv">2</span>, <span class="dv">4</span>), <span class="st">&quot;hello&quot;</span>, <span class="dv">10</span>)</span>
 <span id="cb683-2"><a href="#cb683-2" aria-hidden="true"></a>}</span></code></pre></div>
-<p>examples call the built-in function panic to demonstrate the stack traces.</p>
+<p>예제는 내장 함수 <code>panic</code>을 호출하여 스택 트레이스을 보여준다.</p>
 <div class="sourceCode" id="cb684"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb684-1"><a href="#cb684-1" aria-hidden="true"></a><span class="kw">func</span> example(slice []<span class="dt">string</span>, str <span class="dt">string</span>, i <span class="dt">int</span>) {</span>
 <span id="cb684-2"><a href="#cb684-2" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
 <span id="cb684-3"><a href="#cb684-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>This is the output that we get:</p>
+<p>예제를 통해 출력되는 결과:</p>
 <pre class="text"><code>panic: Want stack trace
 
 goroutine 1 [running]:
@@ -4848,21 +4849,21 @@ main.main()
 
 /Users/hoanhan/go/src/github.com/hoanhan101/ultimate-go/go/profiling/stack_trace.go:13 +0x72
 exit status 2</code></pre>
-<p>We already know that the compiler tells us the lines of problems. That’s good. What is even better is that we know exactly what values are passed to the function at the time stack traces occur. Stack traces show words of data at a time. We know that a slice is a 3-word data structure. In our case, the 1st word is a pointer, 2nd is 2 (length) and 3rd is 4 (capacity). String is a 2-word data structure: a pointer and length of 5 because there are 5 bytes in string “hello”. Then we have a 1 word integer of value 10. In the stack traces, main.example(0xc420053f38, 0x2, 0x4, 0x1066c02, 0x5, 0xa), the corresponding values in the function are address, 2, 4, address, 5, a (which is 10 in base 2).</p>
-<p>If we ask for the data we need, this is a benefit that we can get just by looking at the stack traces and see the values that are going in. If we work with the error package from Dave, wrap it and add more context, and log package, we have more than enough information to debug a problem.</p>
+<p>컴파일러는 어떤 라인에서 문제가 생겼는지 알려준다. 스택 트레이스를 사용했을 때 더 좋은 점은, 함수에 전달되는 값을 정확히 알 수 있다. 스택 트레이스는 데이터 구조를 펼쳐서 표시한다. <code>slice</code>는 3개의 word로 표시 되는데, 첫 번째 word는 포인터, 두 번째 word는 2(길이), 세 번째 word는 4(용량)이다. <code>string</code>은 2개의 word로 표시 되는데, <code>&quot;hello&quot;</code>는 길이가 5인 5byte의 문자열이고, 첫 번째 word는 포인터, 두 번째 word는 5(길이)이다. 마지막으로 남은 word는 10(정수)이다. 스택 트레이스에서 볼 수 있는 <code>main.example (0xc420053f38, 0x2, 0x4, 0x1066c02, 0x5, 0xa)</code>에서 각각에 해당되는 값은 <code>포인터 주소, 2, 4, 포인터 주소, 5, a(16진수로 표기된 10)</code> 이다.</p>
+<p>스택 트레이스를 사용하는 것 만으로도 사용된 값을 확인하거나 필요한 데이터를 얻을 수 있다. <a href="https://github.com/pkg/errors">Dave의 error 패키지</a>를 사용하고, 몇몇 컨텍스트를 더하거나 log 패키지를 추가하면 디버깅 할 때 문제에 대한 더 많은 정보를 얻을 수 있다.</p>
 <h5 id="packing">Packing</h5>
-<p>Sample stack races that pack values.</p>
+<p>값을 채우는 스택 트레이스의 예.</p>
+<p><code>example</code> 함수에 할당되는 값들은 전부 1byte이다.</p>
 <div class="sourceCode" id="cb686"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb686-1"><a href="#cb686-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb686-2"><a href="#cb686-2" aria-hidden="true"></a></span>
-<span id="cb686-3"><a href="#cb686-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Passing values that are 1-byte values.</p>
-<div class="sourceCode" id="cb687"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb687-1"><a href="#cb687-1" aria-hidden="true"></a>    example(<span class="ot">true</span>, <span class="ot">false</span>, <span class="ot">true</span>, <span class="dv">25</span>)</span>
-<span id="cb687-2"><a href="#cb687-2" aria-hidden="true"></a>}</span>
-<span id="cb687-3"><a href="#cb687-3" aria-hidden="true"></a></span>
-<span id="cb687-4"><a href="#cb687-4" aria-hidden="true"></a><span class="kw">func</span> example(b1, b2, b3 <span class="dt">bool</span>, i <span class="dt">uint8</span>) {</span>
-<span id="cb687-5"><a href="#cb687-5" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
-<span id="cb687-6"><a href="#cb687-6" aria-hidden="true"></a>}</span></code></pre></div>
-<p>This is the output that we get:</p>
+<span id="cb686-3"><a href="#cb686-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span>
+<span id="cb686-4"><a href="#cb686-4" aria-hidden="true"></a>    example(<span class="ot">true</span>, <span class="ot">false</span>, <span class="ot">true</span>, <span class="dv">25</span>)</span>
+<span id="cb686-5"><a href="#cb686-5" aria-hidden="true"></a>}</span>
+<span id="cb686-6"><a href="#cb686-6" aria-hidden="true"></a></span>
+<span id="cb686-7"><a href="#cb686-7" aria-hidden="true"></a><span class="kw">func</span> example(b1, b2, b3 <span class="dt">bool</span>, i <span class="dt">uint8</span>) {</span>
+<span id="cb686-8"><a href="#cb686-8" aria-hidden="true"></a>    <span class="bu">panic</span>(<span class="st">&quot;Want stack trace&quot;</span>)</span>
+<span id="cb686-9"><a href="#cb686-9" aria-hidden="true"></a>}</span></code></pre></div>
+<p>출력 결과:</p>
 <pre class="text"><code>panic: Want stack trace
 
 goroutine 1 [running]:
@@ -4873,7 +4874,7 @@ main.main()
 
 /Users/hoanhan/go/src/github.com/hoanhan101/ultimate-go/go/profiling/stack_trace_2.go:8 +0x29
 exit status 2</code></pre>
-<p>Since stack traces show 1 word at a time, all of these 4 bytes fit in a half-word on a 32-bit platform and a full word on 64-bit. Also, the system we are looking at is using little endian so we need to read from right to left. In our case, the word value 0xc419010001 can be represented as:</p>
+<p>이번에는 스택 트레이스가 1 word 밖에 보여주지 않는데, 이 4바이트는 32비트 환경에선 half-wold로, 64비트 환경에선 full-word로 표시된다. 예제에 사용된 시스템은 리틀 엔디언을 사용하고 있기 때문에 오른쪽에서 왼쪽으로 읽어야 한다. <code>0xc419010001</code> 을 아래와 같이 나타낼 수 있다:</p>
 <table>
 <thead>
 <tr class="header">
@@ -4911,48 +4912,36 @@ exit status 2</code></pre>
 </tbody>
 </table>
 <h4 id="godebug">GODEBUG</h4>
-<h5 id="memory-tracing">Memory Tracing</h5>
-<p>Memory Tracing gives us a general idea if our software is healthy as related to the GC and memory in the heap that we are working with. Below is a sample program that causes memory leaks.</p>
-<div class="sourceCode" id="cb689"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb689-1"><a href="#cb689-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
-<span id="cb689-2"><a href="#cb689-2" aria-hidden="true"></a></span>
-<span id="cb689-3"><a href="#cb689-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
-<span id="cb689-4"><a href="#cb689-4" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
-<span id="cb689-5"><a href="#cb689-5" aria-hidden="true"></a>    <span class="st">&quot;os/signal&quot;</span></span>
-<span id="cb689-6"><a href="#cb689-6" aria-hidden="true"></a>)</span>
-<span id="cb689-7"><a href="#cb689-7" aria-hidden="true"></a></span>
-<span id="cb689-8"><a href="#cb689-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Create a Goroutine that leaks memory. Dumping key-value pairs to put tons of allocation.</p>
-<div class="sourceCode" id="cb690"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb690-1"><a href="#cb690-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
-<span id="cb690-2"><a href="#cb690-2" aria-hidden="true"></a>        m := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">int</span>]<span class="dt">int</span>)</span>
-<span id="cb690-3"><a href="#cb690-3" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; ; i++ {</span>
-<span id="cb690-4"><a href="#cb690-4" aria-hidden="true"></a>            m[i] = i</span>
-<span id="cb690-5"><a href="#cb690-5" aria-hidden="true"></a>        }</span>
-<span id="cb690-6"><a href="#cb690-6" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>Shutdown the program with Ctrl-C.</p>
-<div class="sourceCode" id="cb691"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb691-1"><a href="#cb691-1" aria-hidden="true"></a>    sig := <span class="bu">make</span>(<span class="kw">chan</span> os.Signal, <span class="dv">1</span>)</span>
-<span id="cb691-2"><a href="#cb691-2" aria-hidden="true"></a>    signal.Notify(sig)</span>
-<span id="cb691-3"><a href="#cb691-3" aria-hidden="true"></a>    &lt;-sig</span>
-<span id="cb691-4"><a href="#cb691-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>We are using a special environmental variable called <code>GODEBUG</code>. It gives us the ability to do a memory trace and a scheduler trace. Here are the steps to build and run:</p>
-<p>Build the program by: <code>go build memory_tracing.go</code></p>
-<p>Run the binary: <code>GODEBUG=gctrace=1 ./memory_tracing</code></p>
-<p>Setting the <code>GODEBUG=gctrace=1</code> causes the garbage collector to emit a single line to standard error at each collection, summarizing the amount of memory collected and the length of the pause.</p>
-<p>What we are gonna see are bad traces followed by this pattern:</p>
-<p>gc {0} @{1}s {2}%: {3}+…+{4} ms clock, {5}+…+{6} ms cpu, {7}-&gt;{8}-&gt;{9} MB, {10} MB goal, {11} P</p>
-<p>where:<br />
-{0} : The number of times gc run<br />
-{1} : The amount of time the program has been running.<br />
-{2} : The percentage of CPU the gc is taking away from us.<br />
-{3} : Stop of wall clock time - a measure of the real time including time that passes due to programmed delays or waiting for resources to become available.<br />
-{4} : Stop of wall clock. This is normally a more important number to look at.<br />
-{5} : CPU clock<br />
-{6} : CPU clock<br />
-{7} : The size of the heap prior to the gc starting.<br />
-{8} : The size of the heap after the gc run.<br />
-{9} : The size of the live heap.<br />
-{10}: The goal of the gc, pacing algorithm.<br />
-{11}: The number of processes.</p>
-<p>Here’s the actual output for the run:</p>
+<h5 id="메모리-트레이싱">메모리 트레이싱</h5>
+<p>메모리 트레이싱은 코드가 실행될 때 GC 및 힙 메모리에 관련해서 잘 작동하는지 분석을 제공한다. 다음은 메모리 릭<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>을 일으키는 예제이다.</p>
+<div class="sourceCode" id="cb688"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb688-1"><a href="#cb688-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
+<span id="cb688-2"><a href="#cb688-2" aria-hidden="true"></a></span>
+<span id="cb688-3"><a href="#cb688-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
+<span id="cb688-4"><a href="#cb688-4" aria-hidden="true"></a>    <span class="st">&quot;os&quot;</span></span>
+<span id="cb688-5"><a href="#cb688-5" aria-hidden="true"></a>    <span class="st">&quot;os/signal&quot;</span></span>
+<span id="cb688-6"><a href="#cb688-6" aria-hidden="true"></a>)</span>
+<span id="cb688-7"><a href="#cb688-7" aria-hidden="true"></a></span>
+<span id="cb688-8"><a href="#cb688-8" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
+<p>아래 코드는 고루틴을 생성할 때 메모리 릭을 일으킨다. 코드가 종료될 때 까지 계속 Key-value를 할당한다.</p>
+<div class="sourceCode" id="cb689"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb689-1"><a href="#cb689-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
+<span id="cb689-2"><a href="#cb689-2" aria-hidden="true"></a>        m := <span class="bu">make</span>(<span class="kw">map</span>[<span class="dt">int</span>]<span class="dt">int</span>)</span>
+<span id="cb689-3"><a href="#cb689-3" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; ; i++ {</span>
+<span id="cb689-4"><a href="#cb689-4" aria-hidden="true"></a>            m[i] = i</span>
+<span id="cb689-5"><a href="#cb689-5" aria-hidden="true"></a>        }</span>
+<span id="cb689-6"><a href="#cb689-6" aria-hidden="true"></a>    }()</span></code></pre></div>
+<p>Ctrl-C 로 코드를 종료한다.</p>
+<div class="sourceCode" id="cb690"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb690-1"><a href="#cb690-1" aria-hidden="true"></a>    sig := <span class="bu">make</span>(<span class="kw">chan</span> os.Signal, <span class="dv">1</span>)</span>
+<span id="cb690-2"><a href="#cb690-2" aria-hidden="true"></a>    signal.Notify(sig)</span>
+<span id="cb690-3"><a href="#cb690-3" aria-hidden="true"></a>    &lt;-sig</span>
+<span id="cb690-4"><a href="#cb690-4" aria-hidden="true"></a>}</span></code></pre></div>
+<p><code>GODEBUG</code> 라는 환경변수를 사용하게 되면 메모리와 스케줄러를 확인할 수 있게 된다. 빌드 및 실행 방법:</p>
+<p>빌드 : <code>go build memory_tracing.go</code></p>
+<p>실행 : <code>GODEBUG=gctrace=1 ./memory_tracing</code></p>
+<p><code>GODEBUG=gctrace=1</code>을 설정하면 가비지 컬렉터는 각 수집마다 수집된 메모리와 실행 시간을 요약하여 한줄씩 출력한다.</p>
+<p>문제가 발생한 부분을 찾는 방법:</p>
+<pre class="text"><code>gc {0} @{1}s {2}%: {3}+...+{4} ms clock, {5}+...+{6} ms cpu, {7}-&gt;{8}-&gt;{9} MB, {10} MB goal, {11} P</code></pre>
+<p>의미: {0} : gc 실행 횟수 {1} : 프로그램이 실행 된 시간. {2} : gc가 차지하는 CPU의 비율. {3} : 프로그램 실행 시간 - 프로그램의 지연시간이나 리소스를 사용할 수 있을 때까지 대기하는 시간을 포함한 실시간 측정 값. {4} : 프로그램 실행 시간. 보기보다 중요한 숫자. {5} : CPU 클럭 {6} : CPU 클럭 {7} : gc가 시작되기 전의 힙 크기. {8} : gc 실행 후 힙 크기. {9} : 라이브 힙의 크기. {10} : gc의 목표, 페이싱 알고리즘. {11} : 프로세스 수.</p>
+<p>실행 결과:</p>
 <pre class="text"><code>gc 1 @0.007s 0%: 0.010+0.13+0.030 ms clock, 0.080+0/0.058/0.15+0.24 ms cpu, 5-&gt;5-&gt;3 MB, 6 MB goal, 8 P
 gc 2 @0.013s 0%: 0.003+0.21+0.034 ms clock, 0.031+0/0.030/0.22+0.27 ms cpu, 9-&gt;9-&gt;7 MB, 10 MB goal, 8 P
 gc 3 @0.029s 0%: 0.003+0.23+0.030 ms clock, 0.029+0.050/0.016/0.25+0.24 ms cpu, 18-&gt;18-&gt;15 MB, 19 MB goal, 8 P
@@ -4963,10 +4952,17 @@ gc 7 @0.317s 0%: 0.003+1.2+0.080 ms clock, 0.026+0/1.1/0.13+0.64 ms cpu, 120-&gt
 gc 8 @0.685s 0%: 0.004+1.6+0.041 ms clock, 0.032+0/1.5/0.72+0.33 ms cpu, 288-&gt;288-&gt;241 MB, 289 MB goal, 8 P
 gc 9 @1.424s 0%: 0.004+4.0+0.081 ms clock, 0.033+0.027/3.8/0.53+0.65 ms cpu, 577-&gt;577-&gt;482 MB, 578 MB goal, 8 P
 gc 10 @2.592s 0%: 0.003+11+0.045 ms clock, 0.031+0/5.9/5.2+0.36 ms cpu, 499-&gt;499-&gt;317 MB, 964 MB goal, 8 P</code></pre>
-<p>It goes really fast in the beginning and starts to slow down. This is bad. The size of the heap is increasing every time the GC runs. Hence, we know that there is a memory leak.</p>
-<h2 id="keep-in-touch">Keep in touch</h2>
-<p>Let me know how The Ultimate Go Book works out for you. Send an email to <a href="hoanhan101@gmail.com">hoanhan101@gmail.com</a>.</p>
-<p>If you’re interested in getting updates on my latest insights, projects and becoming a better software engineer as well as a better person overall, feel free to join my visit my website at <a href="https://hoanhan101.github.io/">https://hoanhan101.github.io/</a>.</p>
-<p><strong>Thanks for reading and good luck!</strong></p>
+<p>처음에는 빠른데, 점점 느려지기 시작한다. GC가 실행될 때 마다 힙 사이즈가 증가하는 부분에서 메모리 릭이 발생함을 알 수 있다.</p>
+<h2 id="소통하기">소통하기</h2>
+<p>당신이 <strong>The Ultimate Go Book</strong>을 잘 이해할 수 있었는지 이메일(<a href="hoanhan101@gmail.com">hoanhan101@gmail.com</a>)로 알려주시길 바랍니다.</p>
+<p>만약, 당신이 나의 활동 및 프로젝트, 그리고 더 나은 소프트웨어 엔지니어가 되는데 관심이 있다면, 내 웹사이트 <a href="https://hoanhan101.github.io/">https://hoanhan101.github.io/</a> 에 자유롭게 방문해주시길 바랍니다.</p>
+<p><strong>읽어주셔서 고맙습니다. 행운을 빕니다!</strong></p>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>불필요한 코드<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>프로그램이 불필요한 메모리를 해제하지 않아 메모리가 낭비되는 현상. 메모리 누수.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 </body>
 </html>
