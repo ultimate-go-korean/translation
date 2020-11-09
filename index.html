@@ -651,18 +651,18 @@ Updated user record for ID 101</code></pre>
 Log: 1 2 4 8 16 32</code></pre>
 <h3 id="데이터-구조data-structures">데이터 구조(Data Structures)</h3>
 <h4 id="배열array">배열(Array)</h4>
-<h5 id="cpu-cache">CPU Cache</h5>
-<p>Cores DO NOT access main memory directly but their local caches. What store in caches are data and instruction.</p>
-<p>Cache speed from fastest to slowest: L1 -&gt; L2 -&gt; L3 -&gt; main memory. As Scott Meyers has said “If performance matters then the total memory you have is the total amount of caches”. Access to main memory is incredibly slow. Practically speaking it might not even be there.</p>
-<p>So how do we write code that can be sympathetic with the caching system to make sure that we don’t have a cache miss or at least, we minimize cache misses to our fullest potential?</p>
-<p>Processor has a Prefetcher. It predicts what data is needed ahead of time. There are different granularities depending on where we are on the machine. Our programming model uses a byte. We can read and write to a byte at a time. However, from the caching system point of view, our granularity is not 1 byte. It is 64 bytes, called a cache line. All memory us junked up in this 64 bytes cache line. Since the caching mechanism is complex, Prefetcher tries to hide all the latency from us. It has to be able to pick up on predictable access patterns to data. That said, we need to write code that creates predictable access patterns to data.</p>
-<p>One easy way is to create a contiguous allocation of memory and to iterate over them. The array data structure gives us the ability to do so. From the hardware perspective, array is the most important data structure. From Go perspective, slice is. Array is the backing data structure for slice (like Vector in C++). Once we allocate an array, whatever its size, every element is equally distant from other elements. As we iterate over that array, we begin to walk cache line by cache line. As the Prefetcher sees that access pattern, it can pick it up and hide all the latency from us.</p>
-<p>For example, we have a big nxn matrix. We do LinkedList Traverse, Column Traverse, and Row Traverse and benchmark against them. Unsurprisingly, Row Traverse has the best performance. It walks through the matrix cache line by cache line and creates a predictable access pattern. Column Traverse does not walk through the matrix cache line by cache line. It looks like a random access memory pattern. That is why it is the slowest among those. However, that doesn’t explain why LinkedList Traverse’s performance is in the middle. We just think that it might perform as poorly as the Column Traverse. This leads us to another cache: TLB - Translation Lookaside Buffer. Its job is to maintain the operating system’s page and offset to where physical memory is.</p>
-<h5 id="translation-lookaside-buffer">Translation Lookaside Buffer</h5>
-<p>Back to the different granularity, the caching system moves data in and out the hardware at 64 bytes at a time. However, the operating system manages memory by paging its 4K (traditional page size for an operating system).</p>
-<p>For every page that we are managing, let’s take our virtual memory addresses because that we use (softwares runs virtual addresses, its sandbox, that is how we use/share physical memory) and map it to the right page and offset for that physical memory.</p>
-<p>A miss on the TLB can be worse than just the cache miss alone. The LinkedList is somewhere in between because the chance of multiple nodes being on the same page is probably pretty good. Even though we can get cache misses because cache lines aren’t necessary in the distance that is predictable, we probably do not have so many TLB cache misses. In the Column Traverse, not only do we have cache misses, we probably have a TLB cache miss on every access as well.</p>
-<p>That said, data-oriented design matters. It is not enough to write the most efficient algorithm, how we access our data can have much more lasting effect on the performance than the algorithm itself.</p>
+<h5 id="cpu-캐시cpu-cache">CPU 캐시(CPU Cache)</h5>
+<p>코어들은 메인 메모리로 바로 접근하지 않고 로컬 캐시로 접근한다. 캐시에는 데이터와 명령어가 저장되어 있다.</p>
+<p>캐시 속도는 L1, L2, L3, 메인 메모리 순으로 빠르다. Scott Meyers에 따르면 “만약 퍼포먼스가 중요하다면 모두 캐시 메모리로 접근해야 한다”고 한다. 메인 메모리 접근은 굉장히 느리다. 사실상 접근이 힘들다고 보면 된다.</p>
+<p>그래서 캐시 미스(cache miss)가 발생하지 않거나 잠재적인 문제로부터 최소화하는 캐싱 시스템(caching system)은 어떻게 작성해야 할까?</p>
+<p>프로세서(Processor)는 프리페처(Prefetcher)를 가지고 있다. 프리페처는 어떤 데이터가 필요할지 예상한다. 데이터 단위(granularity)는 사용하는 기계에 따라 다르다. 대체로 프로그래밍 모델은 바이트를 사용한다. 한 번에 바이트를 읽고 쓸 수 있다. 그러나, 캐싱 시스템의 관점에서 보면 데이터 단위는 1바이트가 아니다. 캐싱 시스템의 관점에서 데이터의 단위는 64바이트고 이걸 캐시 라인(cache line)이라고 부른다. 모든 메모리는 64바이트의 캐시 라인으로 구성되어 있다. 캐싱 메커니즘(caching mechanism)은 복잡하지만 프리페처는 모든 지연 시간을 없애려 한다. 프리페처가 예측 가능한 데이터 접근 패턴을 파악 할 수 있어야 한다. 즉, 예측 가능한 데이터 접근 패턴을 생성하는 코드를 작성해야 한다.</p>
+<p>쉬운 방법의 하나는 메모리의 연속 할당을 만들고 이것을 순회하는 것이다. 배열(Array) 데이터 구조는 연속 할당과 순회를 할 수 있게 해준다. 하드웨어 관점에서 배열은 가장 중요한 데이터 구조이며 Go 관점에서 슬라이스(slice)가 그러하다. C++의 vector와 마찬가지로 슬라이스는 배열 기반 자료구조이다. 사이즈가 어떻든 배열을 할당하면, 모든 원소는 각각 다른 원소로부터 같은 거리를 갖게 된다. 배열을 순회하는 건 캐시 라인을 한줄 한줄 순회하는 것과 같다. 프리페처는 접근 패턴을 고르고 모든 지연 시간을 숨긴다.</p>
+<p>예를 들어, 큰 nxn 행렬이 있다고 하자. 연결 리스트 순회(LinkedList Traverse), 열 순회(Column Traverse), 행 순회(Row Traverse)를 했을 때 각 순회의 성능을 측정해보자. 당연하게도 행 순회가 가장 높은 성능을 가진다. 행 순회는 행렬의 캐시 라인을 순회하면서 예측 가능한 접근 패턴을 만든다. 이와 달리 열 순회는 캐시 라인을 순회하지 않는다. 메모리 임의 접근 패턴을 가지고 있다. 이게 성능이 제일 느린 이유다. 연결 리스트 순회의 성능이 왜 중간인지 설명하지 않았다. 단순히 열 순회만큼 성능이 안 좋을 거라고 생각해 볼 수 있다. 자세한 이해를 위해 또 다른 캐시인 TLB - 변환 색인 버퍼(Translation Lookaside Buffer)를 알아보자. 변환 색인 버퍼는 물리적 메모리에 있는 운영 체제의 페이지(page)와 오프셋(offset)을 유지한다.</p>
+<h5 id="변환-색인-버퍼translation-lookaside-buffer">변환 색인 버퍼(Translation Lookaside Buffer)</h5>
+<p>캐싱 시스템은 하드웨어로 한 번에 64바이트씩 데이터를 옮긴다. 데이터 단위는 기계 별로 다르듯이, 운영 체제는 4k(운영 체제의 기존 페이지 크기) 바이트씩 페이징 함으로써 메모리를 관리한다.</p>
+<p>관리되는 모든 페이지는 가상 메모리 주소(소프트웨어는 가상 주소를 물리적 메모리를 사용하고 공유하는 샌드박스에서 실행한다)를 갖게 되는데, 올바른 페이지에 매핑되고 물리적 메모리로 오프셋 하기 위해 사용된다.</p>
+<p>변환 색인 버퍼의 미스는 캐시 미스보다 나쁠 수 있다. 연결 리스트 순회가 중간 성능인 이유는 다수의 노드가 같은 페이지에 있기 때문이다. 캐시 라인은 예측 가능한 거리를 요구하지 않기 때문에 캐시 미스가 발생 할 수 있지만, 많은 변환 색인 버퍼의 미스는 발생하지 않을 수 있다. 열 순회에서는 캐시 미스뿐만 아니라 엑세스할 때마다 변환 색인 버퍼의 캐시 미스가 발생 할 수 있다.</p>
+<p>즉, 데이터 지향 설계가 중요하다. 효율적인 알고리즘을 작성하는 것에 그치지 않고, 어떻게 데이터에 접근하는 것이 알고리즘보다 성능에 좋은 영향을 미칠지 고려해야 한다.</p>
 <h5 id="선언과-초기화declare-and-initialize-2">선언과 초기화(Declare and initialize)</h5>
 <p>문자열이 원소이고 길이가 5인 배열을 선언하고, 제로 값(zero value)으로 초기화 해보자. 다시 한 번 더 말하지만, 문자열은 포인터와 길이를 표현하는 두 워드(word)로 이루어진 데이터 구조다. 이 배열을 제로 값(zero value)으로 설정하면, 배열속의 모든 문자열도 제로 값(zero value)이 된다. 각각의 문자열의 첫 번째 워드는 nil을 가리키고 두 번째 워드는 0이 된다.</p>
 <figure>
@@ -708,10 +708,10 @@ Log: 1 2 4 8 16 32</code></pre>
 1 20
 2 30
 3 40</code></pre>
-<h5 id="different-type-arrays">Different type arrays</h5>
-<p>Declare an array of 5 integers that is initialized to its zero value.</p>
+<h5 id="다른-타입의-배열들different-type-arrays">다른 타입의 배열들(Different type arrays)</h5>
+<p>제로 값으로 초기화 된 길이가 5인 정수 형 배열을 선언하자.</p>
 <div class="sourceCode" id="cb51"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true"></a><span class="kw">var</span> five [<span class="dv">5</span>]<span class="dt">int</span></span></code></pre></div>
-<p>Declare an array of 4 integers that is initialized with some values.</p>
+<p>특정 값으로 초기화 된 길이가 4인 정수 형 배열을 선언하자.</p>
 <div class="sourceCode" id="cb52"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true"></a>four := [<span class="dv">4</span>]<span class="dt">int</span>{<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">30</span>, <span class="dv">40</span>}</span></code></pre></div>
 <div class="sourceCode" id="cb53"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Different type arrays</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb53-2"><a href="#cb53-2" aria-hidden="true"></a>fmt.Println(five)</span>
@@ -719,14 +719,15 @@ Log: 1 2 4 8 16 32</code></pre>
 <pre><code>=&gt; Different type arrays
 [0 0 0 0 0]
 [10 20 30 40]</code></pre>
-<p>When we try to assign four to five like so five = four, the compiler says that “cannot use four (type [4]int) as type [5]int in assignment”. This cannot happen because they have different types (size and representation). The size of an array makes up its type name: [4]int vs [5]int. Just like what we’ve seen with pointers. The * in *int is not an operator but part of the type name. Unsurprisingly, all arrays have known size at compile time.</p>
-<h5 id="contiguous-memory-allocations">Contiguous memory allocations</h5>
-<p>Declare an array of 6 strings initialized with values.</p>
+<p><code>five = four</code>와 같이 변수 four를 변수 five에 할당하려고 할 때, 컴파일러는 <code>&quot;cannot use four (type [4]int) as type [5]int in assignment&quot;</code>라는 메세지를 출력한다. 타입(길이와 표현)이 다르기 때문에 할당 할 수 없다. 배열의 크기는 타입명에 표시 된다: <code>[4]int</code> vs <code>[5]int</code>. 이것은 포인터의 표현과 같은 맥락이다. <code>*int</code>의 *은 연산자가 아니고 타입명의 일부이다. 당연하게도 모든 배열은 컴파일 타임(compile time) 때 정해진 크기를 갖게 된다.</p>
+<h5 id="연속-메모리-할당contiguous-memory-allocations">연속 메모리 할당(Contiguous memory allocations)</h5>
+<p>특정 값들로 초기화 된 길이가 6인 문자열 배열을 선언하자.</p>
 <div class="sourceCode" id="cb55"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true"></a>six := [<span class="dv">6</span>]<span class="dt">string</span>{<span class="st">&quot;Annie&quot;</span>, <span class="st">&quot;Betty&quot;</span>, <span class="st">&quot;Charley&quot;</span>, <span class="st">&quot;Doug&quot;</span>, <span class="st">&quot;Edward&quot;</span>, <span class="st">&quot;Hoanh&quot;</span>}</span></code></pre></div>
-<p>Iterate over the array displaying the value and address of each element. By looking at the output of this Printf function, we can see that this array is truly a contiguous block of memory. We know a string is 2 words and depending on computer architecture, it will have x byte. The distance between two consecutive IndexAddr is exactly x byte. v is its own variable on the stack and it has the same address every single time.</p>
-<div class="sourceCode" id="cb56"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true"></a><span class="kw">for</span> i, v := <span class="kw">range</span> six {</span>
-<span id="cb56-2"><a href="#cb56-2" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Value[%s]</span><span class="ch">\t</span><span class="st">Address[%p] IndexAddr[%p]</span><span class="ch">\n</span><span class="st">&quot;</span>, v, &amp;v, &amp;six[i])</span>
-<span id="cb56-3"><a href="#cb56-3" aria-hidden="true"></a>}</span></code></pre></div>
+<p>이 배열을 반복하면서 각 원소의 값과 주소를 출력하자. <code>Printf</code>의 결과를 보면, 이 배열은 연속 된 메모리 블록으로 이루어진 것을 알 수 있다. 문자열은 두 워드로 되어 있고, 컴퓨터 아키텍처에 따라 x 바이트를 가지게 된다. 연속 된 두 <code>IndexAddr</code>의 거리는 정확히 x 바이트이다. 변수 <code>v</code>는 스택에 있고 매번 같은 주소를 가진다.</p>
+<div class="sourceCode" id="cb56"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Contiguous memory allocations</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true"></a><span class="kw">for</span> i, v := <span class="kw">range</span> six {</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Value[%s]</span><span class="ch">\t</span><span class="st">Address[%p] IndexAddr[%p]</span><span class="ch">\n</span><span class="st">&quot;</span>, v, &amp;v, &amp;six[i])</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true"></a>}</span></code></pre></div>
 <pre><code>=&gt; Contiguous memory allocations
 Value[Annie] Address[0xc000010250] IndexAddr[0xc000052180]
 Value[Betty] Address[0xc000010250] IndexAddr[0xc000052190]
