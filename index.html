@@ -479,14 +479,14 @@ inc2:  Value Of[ 0xc000050738 ] Addr Of[ 0xc000050748 ] Value Points To[ 11 ]</c
 <span id="cb20-6"><a href="#cb20-6" aria-hidden="true"></a></span>
 <span id="cb20-7"><a href="#cb20-7" aria-hidden="true"></a>    <span class="kw">return</span> &amp;u</span>
 <span id="cb20-8"><a href="#cb20-8" aria-hidden="true"></a>}</span></code></pre></div>
-<p><strong>What if we run out of stack space?</strong></p>
-<p>What happens next is during that function call, there is a little preamble that asks “Do we have enough stack space for this frame?”. If yes then no problem because at compile time we know the size of every frame. If not, we have to have a bigger frame and these values need to be copied over. The memory on that stack moves. It is a trade off. We have to take the cost of this copy because it doesn’t happen a lot. The benefit of using less memory in any Goroutine outweighs the cost.</p>
-<p>Because the stack can grow, no Goroutine can have a pointer to some other Goroutine stack. There would be too much overhead for the compiler to keep track of every pointer. The latency will be insane.</p>
-<p>The stack for a Goroutine is only for that Goroutine. It cannot be shared between Goroutines.</p>
-<p><strong>Garbage collection</strong></p>
-<p>Once something is moved to the heap, Garbage Collection has to get in. The most important thing about the Garbage Collector (GC) is the pacing algorithm. It determines the frequency/pace that the GC has to run in order to maintain the smallest possible t.</p>
-<p>Imagine a program where you have a 4 MB heap. GC is trying to maintain a live heap of 2 MB. If the live heap grows beyond 4 MB, we have to allocate a larger heap. The pace the GC runs at depends on how fast the heap grows in size. The slower the pace, the less impact it is going to have. The goal is to get the live heap back down.</p>
-<p>When the GC is running, we have to take a performance cost so all Goroutines can keep running concurrently. The GC also has a group of Goroutines that perform the garbage collection work. It uses 25% of our available CPU capacity for itself. More details about GC and pacing algorithm can be find at: https://docs.google.com/document/d/1wmjrocXIWTr1JxU-3EQBI6BK6KgtiFArkG47XK73xIQ/ed it?usp=sharing</p>
+<p><strong>스택 공간이 부족해지면 어떻게 될까?</strong></p>
+<p>함수 호출을 하면, 가장 먼저 <code>이 프레임을 위한 스택 공간이 충분한가?</code> 를 확인한다. 충분하면 아무 문제가 없지만, 부족하다면 더 큰 스택 프레임을 만든 다음, 값을 복사해야 한다. 스택 공간을 조금만 주어서, 공간이 부족할 때 마다 값을 복사해야 하는 것은 상충관계가 있지만 고루틴에 스택 메모리를 적게 할당하여 얻는 이점이 더 크다.</p>
+<p>스택은 커질 수 있기 때문에 하나의 고루틴이 다른 고루틴의 스택 메모리에 대한 포인터를 가질 수 없다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> 컴파일러가 모든 포인터를 추적하는 것은 지나친 과부하가 되어 지연 시간이 엄청나게 늘어날 수 있다.</p>
+<p>따라서, 하나의 고루틴의 스택은 온전히 그 고루틴만을 위한 것이고, 고루틴 사이에 공유하지 않는다.</p>
+<p><strong>가비지 컬렉션</strong></p>
+<p>힙에 저장한다는 것은 가비지 컬렉션이 개입한다는 것이다. 가비지 컬렉터(GC)에 있어서 가장 중요한 것은 페이싱 알고리즘(pacing algorithm)이다. 최소한의 가비지 컬렉션 작업시간 <code>t</code>가 소요되도록 어떠한 주기와 페이스로 가비지 컬렉션을 실행할 지를 결정해야 한다.</p>
+<p>4 MB 힙을 가진 프로그램이 있다고 할 때에, GC는 라이브 힙(live heap)을 2 MB로 유지하려 한다. 라이브 힙이 4 MB를 넘어서면 더 큰 힙을 할당해줘야 한다. GC의 페이스는 힙이 얼마나 빠르게 커지는지에 달려있다. 그에 맞게 적절하게 라이브 힙을 줄여줘야 하는 것이다.</p>
+<p>GC가 작동할 때는 성능이 떨어질 수밖에 없다. 그래야 모든 고루틴이 동시에 작동할 수 있다. GC 역시 가비지 컬렉션 작업을 하는 고루틴들을 실행시키며, 가용 CPU 의 25%를 사용한다. GC와 페이스 알고리즘에 대한 자세한 설명은 링크를 참조바란다: <a href="https://docs.google.com/document/d/1wmjrocXIWTr1JxU-3EQBI6BK6KgtiFArkG47XK73xIQ/edit?usp=sharing">!Go 1.5 concurrent garbage collector pacing</a></p>
 <h4 id="함수">함수</h4>
 <div class="sourceCode" id="cb21"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true"></a><span class="co">// user 구조체는 user 정보를 담고 있다.</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true"></a><span class="kw">type</span> user <span class="kw">struct</span> {</span>
@@ -585,7 +585,7 @@ Updated user record for ID 101</code></pre>
 <div class="sourceCode" id="cb29"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true"></a><span class="kw">var</span> answer = <span class="dv">3</span> * <span class="dv">0</span><span class="fl">.333</span> <span class="co">// KindFloat(3) * KindFloat(0.333)</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true"></a>fmt.Println(answer)</span></code></pre></div>
 <pre><code>0.999</code></pre>
-<p>Constant third will be of kind floating point. 상수 <code>third</code>의 <code>kind</code>는 실수가 될 것이다.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Constant third will be of kind floating point. 상수 <code>third</code>의 <code>kind</code>는 실수가 될 것이다.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
 <div class="sourceCode" id="cb31"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true"></a><span class="kw">const</span> third = <span class="dv">1</span> / <span class="dv">3</span><span class="fl">.0</span> <span class="co">// KindFloat(1) / KindFloat(3.0)</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true"></a>fmt.Println(third)</span></code></pre></div>
 <pre><code>0.3333333333333333</code></pre>
@@ -4752,7 +4752,7 @@ ok      command-line-arguments 0.191s</code></pre>
 <span id="cb672-6"><a href="#cb672-6" aria-hidden="true"></a>)</span>
 <span id="cb672-7"><a href="#cb672-7" aria-hidden="true"></a></span>
 <span id="cb672-8"><a href="#cb672-8" aria-hidden="true"></a><span class="kw">var</span> gs <span class="dt">string</span></span></code></pre></div>
-<p><code>BenchmarkSprintBasic</code>은 <code>Sprint</code> 성능을 테스트한다. 벤치마크 하려는 모든 코드는 <code>b.N</code> 반복문 안에 있어야 한다. 벤치마크 도구가 처음 호출 할 때 <code>b.N</code>은 1이고, 충분히 테스트가 진행될 때 까지 <code>b.N</code>값은 지속적으로 증가한다. 전역변수 <code>gs</code>에 <code>fmt.Sprint</code>의 값을 반환하기 때문에 dead code<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> 처럼 보이지 않게 된다.</p>
+<p><code>BenchmarkSprintBasic</code>은 <code>Sprint</code> 성능을 테스트한다. 벤치마크 하려는 모든 코드는 <code>b.N</code> 반복문 안에 있어야 한다. 벤치마크 도구가 처음 호출 할 때 <code>b.N</code>은 1이고, 충분히 테스트가 진행될 때 까지 <code>b.N</code>값은 지속적으로 증가한다. 전역변수 <code>gs</code>에 <code>fmt.Sprint</code>의 값을 반환하기 때문에 dead code<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> 처럼 보이지 않게 된다.</p>
 <div class="sourceCode" id="cb673"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb673-1"><a href="#cb673-1" aria-hidden="true"></a><span class="kw">func</span> BenchmarkSprintBasic(b *testing.B) {</span>
 <span id="cb673-2"><a href="#cb673-2" aria-hidden="true"></a>    <span class="kw">var</span> s <span class="dt">string</span></span>
 <span id="cb673-3"><a href="#cb673-3" aria-hidden="true"></a></span>
@@ -4908,7 +4908,7 @@ exit status 2</code></pre>
 </table>
 <h4 id="godebug">GODEBUG</h4>
 <h5 id="메모리-트레이싱">메모리 트레이싱</h5>
-<p>메모리 트레이싱은 코드가 실행될 때 GC 및 힙 메모리에 관련해서 잘 작동하는지 분석을 제공한다. 다음은 메모리 릭<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>을 일으키는 예제이다.</p>
+<p>메모리 트레이싱은 코드가 실행될 때 GC 및 힙 메모리에 관련해서 잘 작동하는지 분석을 제공한다. 다음은 메모리 릭<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>을 일으키는 예제이다.</p>
 <div class="sourceCode" id="cb687"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb687-1"><a href="#cb687-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb687-2"><a href="#cb687-2" aria-hidden="true"></a></span>
 <span id="cb687-3"><a href="#cb687-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -4955,9 +4955,10 @@ gc 10 @2.592s 0%: 0.003+11+0.045 ms clock, 0.031+0/5.9/5.2+0.36 ms cpu, 499-&gt;
 <section class="footnotes" role="doc-endnotes">
 <hr />
 <ol>
-<li id="fn1" role="doc-endnote"><p>변수는 다른 타입으로 대입을 할 수 없지만, <code>kind</code>는 다른 타입으로 <code>암묵적으로</code> 변환이 된다<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>불필요한 코드<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p>프로그램이 불필요한 메모리를 해제하지 않아 메모리가 낭비되는 현상. 메모리 누수.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1" role="doc-endnote"><p>스택이 커지면, 값을 커진 스택 메모리 공간으로 복사하게 되고, 주소값 역시 바뀌기 때문이다.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>변수는 다른 타입으로 대입을 할 수 없지만, <code>kind</code>는 다른 타입으로 <code>암묵적으로</code> 변환이 된다<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>불필요한 코드<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4" role="doc-endnote"><p>프로그램이 불필요한 메모리를 해제하지 않아 메모리가 낭비되는 현상. 메모리 누수.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol>
 </section>
 </body>
