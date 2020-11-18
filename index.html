@@ -229,7 +229,7 @@ display: block;
 <ul>
 <li><a href="#basic-unit-test">Basic Unit Test</a></li>
 </ul></li>
-<li><a href="#benchmarking">Benchmarking</a>
+<li><a href="#벤치마킹">벤치마킹</a>
 <ul>
 <li><a href="#기본-벤치마크">기본 벤치마크</a></li>
 <li><a href="#하위-벤치마크">하위 벤치마크</a></li>
@@ -4741,9 +4741,9 @@ ok      github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers
     web_test.go:135:    ✓     Should have 1 item in the feed.
 PASS
 ok      command-line-arguments 0.191s</code></pre>
-<h3 id="benchmarking">Benchmarking</h3>
+<h3 id="벤치마킹">벤치마킹</h3>
 <h4 id="기본-벤치마크">기본 벤치마크</h4>
-<p>벤치마크 함수를 가진 <code>&lt;file_name&gt;_test.go</code> 파일로 벤치마크를 할 수 있다. <code>Sprint</code>와 <code>Sprintf</code> 중 어느 것이 더 성능이 좋고, 효율적으로 자원을 할당하는지 벤치마크 해보자. 언뜻 <code>Sprint</code>가 문자열 포맷을 하는 동안 오버헤드가 없기 때문에 더 나을 것 같아 보이지만 그렇지 않다. 추측보다는 실제 확인한 결과로 판단하자.</p>
+<p>벤치마크 함수가 있는 <code>&lt;file_name&gt;_test.go</code> 파일로 벤치마크를 할 수 있다. <code>Sprint</code>와 <code>Sprintf</code> 중 어느 것이 더 성능이 좋고, 효율적으로 자원을 할당하는지 벤치마크 해볼 텐데, <code>Sprint</code>가 문자열 포맷을 하는 동안 오버헤드가 없기 때문에 더 나을 것으로 보이지만 그렇지 않다. 추측보다는 실제 확인한 결과로 판단하자.</p>
 <div class="sourceCode" id="cb672"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb672-1"><a href="#cb672-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb672-2"><a href="#cb672-2" aria-hidden="true"></a></span>
 <span id="cb672-3"><a href="#cb672-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -4777,7 +4777,7 @@ BenchmarkSprintfBasic-16    72737234    45.7 ns/op    5 B/op    1 allocs/op
 PASS
 ok  command-line-arguments  6.637s</code></pre>
 <h4 id="하위-벤치마크">하위 벤치마크</h4>
-<p>하위 테스트를 하듯이, 하위 벤치마크도 할 수 있다.</p>
+<p>하위 테스트를 하듯이, 하위 벤치마크도 가능하다.</p>
 <div class="sourceCode" id="cb676"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb676-1"><a href="#cb676-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb676-2"><a href="#cb676-2" aria-hidden="true"></a></span>
 <span id="cb676-3"><a href="#cb676-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -4814,7 +4814,7 @@ BenchmarkSprintSub/none-16    54088082    60.6 ns/op    5 B/op    1 allocs/op
 BenchmarkSprintSub/format-16  67906119    52.3 ns/op    5 B/op    1 allocs/op
 PASS
 ok command-line-arguments 7.131s</code></pre>
-<p>하위 벤치마크를 실행할 수 있는 다른 방법들:</p>
+<p>하위 벤치마크를 할 수 있는 다른 방법들:</p>
 <ul>
 <li><code>go test -run none -bench BenchmarkSprintSub/none -benchtime 3s -benchmem</code></li>
 <li><code>go test -run none -bench BenchmarkSprintSub/format -benchtime 3s -benchmem</code></li>
