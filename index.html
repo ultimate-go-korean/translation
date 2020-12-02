@@ -203,7 +203,7 @@ display: block;
 <li><a href="#기본-에러-값">기본 에러 값</a></li>
 <li><a href="#에러-변수">에러 변수</a></li>
 <li><a href="#타입을-통한-컨텍스트-처리">타입을 통한 컨텍스트 처리</a></li>
-<li><a href="#컨텍스트로서의-기능behavior-as-context">컨텍스트로서의 기능(Behavior as context)</a></li>
+<li><a href="#기능을-통한-컨텍스트-처리behavior-as-context">기능을 통한 컨텍스트 처리(Behavior as context)</a></li>
 <li><a href="#버그-사냥finding-the-bug">버그 사냥(Finding the bug)</a></li>
 <li><a href="#에러-포장wrapping-errors">에러 포장(Wrapping Errors)</a></li>
 </ul></li>
@@ -2646,24 +2646,25 @@ Got Unlucky</code></pre>
 <span id="cb370-6"><a href="#cb370-6" aria-hidden="true"></a>}</span></code></pre></div>
 <pre><code>Bad Request Occurred</code></pre>
 <h4 id="타입을-통한-컨텍스트-처리">타입을 통한 컨텍스트 처리</h4>
-<p>컨텍스트를 표현하는 데 에러 인터페이스 값이 충분하지 않을 수 있다. 더 많은 컨텍스트를 필요로 하는 경우가 있을 수 있다. 예를 들어, 네트워킹 문제는 복잡할 수 있다. 에러 변수 자체로는 충분하지 못하다. 에러 변수로 충분하지 못한 경우에는, 커스텀 타입을 통해 문제를 해결해야 한다.</p>
-<p>아래 2개 타입은 표준 라이브러리인 JSON 패키지 기반 커스텀 에러 정의 방법이다. 이것이 컨텍스트를 포함하는 타입이다.</p>
+<p>컨텍스트를 표현하는 데 에러 인터페이스 값보다 더 많은 컨텍스트를 필요로 하는 경우도 있다. 예를 들어, 네트워킹 문제는 복잡할 수 있어, 에러 변수 만으로는 부족하다. 이럴 때에는 사용자 정의 타입을 통해 문제를 해결할 수 있다.</p>
+<p>아래 2개 타입은 표준 라이브러리인 JSON 패키지 기반 사용자 정의 에러 정의 방법이다. 컨텍스트를 포함하는 타입이다.</p>
 <p>http://golang.org/src/pkg/encoding/json/decode.go</p>
 <div class="sourceCode" id="cb372"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb372-1"><a href="#cb372-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb372-2"><a href="#cb372-2" aria-hidden="true"></a>import​ (</span>
 <span id="cb372-3"><a href="#cb372-3" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
 <span id="cb372-4"><a href="#cb372-4" aria-hidden="true"></a>    <span class="st">&quot;reflect&quot;</span></span>
 <span id="cb372-5"><a href="#cb372-5" aria-hidden="true"></a>)</span></code></pre></div>
-<p><code>UnmarshalTypeError</code>은 Go의 특정 타입으로 간주하기 어려운 JSON 값을 표현한다. 명명 규칙 : 타입 명명 시에는 접미사를 <code>Error</code>로 한다.</p>
+<p><code>UnmarshalTypeError</code>은 Go의 특정 타입으로 간주하기 어려운 JSON 값을 표현한다.<br />
+<strong>명명 규칙</strong> : 타입 명명 시에는 접미사를 <code>Error</code>로 한다.</p>
 <div class="sourceCode" id="cb373"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb373-1"><a href="#cb373-1" aria-hidden="true"></a>type​ UnmarshalTypeError ​struct​ {</span>
-<span id="cb373-2"><a href="#cb373-2" aria-hidden="true"></a>    Value ​string​ ​<span class="co">// description of JSON value</span></span>
-<span id="cb373-3"><a href="#cb373-3" aria-hidden="true"></a>    Type reflect.Type ​<span class="co">// type of Go value it could not be assigned to</span></span>
+<span id="cb373-2"><a href="#cb373-2" aria-hidden="true"></a>    Value ​string​ ​<span class="co">// JSON value에 대한 설명이다</span></span>
+<span id="cb373-3"><a href="#cb373-3" aria-hidden="true"></a>    Type reflect.Type ​<span class="co">// 미리 선언할 수 없는 타입을 의미한다</span></span>
 <span id="cb373-4"><a href="#cb373-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p><code>UnmarshalTypeError</code>은 에러 인터페이스를 구현한다. 포인터 시맨틱(pointer semantics)을 이용한다. 구현 시, 모든 필드가 에러 메시지에서 사용되는가 검증한다. 이렇게 하지 않는다면, 문제가 발생할 것이다. 커스텀 에러 타입에 필드를 추가 해두어도 아래 메소드가 호출될 때 로그가 정상적으로 출력되지 않을 것이기 때문이다. 정말 필요할 때만 이렇게 사용하기로 한다.</p>
+<p><code>UnmarshalTypeError</code>은 포인터 시맨틱(pointer semantics)을 이용하여 에러 인터페이스를 구현한다. 구현 할 때, 모든 필드를 에러 메시지에서 사용하는가 검증한다. 그렇지 않다면 문제가 발생할 수 있다. 사용자 정의 에러 타입에 필드를 추가 해두어도 아래 메서드(<code>Error</code>)가 호출될 때 로그가 정상적으로 출력되지 않을 것이기 때문이다. 정말 필요할 때만 이렇게 사용하자.</p>
 <div class="sourceCode" id="cb374"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb374-1"><a href="#cb374-1" aria-hidden="true"></a>func​ (e *UnmarshalTypeError) ​Error​() ​string​ {</span>
 <span id="cb374-2"><a href="#cb374-2" aria-hidden="true"></a>    return​ ​<span class="st">&quot;json: cannot unmarshal &quot;</span>​ + e.Value + ​<span class="st">&quot; into Go value of type &quot;</span>​ + e.Type.String()</span>
 <span id="cb374-3"><a href="#cb374-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p><code>InvalidUnmarshalError</code>는 <code>Unmarshal</code> 함수에 유효하지 않은 매개변수가 들어왔음을 알린다. <code>Unmarshal</code>의 매개변수로는 <code>nil</code>이 아닌 포인터가 들어와야 한다. 실제 타입은 <code>Unmarshal</code> 함수가 값에 대한 주소를 받지 않았을 때 반환값에 사용된다.</p>
+<p><code>InvalidUnmarshalError</code>는 <code>Unmarshal</code> 함수에 유효하지 않은 매개변수가 들어왔음을 알린다. <code>Unmarshal</code>의 매개변수로는 <code>nil</code>이 아닌 포인터가 들어와야 한다. 실제 타입은 <code>Unmarshal</code> 함수가 값의 주소를 받지 않았을 때 반환값에 사용된다.</p>
 <div class="sourceCode" id="cb375"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb375-1"><a href="#cb375-1" aria-hidden="true"></a>type​ InvalidUnmarshalError ​struct​ {</span>
 <span id="cb375-2"><a href="#cb375-2" aria-hidden="true"></a>    Type reflect.Type</span>
 <span id="cb375-3"><a href="#cb375-3" aria-hidden="true"></a>}</span></code></pre></div>
@@ -2677,7 +2678,7 @@ Got Unlucky</code></pre>
 <span id="cb376-7"><a href="#cb376-7" aria-hidden="true"></a>    }</span>
 <span id="cb376-8"><a href="#cb376-8" aria-hidden="true"></a>    return​ ​<span class="st">&quot;json: Unmarshal(nil &quot;</span>​ + e.Type.String() + ​<span class="st">&quot;)&quot;</span></span>
 <span id="cb376-9"><a href="#cb376-9" aria-hidden="true"></a>}</span></code></pre></div>
-<p><code>Unmarshal</code> 호출을 위해 사용하는 <code>user</code> 타입.</p>
+<p><code>Unmarshal</code> 호출을 위해 <code>user</code> 타입을 사용한다.</p>
 <div class="sourceCode" id="cb377"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb377-1"><a href="#cb377-1" aria-hidden="true"></a>type​ user ​struct​ {</span>
 <span id="cb377-2"><a href="#cb377-2" aria-hidden="true"></a>    Name ​int</span>
 <span id="cb377-3"><a href="#cb377-3" aria-hidden="true"></a>}</span></code></pre></div>
@@ -2698,7 +2699,7 @@ Got Unlucky</code></pre>
 <span id="cb378-15"><a href="#cb378-15" aria-hidden="true"></a>    }</span>
 <span id="cb378-16"><a href="#cb378-16" aria-hidden="true"></a>    fmt.Println(​<span class="st">&quot;Name:&quot;</span>​, u.Name)</span>
 <span id="cb378-17"><a href="#cb378-17" aria-hidden="true"></a>}</span></code></pre></div>
-<p><code>Unmarshal</code> 함수는 항상 실패할 언마셜을 실험한다. 매개변수 영역을 주목해보면, 첫 번째는 바이트 슬라이스이고, 두 번째는 빈 인터페이스이다. 빈 인터페이스는 기본적으로 어떤 것도 의미하지 않으며, 함수를 통해 어떤 값이든 받을 수 있다. 아래에서는 리플렉션을 이용해 인터페이스에 저장된 값의 실제 타입을 알아내고, 그것이 포인터가 아니거나 <code>nil</code>이 아닌지 평가할 것이다. 결과에 기초하여 다른 에러 타입을 반환한다.</p>
+<p><code>Unmarshal</code> 함수는 항상 실패할 언마셜을 실험한다. 매개변수 영역을 보면, 첫번째는 바이트 슬라이스이고, 두번째는 빈 인터페이스이다. 빈 인터페이스는 기본적으로 어떤 것도 의미하지 않으며, 함수를 통해 어떤 값이든 받을 수 있다. 아래에서는 리플렉션을 이용해 인터페이스에 저장된 값의 실제 타입을 알아내고, 그것이 포인터가 아니거나 <code>nil</code>이 아닌지 확인할 것이다. 결과에 기초하여 다른 에러 타입을 반환한다.</p>
 <div class="sourceCode" id="cb379"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb379-1"><a href="#cb379-1" aria-hidden="true"></a>func​ ​Unmarshal​(data []​byte​, v ​interface​{}) ​error​ {</span>
 <span id="cb379-2"><a href="#cb379-2" aria-hidden="true"></a>    rv := reflect.ValueOf(v)</span>
 <span id="cb379-3"><a href="#cb379-3" aria-hidden="true"></a>    if​ rv.Kind() != reflect.Ptr || rv.IsNil() {</span>
@@ -2706,10 +2707,10 @@ Got Unlucky</code></pre>
 <span id="cb379-5"><a href="#cb379-5" aria-hidden="true"></a>    }</span>
 <span id="cb379-6"><a href="#cb379-6" aria-hidden="true"></a>    return​ &amp;UnmarshalTypeError{​<span class="st">&quot;string&quot;</span>​, reflect.TypeOf(v)}</span>
 <span id="cb379-7"><a href="#cb379-7" aria-hidden="true"></a>}</span></code></pre></div>
-<p>컨텍스트 타입을 이용할 때의 결점이 한 가지 있다. 여기서는, 실제 값으로 돌아간다. 구체적인 타입들로 인해 코드에 결합성이 생기게 된다. <code>json</code> 패키지를 작성한 개발자가 구체적 타입들에 대해 변경하면, 예제 코드에도 연쇄적인 영향을 미치게 된다. 에러 인터페이스 디커플링에 의해 보호받지 못한다.</p>
-<p>이러한 문제는 가끔 발생할 수 있다. 디커플링을 유지하는 다른 방법은 없을까? 컨텍스트로써의 기능을 살펴보자.</p>
-<h4 id="컨텍스트로서의-기능behavior-as-context">컨텍스트로서의 기능(Behavior as context)</h4>
-<p>컨텍스트로서의 기능은 사용자 정의 오류를 마치 컨텍스트처럼 다룰 수 있게 해준다. 하지만 타입 단언이 구체적인 형태로 돌아가는 건 막는다. 이로써 디커플링(decoupling)의 레벨에서 코드를 유지보수할 수 있게 되었다.</p>
+<p>타입을 통해 컨텍스트를 처리할 때의 한 가지 흠이 있다. 이 경우에는, 구현된 타입에 접근하여 디커플링(decoupling)에서 멀어지게 된다. <code>json</code> 패키지를 작성한 개발자가 구현된 타입들을 변경하면, 예제 코드에도 연쇄적인 영향을 미치게 된다. 에러 인터페이스 디커플링의 보호를 받지 못한다.</p>
+<p>이런 문제는 가끔 발생할 수 있다. 디커플링을 유지하는 다른 방법은 없을까? 기능을 통한 컨텍스트 처리를 살펴보자.</p>
+<h4 id="기능을-통한-컨텍스트-처리behavior-as-context">기능을 통한 컨텍스트 처리(Behavior as context)</h4>
+<p>기능을 통한 컨텍스트 처리는 사용자 정의 오류를 마치 컨텍스트처럼 다룰 수 있게 해준다. 그리고 구현된 타입으로 단언하는 걸 막는다. 이를 통해 디커플링(decoupling)의 레벨에서 코드를 유지보수할 수 있게 된다.</p>
 <div class="sourceCode" id="cb380"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb380-1"><a href="#cb380-1" aria-hidden="true"></a>package​ main</span>
 <span id="cb380-2"><a href="#cb380-2" aria-hidden="true"></a>import​ (</span>
 <span id="cb380-3"><a href="#cb380-3" aria-hidden="true"></a>    <span class="st">&quot;bufio&quot;</span></span>
@@ -2726,10 +2727,10 @@ Got Unlucky</code></pre>
 <p><code>TypeAsContext</code>는 <code>net</code> 패키지가 반환하는 여러 사용자 정의 오류들을 확인하는 방법을 보여준다.</p>
 <div class="sourceCode" id="cb382"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb382-1"><a href="#cb382-1" aria-hidden="true"></a>func​ (c *client) ​TypeAsContext​() {</span>
 <span id="cb382-2"><a href="#cb382-2" aria-hidden="true"></a>    for​ {</span></code></pre></div>
-<p>네트워크에서 받아온 데이터를 <code>reader</code>를 통해 분리한다.</p>
+<p><code>reader</code> 인터페이스를 이용하여 네트워크를 읽는 것에서 코드를 분리할 수 있다.</p>
 <div class="sourceCode" id="cb383"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb383-1"><a href="#cb383-1" aria-hidden="true"></a>        line, err := c.reader.ReadString(​<span class="ch">&#39;\n&#39;</span>​)</span>
 <span id="cb383-2"><a href="#cb383-2" aria-hidden="true"></a>        if​ err != ​nil​ {</span></code></pre></div>
-<p>이 예제는 이전 예제와 마찬가지로 타입을 컨텍스트처럼 쓴다. 여기서는 <code>Temporary</code>라는 메서드가 중요하다. 이 메서드가 정상적으로 작동한다면 계속 작업을 수행하고 그렇지 않다면 일단 멈춘 후에 다시 시작한다. 아래 모든 케이스는 오직 <code>Temporary</code>만을 위한 것이다. 이게 왜 중요한가? 만약 타입 단언을 한다거나 구현된 타입의 잠재적인 기능만 요구한다면, 이것을 컨텍스트로서의 타입을 기능으로서의 타입으로 바꿀 수 있다. 그렇기에 아래의 <code>temporary</code>라는 사용자 정의 인터페이스를 만들 수 있다.</p>
+<p>이 예제는 이전 예제와 마찬가지로 타입을 통해 컨텍스트를 처리한다. 여기서는 <code>Temporary</code>라는 메서드가 중요하다. 이 메서드가 정상적으로 작동한다면 계속 작업을 수행하고 그렇지 않다면 멈춘 후에 다시 시작한다. 아래 모든 케이스는 오직 <code>Temporary</code>만을 위한 것이다. 이게 왜 중요한가? 만약 타입 단언을 한다거나 구현된 타입의 내재된 기능만 요구한다면, 이것을 타입이 아니라 기능을 통해 처리하는 방식으로 바꿀 수 있다. 그렇기에 아래의 <code>temporary</code>라는 사용자 정의 인터페이스를 만들 수 있다.</p>
 <div class="sourceCode" id="cb384"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb384-1"><a href="#cb384-1" aria-hidden="true"></a>            switch​ e := err.(​type​) {</span>
 <span id="cb384-2"><a href="#cb384-2" aria-hidden="true"></a>            case​ *net.OpError:</span>
 <span id="cb384-3"><a href="#cb384-3" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
@@ -2761,13 +2762,13 @@ Got Unlucky</code></pre>
 <div class="sourceCode" id="cb385"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb385-1"><a href="#cb385-1" aria-hidden="true"></a>type​ temporary ​interface​ {</span>
 <span id="cb385-2"><a href="#cb385-2" aria-hidden="true"></a>    Temporary() ​bool</span>
 <span id="cb385-3"><a href="#cb385-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p><code>BehaviorAsContext</code>는 <code>net</code> 패키지가 반환할 지도 모르는 있는 인터페이스를 어떻게 확인하는 지 보여준다.</p>
+<p><code>BehaviorAsContext</code>는 <code>net</code> 패키지가 반환할 지도 모르는 인터페이스를 어떻게 확인하는 지 보여준다.</p>
 <div class="sourceCode" id="cb386"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb386-1"><a href="#cb386-1" aria-hidden="true"></a>func​ (c *client) ​BehaviorAsContext​() {</span>
 <span id="cb386-2"><a href="#cb386-2" aria-hidden="true"></a>    for​ {</span>
 <span id="cb386-3"><a href="#cb386-3" aria-hidden="true"></a>        line, err := c.reader.ReadString(​<span class="ch">&#39;\n&#39;</span>​)</span>
 <span id="cb386-4"><a href="#cb386-4" aria-hidden="true"></a>        if​ err != ​nil​ {</span>
 <span id="cb386-5"><a href="#cb386-5" aria-hidden="true"></a>            switch​ e := err.(​type​) {</span></code></pre></div>
-<p>타입 단언을 통해 세가지 경우를 한가지 경우로 줄일 수 있다: 이 구현 타입은 해당 인터페이스를 구현하고 있는 <code>error</code> 인터페이스를 가지고 있으며 해당 인터페이스를 정의하고 이용할 수 있다.</p>
+<p>타입 단언을 통해 세가지 경우를 한가지로 줄일 수 있다: 이 구현 타입은 해당 인터페이스를 구현하고 있는 <code>error</code> 인터페이스를 가지고 있으며 해당 인터페이스를 정의하고 이용할 수 있다.</p>
 <div class="sourceCode" id="cb387"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb387-1"><a href="#cb387-1" aria-hidden="true"></a>            case​ temporary:</span>
 <span id="cb387-2"><a href="#cb387-2" aria-hidden="true"></a>                if​ !e.Temporary() {</span>
 <span id="cb387-3"><a href="#cb387-3" aria-hidden="true"></a>                    log.Println(​<span class="st">&quot;Temporary: Client leaving return chat&quot;</span>)</span>
@@ -2829,7 +2830,7 @@ Got Unlucky</code></pre>
 <p><code>firstCall</code>은 오류를 처리하지는 않지만 래핑해서 위로 올려준다. <code>main</code>에서 해당 오류를 처리하고 로그를 남기게 된다.</p>
 <p>이 오류를 적절히 처리하기 위해서는 처음 발생한 오류, 래핑되지 않은 원시 오류에 대해 알 필요가 있다. <code>Cause</code> 메서드는 오류를 이러한 래핑으로부터 끌어내어 사용 가능한 모든 언어적 기술을 이용할 수 있게 해준다.</p>
 <p><code>State</code>에 접근하는 것뿐만 아니라, 구현 타입으로 단언했더라도 %+v를 이용하여 전체 스택 트레이스(stack trace)를 추적할 수 있다.</p>
-<p>컨텍스트로서의 타입을 이용하여 사용자 정의 오류로 밝혀낸다.</p>
+<p>타입을 통한 컨텍스트의 처리를 이용하여 사용자 정의 오류로 밝혀낸다.</p>
 <div class="sourceCode" id="cb398"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb398-1"><a href="#cb398-1" aria-hidden="true"></a>    if​ err := firstCall(​10​); err != ​nil​ {</span>
 <span id="cb398-2"><a href="#cb398-2" aria-hidden="true"></a>        switch​ v := errors.Cause(err).(​type​) {</span>
 <span id="cb398-3"><a href="#cb398-3" aria-hidden="true"></a>        case​ *AppError:</span>
