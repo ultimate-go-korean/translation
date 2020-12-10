@@ -4134,7 +4134,7 @@ User Not Found</code></pre>
 <span id="cb607-7"><a href="#cb607-7" aria-hidden="true"></a>    }</span>
 <span id="cb607-8"><a href="#cb607-8" aria-hidden="true"></a>}</span></code></pre></div>
 <pre class="terminal"><code>work cancelled</code></pre>
-<h5 id="withtimeout-169">WithTimeout 169</h5>
+<h5 id="withtimeout">WithTimeout</h5>
 <div class="sourceCode" id="cb609"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb609-1"><a href="#cb609-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb609-2"><a href="#cb609-2" aria-hidden="true"></a></span>
 <span id="cb609-3"><a href="#cb609-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -4148,21 +4148,21 @@ User Not Found</code></pre>
 <span id="cb609-11"><a href="#cb609-11" aria-hidden="true"></a>}</span>
 <span id="cb609-12"><a href="#cb609-12" aria-hidden="true"></a></span>
 <span id="cb609-13"><a href="#cb609-13" aria-hidden="true"></a><span class="kw">func</span> main (){</span></code></pre></div>
-<p>Set a duration</p>
+<p>기간을 설정한다.</p>
 <div class="sourceCode" id="cb610"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb610-1"><a href="#cb610-1" aria-hidden="true"></a>    duration := <span class="dv">150</span> * time.Millisecond</span></code></pre></div>
-<p>Create a context that is both manually cancellable and will signal a cancel at the specified duration.</p>
+<p>수동으로 취소 가능하거나 특정 기간에 취소 신호를 보낼 수 있는 컨텍스트를 생성한다.</p>
 <div class="sourceCode" id="cb611"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb611-1"><a href="#cb611-1" aria-hidden="true"></a>    ctx, cancel := context.WithTimeout(context.Background(), duration)</span>
 <span id="cb611-2"><a href="#cb611-2" aria-hidden="true"></a>    <span class="kw">defer</span> cancel()</span></code></pre></div>
-<p>Create a channel to received a signal that work is done.</p>
+<p>작업 종료의 신호를 수신할 수 있는 채널을 생성한다.</p>
 <div class="sourceCode" id="cb612"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb612-1"><a href="#cb612-1" aria-hidden="true"></a>    ch := <span class="bu">make</span>(<span class="kw">chan</span> data, <span class="dv">1</span>)</span></code></pre></div>
-<p>Ask the goroutine to do some work for us,</p>
+<p>고루틴에 작업을 하도록 요청한다.</p>
 <div class="sourceCode" id="cb613"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb613-1"><a href="#cb613-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span></code></pre></div>
-<p>Simulate work.</p>
+<p>작업을 시뮬레이션 한다.</p>
 <div class="sourceCode" id="cb614"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb614-1"><a href="#cb614-1" aria-hidden="true"></a>        time.Sleep(<span class="dv">50</span> * time.Millisecond)</span></code></pre></div>
-<p>Report the work is done.</p>
+<p>작업이 끝났음을 알려준다.</p>
 <div class="sourceCode" id="cb615"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb615-1"><a href="#cb615-1" aria-hidden="true"></a>        ch &lt;- data{<span class="st">&quot;123&quot;</span>}</span>
 <span id="cb615-2"><a href="#cb615-2" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>Wait for the work to finish. If it takes too long, move on.</p>
+<p>작업이 끝나기를 기다린다. 만약 시간이 많이 걸릴 경우 최소를 이행한다.</p>
 <div class="sourceCode" id="cb616"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb616-1"><a href="#cb616-1" aria-hidden="true"></a>    <span class="kw">select</span> {</span>
 <span id="cb616-2"><a href="#cb616-2" aria-hidden="true"></a>    <span class="kw">case</span> d := &lt;-ch:</span>
 <span id="cb616-3"><a href="#cb616-3" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;work complete&quot;</span>, d)</span>
