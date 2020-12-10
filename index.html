@@ -4110,21 +4110,21 @@ User Not Found</code></pre>
 <span id="cb600-11"><a href="#cb600-11" aria-hidden="true"></a>}</span>
 <span id="cb600-12"><a href="#cb600-12" aria-hidden="true"></a></span>
 <span id="cb600-13"><a href="#cb600-13" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Set a deadline.</p>
+<p>데드라인을 설정한다.</p>
 <div class="sourceCode" id="cb601"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb601-1"><a href="#cb601-1" aria-hidden="true"></a>    deadline := time.Now().Add(<span class="dv">150</span> * time.Millisecond)</span></code></pre></div>
-<p>Create a context that is both manually cancellable and will signal a cencel at the specified data/time. We use <code>Background</code> as our parents context and set out deadline time.</p>
+<p>수동으로 취소 가능하거나 특정 날짜/시간에 취소 신호를 보낼 수 있는 컨텍스트를 생성한다. <code>Background</code>를 부모 컨텍스트로 사용하고 데드라인 시간을 설정한다.</p>
 <div class="sourceCode" id="cb602"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb602-1"><a href="#cb602-1" aria-hidden="true"></a>    ctx, cancel := context.WithDeadline(context.Background(), deadline)</span>
 <span id="cb602-2"><a href="#cb602-2" aria-hidden="true"></a>    <span class="kw">defer</span> cancel()</span></code></pre></div>
-<p>Create a channel to received a signal that work is done.</p>
+<p>작업 종료의 신호를 수신할 수 있는 채널을 생성한다.</p>
 <div class="sourceCode" id="cb603"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb603-1"><a href="#cb603-1" aria-hidden="true"></a>   ch := <span class="bu">make</span>(<span class="kw">chan</span> data, <span class="dv">1</span>)</span></code></pre></div>
-<p>Ask a Goroutine to do some work for us.</p>
+<p>고루틴에 작업을 하도록 요청한다.</p>
 <div class="sourceCode" id="cb604"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb604-1"><a href="#cb604-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span></code></pre></div>
-<p>Simulate work.</p>
+<p>작업을 시뮬레이션 한다.</p>
 <div class="sourceCode" id="cb605"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb605-1"><a href="#cb605-1" aria-hidden="true"></a>        time.Sleep(<span class="dv">200</span> * time.Millisecond)</span></code></pre></div>
-<p>Report the work is done.</p>
+<p>작업이 끝났음을 알려준다.</p>
 <div class="sourceCode" id="cb606"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb606-1"><a href="#cb606-1" aria-hidden="true"></a>        ch &lt;- data{<span class="st">&quot;123&quot;</span>}</span>
 <span id="cb606-2"><a href="#cb606-2" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>Wait for the work to finish. If it takes too long move on.</p>
+<p>작업이 끝나기를 기다린다. 만약 시간이 많이 걸릴 경우 취소를 이행한다.</p>
 <div class="sourceCode" id="cb607"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb607-1"><a href="#cb607-1" aria-hidden="true"></a>    <span class="kw">select</span> {</span>
 <span id="cb607-2"><a href="#cb607-2" aria-hidden="true"></a>    <span class="kw">case</span> d := &lt;-ch:</span>
 <span id="cb607-3"><a href="#cb607-3" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;work complete&quot;</span>, d)</span>
