@@ -4162,7 +4162,7 @@ User Not Found</code></pre>
 <p>작업이 끝났음을 알려준다.</p>
 <div class="sourceCode" id="cb615"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb615-1"><a href="#cb615-1" aria-hidden="true"></a>        ch &lt;- data{<span class="st">&quot;123&quot;</span>}</span>
 <span id="cb615-2"><a href="#cb615-2" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>작업이 끝나기를 기다린다. 만약 시간이 많이 걸릴 경우 최소를 이행한다.</p>
+<p>작업이 끝나기를 기다린다. 만약 시간이 많이 걸릴 경우 취소를 이행한다.</p>
 <div class="sourceCode" id="cb616"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb616-1"><a href="#cb616-1" aria-hidden="true"></a>    <span class="kw">select</span> {</span>
 <span id="cb616-2"><a href="#cb616-2" aria-hidden="true"></a>    <span class="kw">case</span> d := &lt;-ch:</span>
 <span id="cb616-3"><a href="#cb616-3" aria-hidden="true"></a>        fmt.Println(<span class="st">&quot;work complete&quot;</span>, d)</span>
