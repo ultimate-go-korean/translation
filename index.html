@@ -836,15 +836,15 @@ Addr[0xc000600000] Index[48129] Cap[60416 - 26%]
 Addr[0xc0006ec000] Index[60417] Cap[75776 - 25%]
 Addr[0xc000814000] Index[75777] Cap[94720 - 25%]
 Addr[0xc000600000] Index[94721] Cap[118784 - 25%]</code></pre>
-<h5 id="slice-of-slice">Slice of slice</h5>
-<p>Take a slice of slice2. We want just indexes 2 and 3. The length is slice3 is 2 and capacity is 6.</p>
-<p>Parameters are [starting_index:(starting_index + length)]</p>
-<p>By looking at the output, we can see that they are sharing the same backing array. These slice headers get to stay on the stack when we use these value semantics. Only the backing array that needed to be on the heap.</p>
+<h5 id="슬라이스의-슬라이스">슬라이스의 슬라이스</h5>
+<p><code>slice2</code>의 인덱스 2, 인덱스 3의 값을 갖는 <code>slice3</code>을 생성하자. <code>slice3</code>의 길이는 2이고 용량은 6이다.</p>
+<p>매개변수는 <code>[시작 인덱스:(시작 인덱스 + 길이)]</code> 형태이다.</p>
+<p>결과를 통해 두 슬라이스는 같은 배열을 공유하고 있는 것을 알 수 있다. 슬라이스의 헤더는 값의 개념으로 사용 될 때 스택에 존재한다. 오직 공유되는 배열만이 힙에 위치한다.</p>
 <div class="sourceCode" id="cb75"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true"></a>slice3 := slice2[<span class="dv">2</span>:<span class="dv">4</span>]</span></code></pre></div>
 <div class="sourceCode" id="cb76"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Slice of slice (before)</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb76-2"><a href="#cb76-2" aria-hidden="true"></a>inspectSlice(slice2)</span>
 <span id="cb76-3"><a href="#cb76-3" aria-hidden="true"></a>inspectSlice(slice3)</span></code></pre></div>
-<p>When we change the value of the index 0 of slice3, who are going to see this change?</p>
+<p><code>slice3</code>의 인덱스 0의 값을 바꾸면, 어떤 슬라이스가 변경 될까?</p>
 <pre><code>=&gt; Slice of slice (before)
 Length[5] Capacity[8]
 [0] 0xc00007e000 Apple
@@ -856,7 +856,7 @@ Length[2] Capacity[6]
 [0] 0xc00007e020 Banana
 [1] 0xc00007e030 Grape</code></pre>
 <div class="sourceCode" id="cb78"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true"></a>slice3[<span class="dv">0</span>] = <span class="st">&quot;CHANGED&quot;</span></span></code></pre></div>
-<p>The answer is both. We have to always be aware that we are modifying an existing slice. We have to be aware who is using it, who is sharing that backing array.</p>
+<p>두 슬라이스 모두 변한다. 생성되어 있는 슬라이스를 변경한다는 것을 잊지 말아야 한다. 어디서 이 슬라이스를 사용하는지, 또 배열을 공유하고 있는지를 주의깊게 살펴야 한다.</p>
 <div class="sourceCode" id="cb79"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Slice of slice (after)</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true"></a>inspectSlice(slice2)</span>
 <span id="cb79-3"><a href="#cb79-3" aria-hidden="true"></a>inspectSlice(slice3)</span></code></pre></div>
@@ -870,10 +870,10 @@ Length[5] Capacity[8]
 Length[2] Capacity[6]
 [0] 0xc00007e020 CHANGED
 [1] 0xc00007e030 Grape</code></pre>
-<p>How about slice3 := append(slice3, “CHANGED”)? Similar problem will occur with append if the length and capacity is not the same. Instead of changing slice3 at index 0, we call append on slice3. Since the length of slice3 is 2, capacity is 6 at the moment, we have extra rooms for modification. We go and change the element at index 3 of slice3, which is index 4 of slice2. That is very dangerous. So, what if the length and capacity is the same? Instead of making slice3 capacity 6, we set it to 2 by adding another parameter to the slicing syntax like this: slice3 := slice2[2:4:4]</p>
-<p>When append looks at this slice and sees that the length and capacity is the same, it wouldn’t bring in the element at index 4 of slice2. It would detach. slice3 will have a length of 2 and capacity of 2, still share the same backing array. On the call to append, length and capacity will be different. The addresses are also different. This is called a 3 index slice. This new slice will get its own backing array and we don’t affect anything at all to our original slice.</p>
-<h5 id="copy-a-slice">Copy a slice</h5>
-<p>copy only works with string and slice only. Make a new slice big enough to hold elements of the original slice and copy the values over using the built-in copy function.</p>
+<p><code>slice3 := append(slice3, &quot;CHANGED&quot;)</code>는 어떨까? 슬라이스의 길이와 용량이 다르면, <code>append</code>를 사용 할 때 비슷한 문제가 발생한다. <code>slice3</code>의 0번째 인덱스 값을 변경하는 대신에, <code>append</code>를 호출 해보자. <code>slice3</code>의 길이는 2이고 용량은 6이라서 수정을 위한 여유 공간을 가지고 있다. <code>slice2</code>의 4번째 인덱스와 같은 주소 값을 가지는 <code>slice3</code>의 3번째 인덱스의 원소부터 변경 된다. 이런 상황은 굉장히 위험하다. 그러면 슬라이스의 길이와 용량이 서로 같으면 어떨까? 슬라이싱 구문(slicing syntax)의 또 다른 매개변수를 추가하여, <code>slice3</code>의 용량을 6 대신 2로 만들어보자: <code>slice3 := slice2[2:4:4]</code></p>
+<p>길이와 용량이 같은 슬라이스에 대해 <code>append</code>가 호출 되면, <code>slice2</code>의 4번째 원소를 가지고 오지 않는다. 이것은 분리되어 있다. <code>slice3</code>는 길이가 2이고 용량이 2이면서 여전히 <code>slice2</code>와 같은 배열을 공유하고 있다. <code>append</code>가 호출 되면, 길이와 용량이 달라지게 된다. 주소 또한 달라지게 된다. 길이는 3인 새로운 슬라이스가 된다. 새로운 슬라이스 소유의 배열을 갖게 되고 더 이상 원본 슬라이스의 영향을 받지 않는다.</p>
+<h5 id="슬라이스-복사">슬라이스 복사</h5>
+<p>복사는 문자열과 슬라이스 타입에서만 동작 한다. 원본의 요소들을 담을 수 있을 만큼의 크기로 새로운 슬라이스를 만들고 내장 함수인 <code>copy</code>를 사용해서 값을 복사한다.</p>
 <div class="sourceCode" id="cb81"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true"></a>slice4 := <span class="bu">make</span>([]<span class="dt">string</span>, <span class="bu">len</span>(slice2))</span>
 <span id="cb81-2"><a href="#cb81-2" aria-hidden="true"></a><span class="bu">copy</span>(slice4, slice2)</span>
 <span id="cb81-3"><a href="#cb81-3" aria-hidden="true"></a></span>
@@ -886,40 +886,40 @@ Length[5] Capacity[5]
 [2] 0xc00005c070 CHANGED
 [3] 0xc00005c080 Grape
 [4] 0xc00005c090 Plum</code></pre>
-<h5 id="slice-and-reference">Slice and reference</h5>
-<p>Declare a slice of integers with 7 values.</p>
+<h5 id="슬라이스와-참조">슬라이스와 참조</h5>
+<p>길이가 7인 정수형 슬라이스를 선언하자.</p>
 <div class="sourceCode" id="cb83"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true"></a>x := <span class="bu">make</span>([]<span class="dt">int</span>, <span class="dv">7</span>)</span></code></pre></div>
-<p>Random starting counters.</p>
+<p>임의의 값을 넣어준다.</p>
 <div class="sourceCode" id="cb84"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true"></a><span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">7</span>; i++ {</span>
 <span id="cb84-2"><a href="#cb84-2" aria-hidden="true"></a>    x[i] = i * <span class="dv">100</span></span>
 <span id="cb84-3"><a href="#cb84-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Set a pointer to the second element of the slice.</p>
+<p>슬라이스의 두 번째 원소의 포인터를 변수에 할당한다.</p>
 <div class="sourceCode" id="cb85"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true"></a>twohundred := &amp;x[<span class="dv">1</span>]</span></code></pre></div>
-<p>Append a new value to the slice. This line of code raises a red flag. We have x is a slice with length 7, capacity 7. Since the length and capacity is the same, append doubles its size then copy values over. x nows points to different memory block and has a length of 8, capacity of 14.</p>
+<p>슬라이스에 새로운 값을 추가해보자. 이 코드는 위험 하다. x 슬라이스는 길이가 7이고 용량 7이다. 길이와 용량이 같기 때문에 용량이 두 배로 늘어나고 값들이 복사된다. 이제 x 슬라이스는 길이가 8이고 용량이 14이며 다른 메모리 블록을 가르킨다.</p>
 <div class="sourceCode" id="cb86"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true"></a>x = <span class="bu">append</span>(x, <span class="dv">800</span>)</span></code></pre></div>
-<p>When we change the value of the second element of the slice, twohundred is not gonna change because it points to the old slice. Everytime we read it, we will get the wrong value.</p>
+<p>슬라이스의 두 번째 원소의 값을 변경 할 때, <code>twohundred</code>는 변경되지 않는다. 이전의 슬라이스를 가리키기 때문이다. 이 변수를 읽을 때 마다, 잘못된 값을 얻는다.</p>
 <div class="sourceCode" id="cb87"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true"></a>x[<span class="dv">1</span>]++</span></code></pre></div>
-<p>By printing out the output, we can see that we are in trouble.</p>
+<p>결과를 출력함으로써, 문제를 확인 할 수 있다.</p>
 <div class="sourceCode" id="cb88"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true"></a>fmt.Printf(<span class="st">&quot;</span><span class="ch">\n</span><span class="st">=&gt; Slice and reference</span><span class="ch">\n</span><span class="st">&quot;</span>)</span>
 <span id="cb88-2"><a href="#cb88-2" aria-hidden="true"></a>fmt.Println(<span class="st">&quot;twohundred:&quot;</span>, *twohundred, <span class="st">&quot;x[1]:&quot;</span>, x[<span class="dv">1</span>])</span></code></pre></div>
 <pre><code>=&gt; Slice and reference
 twohundred: 100 x[1]: 101</code></pre>
 <h5 id="utf-8">UTF-8</h5>
-<p>Everything in Go is based on UTF-8 character sets. If we use different encoding scheme, we might have a problem.</p>
-<p>Declare a string with both Chinese and English characters. For each Chinese character, we need 3 byte for each one. The UTF-8 is built on 3 layers: bytes, code point and character. From Go perspective, string are just bytes. That is what we are storing.</p>
-<p>In our example, the first 3 bytes represents a single code point that represents that single character. We can have anywhere from 1 to 4 bytes representing a code point (a code point is a 32 bit value) and anywhere from 1 to multiple code points can actually represent a character. To keep it simple, we only have 3 bytes representing 1 code point representing 1 character. So we can read s as 3 bytes, 3 bytes, 1 byte, 1 byte,… (since there are only 2 Chinese characters in the first place, the rest are English)</p>
+<p>Go의 모든 것은 UTF-8 문자 집합(chrarcter sets)을 근간으로 한다. 만약 다른 인코딩 구조를 사용한다면 문제가 발생한다.</p>
+<p>중국어와 영어로 문자열을 선언하자. 중국 문자는 각각 3 바이트를 사용한다. UTF-8는 바이트, 코드 포인트(code point) 그리고 문자로 3 계층을 이루고 있다. Go 관점에서 문자열은 단지 저장되는 바이트일 뿐이다.</p>
+<p>아래 예제에서 첫 번째 3 바이트는 하나의 코드 포인트를 표현한다. 하나의 코드 포인트는 하나의 문자를 표현한다. 1 바이트부터 4 바이트를 가지고 코드 포인트를 표현 할 수 있고(코드 포인트는 32 비트 값이다.) 1 부터 대다수의 코드 포인트는 문자를 표현 할 수 있다. 간단하게, 3 바이트로 1 코드 포인트로 1 문자를 표현한다. 그래서 s 문자열을 3 바이트, 3 바이트, 1 바이트, 1 바이트.. 로 읽는다(앞 부분에 중국 문자가 2개 있고 나머지는 영어이기 때문에)</p>
 <div class="sourceCode" id="cb90"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true"></a>s := <span class="st">&quot;世界 means world&quot;</span></span></code></pre></div>
-<p>UTFMax is 4 – up to 4 bytes per encoded rune -&gt; maximum number of bytes we need to represent any code point is 4. mRune is its own type. It is an alias for int32 type. Similar to type byte we are using, it is just an alias for uint8.</p>
+<p><code>UTFMax</code> 상수 4다. – 인코딩 된 룬당 최대 4 바이트 -&gt; 모든 코드 포인트를 표현하기 위해 필요한 최대 바이트 수는 4 바이트다.[재방문] <code>Rune</code>은 자체 타입이다. 이것은 <code>int32</code> 타입의 별칭이다. 우리가 사용하는 <code>byte</code> 타입은 <code>uint8</code>의 별칭이다.</p>
 <div class="sourceCode" id="cb91"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true"></a><span class="kw">var</span> buf [utf8.UTFMax]<span class="dt">byte</span></span></code></pre></div>
-<p>When we are ranging over a string, are we doing it byte by byte or code point by code point or character by character? The answer is code point by code point. On the first iteration, i is 0. On the next one, i is 3 because we are moving to the next code point. Then i is 6.</p>
+<p>위의 문자열을 순회 할 때, 바이트에서 바이트, 코드 포인트에서 코드 포인트, 문자에서 문자로 중 어느 방식으로 순회할까? 정답은 코드 포인트에서 코드 포인트이다. 첫 번째 순회에서 i는 0이다. 그 다음 i는 다음 코드 포인트로 이동되기 때문에 3이다. 그 다음은 6이다.</p>
 <div class="sourceCode" id="cb92"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true"></a><span class="kw">for</span> i, r := <span class="kw">range</span> s {</span></code></pre></div>
-<p>Capture the number of bytes for this rune/code point.</p>
+<p>룬/코드 포인트의 바이트 수를 출력해보자.</p>
 <div class="sourceCode" id="cb93"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true"></a>    rl := utf8.RuneLen(r)</span></code></pre></div>
-<p>Calculate the slice offset for the bytes associated with this rune.</p>
+<p>룬을 표현하는 바이트들의 차이를 계산하자.</p>
 <div class="sourceCode" id="cb94"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true"></a>    si := i + rl</span></code></pre></div>
-<p>Copy rune from the string to our buffer. We want to go through every code point and copy them into our array buf, and display them on the screen. “Every array is just a slice waiting to happen.” - Go saying We are using the slicing syntax, creating our slice header where buf becomes the backing array. All of them are on the stack. There is no allocation here.</p>
+<p>문자열로부터 룬을 버퍼에 복사하자. 모든 코드 포인트를 순회하며 배열 버퍼에 복사하고 화면에 출력하려는 것이다. Go 에서 “배열은 언제든 슬라이스가 될 준비가 되어있다.” 슬라이싱 구문을 사용하여 <code>buf</code> 배열을 가리키는 슬라이스 헤더를 만든다. 헤더는 스택에 생성되기에 힙에 할당하지 않는다.</p>
 <div class="sourceCode" id="cb95"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true"></a>    <span class="bu">copy</span>(buf[:], s[i:si])</span></code></pre></div>
-<p>Display the details.</p>
+<p>출력해보자.</p>
 <div class="sourceCode" id="cb96"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;%2d: %q; codepoint: %#6x; encoded bytes: %#v</span><span class="ch">\n</span><span class="st">&quot;</span>​, i, r, r, buf[:rl])</span></code></pre></div>
 <pre><code>0: &#39;世&#39;; codepoint: 0x4e16; encoded bytes: []byte{0xe4, 0xb8, 0x96}
 3: &#39;界&#39;; codepoint: 0x754c; encoded bytes: []byte{0xe7, 0x95, 0x8c}
