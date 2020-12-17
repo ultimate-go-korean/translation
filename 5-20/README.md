@@ -6,7 +6,7 @@ Assigned to
 
 Mandatory reviewer
 
-- 서병선/@famersbs
+- 이재원/@mumunuu
 - 김준희/@juunini
 
 ---

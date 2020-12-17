@@ -2,7 +2,7 @@
 
 Assigned to
 
-- 서병선/@famersbs
+- 이재원/@mumunuu
 
 Mandatory reviewer
 
