@@ -222,11 +222,11 @@ display: block;
 <li><a href="#context">Context</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#testing-and-profiling">Testing and Profiling</a>
+<li><a href="#테스팅-프로파일링">테스팅 &amp; 프로파일링</a>
 <ul>
-<li><a href="#testing">Testing</a>
+<li><a href="#테스팅">테스팅</a>
 <ul>
-<li><a href="#basic-unit-test">Basic Unit Test</a></li>
+<li><a href="#기본-유닛-테스트">기본 유닛 테스트</a></li>
 </ul></li>
 <li><a href="#벤치마킹">벤치마킹</a>
 <ul>
@@ -4243,32 +4243,32 @@ User Not Found</code></pre>
 2020/08/24 18:37:18 timeout, cancel work...
 2020/08/24 18:37:18 Get https://wwww.ardanlabs.com/blog/post/index.xml:
 net/http: request canceled while waiting for connection</code></pre>
-<h2 id="testing-and-profiling">Testing and Profiling</h2>
-<h3 id="testing">Testing</h3>
-<h4 id="basic-unit-test">Basic Unit Test</h4>
-<p>All of our tests must have the format <code>&lt;filename&gt;_test.go</code>. Otherwise, the testing tool is not gonna find the tests. Test files are not compiled into our final binary. Test files should be in the same package as your code. We might also want to have afolder called test for more than unit test, say integration test. The package name can be the name only or name_test.</p>
-<p>If we go with name_test, it allows us to make sure these tests work with the package. The only reason that we don’t want to do this is when we have a function or method that is unexported.</p>
-<p>However, if we don’t use name_test, it will raise a red flag because if we cannot test the exported API to get the coverage for the unexported API then we know we are missing something. Therefore, 9/10 this is what we want.</p>
+<h2 id="테스팅-프로파일링">테스팅 &amp; 프로파일링</h2>
+<h3 id="테스팅">테스팅</h3>
+<h4 id="기본-유닛-테스트">기본 유닛 테스트</h4>
+<p>테스트 파일명은 <code>&lt;filename&gt;_test.go</code> 형식이어야 하며, 형식이 맞지 않으면 테스팅 도구가 테스트를 찾지 못한다. 테스트 파일은 최종 실행 파일로 컴파일 되지 않는다. 테스트 파일은 코드와 같은 폴더에 있어야 하지만, 통합 테스트 같이 유닛 테스트 이상을 진행시 test라는 폴더가 필요할 수 있다. 패키지 이름은 <code>&lt;package name&gt;</code> 또는 <code>&lt;package name&gt;_test</code> 를 쓴다.</p>
+<p>테스트 파일의 패키지 이름으로 <code>name_test</code>를 사용하면, 해당 패키지와 테스트 한다는 것을 명확히 보여준다. 다만, 패키지 내에 외부로 노출하지 않는 함수나 메서드가 있고, 그 함수들을 테스트해야 하는 경우에는 쓸 수 없다.</p>
+<p><code>&lt;package name&gt;_test</code> 형식을 사용한다면, 외부로 노출되지 않은 API를 외부 노출된 API로 테스트 할 수 없을 경우 테스트 커버리지에 대한 경고를 할 것이고, 코드에서 놓친 부분이 있다는 것을 알게 된다. 따라서 열에 아홉은 <code>&lt;package name&gt;_test</code> 형식을 쓰는 것이 맞다.</p>
 <div class="sourceCode" id="cb630"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb630-1"><a href="#cb630-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb630-2"><a href="#cb630-2" aria-hidden="true"></a></span>
 <span id="cb630-3"><a href="#cb630-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
 <span id="cb630-4"><a href="#cb630-4" aria-hidden="true"></a>    <span class="st">&quot;net/http&quot;</span></span>
 <span id="cb630-5"><a href="#cb630-5" aria-hidden="true"></a>    <span class="st">&quot;testing&quot;</span> <span class="co">// This is Go testing package.</span></span>
 <span id="cb630-6"><a href="#cb630-6" aria-hidden="true"></a>)</span></code></pre></div>
-<p>These constants give us checkboxes for visualization.</p>
+<p>테스트 성공여부를 체크박스 특수문자로 시각화해 보았다.</p>
 <div class="sourceCode" id="cb631"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb631-1"><a href="#cb631-1" aria-hidden="true"></a><span class="kw">const</span> (</span>
 <span id="cb631-2"><a href="#cb631-2" aria-hidden="true"></a>    succeed = <span class="st">&quot;\u2713&quot;</span></span>
 <span id="cb631-3"><a href="#cb631-3" aria-hidden="true"></a>    failed = <span class="st">&quot;\u2717&quot;</span></span>
 <span id="cb631-4"><a href="#cb631-4" aria-hidden="true"></a>)</span></code></pre></div>
-<p>TestBasic validates the http.Get function can download content. Every test will be associated with the test function. It starts with the word Test and the first word after Test must be capitalized. It uses a testing.T pointer as its parameter. When writing test, we want to focus on usability first. We must write it the same way as we would write it in production. We also want the verbosity of tests so we are 3 different methods of t: Log or Logf, Fatal or Fatalf, Error or Error f. That is the core APIs for testing.</p>
-<p>Log: Write documentation out into the log output.</p>
-<p>Error: Write documentation and also say that this test is failed but we are continuing moving forward to execute code in this test</p>
-<p>Fatal: Similarly, document that this test is failed but we are done. We move on to the next test function.</p>
-<p><strong>Given, When, Should format.</strong></p>
-<p>Given: Why are we writing this test?</p>
-<p>When: What data are we using for this test?</p>
-<p>Should: When are we expected to see it happen or not happen?</p>
-<p>We are also using the artificial block between a long Log function. They help with readability.</p>
+<p><code>TestBasic</code>은 <code>http.Get</code> 함수가 콘텐츠를 다운로드 할 수 있는지 확인한다. 모든 테스트는 테스트 함수를 이용하며, 테스트 함수의 이름은 <code>Test</code>로 시작하고 <code>Test</code> 다음의 첫 번째 문자는 대문자를 쓴다. 그리고 <code>testing.T</code> 포인터를 매개변수로 사용한다. 테스트를 작성할 때에는 사용성에 중점을 둔다. 실제 제품에서 사용되는 것과 동일하게 테스트를 작성한다는 뜻이다. 테스트는 세 함수를 이용하여 출력할 수 있는데, <code>Log</code> 또는 <code>Logf</code>, <code>Fatal</code> 또는 <code>Fatalf</code>, <code>Error</code> 또는 <code>Errorf</code> 이다. 이것이 테스트를 위한 핵심 API이다.</p>
+<p>Log: 로그에 정보를 출력함.</p>
+<p>Error: 정보를 출력하고 테스트 실패를 알리지만, 테스트 코드는 계속 실행함.</p>
+<p>Fatal: 테스트 실패를 알리는 것은 같지만 해당 테스트 함수는 종료함. 다음 테스트 함수를 실행함</p>
+<p><strong>Given, When, Should 형식.</strong></p>
+<p>Given: 테스트의 목적이 무엇인가?</p>
+<p>When: 어떤 데이터가 테스트에 사용되는가?</p>
+<p>Should: 언제 원하는 함수가 실행되기를 기대하는가?</p>
+<p>또한 인위적인 블럭을 긴 로그 사이에 사용하여 가독성을 높인다.</p>
 <div class="sourceCode" id="cb632"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb632-1"><a href="#cb632-1" aria-hidden="true"></a><span class="kw">func</span> TestBasic(t *testing.T) {</span>
 <span id="cb632-2"><a href="#cb632-2" aria-hidden="true"></a>    url := <span class="st">&quot;https://www.google.com/&quot;</span></span>
 <span id="cb632-3"><a href="#cb632-3" aria-hidden="true"></a>    statusCode := <span class="dv">200</span></span>
@@ -4293,7 +4293,7 @@ net/http: request canceled while waiting for connection</code></pre>
 <span id="cb632-22"><a href="#cb632-22" aria-hidden="true"></a>        }</span>
 <span id="cb632-23"><a href="#cb632-23" aria-hidden="true"></a>    }</span>
 <span id="cb632-24"><a href="#cb632-24" aria-hidden="true"></a>}</span></code></pre></div>
-<p>We can just say “go test” and the testing tool will find that function. We can also say “go test -v” for verbosity, we will get a full output of the logging. Suppose that we have a lot of test functions, “go test -run TestBasic” will only run the TestBasic function.</p>
+<p><code>go test</code> 명령어를 사용하면 테스팅 도구가 관련된 함수를 찾는다. <code>go test -v</code> 명령어로 로그의 전체 출력 결과를 확인할 수 있다. 만약 테스트 함수가 많은데 <code>TestBasic</code> 함수만 테스트하고 싶다면, <code>go test -run TestBasic</code> 명령어를 사용하면 된다.</p>
 <pre class="text"><code>=== RUN TestBasic
 --- PASS: TestBasic (0.24s)
     basic_test.go:58:   Given the need to test downloading content.
