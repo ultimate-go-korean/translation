@@ -196,7 +196,7 @@ display: block;
 <li><a href="#디커플링-1">디커플링</a></li>
 <li><a href="#변환conversion">변환(Conversion)</a></li>
 <li><a href="#인터페이스-오염interface-pollution">인터페이스 오염(Interface Pollution)</a></li>
-<li><a href="#mocking">Mocking</a></li>
+<li><a href="#모조품-만들기mocking">모조품 만들기(Mocking)</a></li>
 </ul></li>
 <li><a href="#에러-처리">에러 처리</a>
 <ul>
@@ -2502,25 +2502,25 @@ Got Unlucky</code></pre>
 <li>변화로부터 쉽게 대응할 수 없다.</li>
 <li>인터페이스가 코드를 더 좋게 만들어주지 않는다.</li>
 </ul>
-<h4 id="mocking">Mocking</h4>
-<h5 id="package-to-mock">Package To Mock</h5>
-<p>It is important to mock things. Most things over the network can be mocked in our test. However, mocking our database is a different story because it is too complex. This is where Docker can come in and simplify our code by allowing us to launch our database while running our tests and have that clean database for everything we do.</p>
-<p>Every API only needs to focus on its test. We no longer have to worry about the application user or user over API test. We used to worry about: if we don’t have that interface, the user who uses our API can’t write tests. That is gone. The example below will demonstrate the reason.</p>
-<p>Imagine we are working at a company that decides to incorporate Go as a part of its stack. They have their internal pubsub system that all applications are supposed to use. Maybe they are doing event sourcing and there is a single pubsub platform they are using that is not going to be replaced. They need the pubsub API for Go that they can start building services that connect into this event source.</p>
-<p>So what can change? Can the event source change?</p>
-<p>If the answer is no, then it immediately tells us that we don’t need to use interfaces. We can build the entire API in the concrete, which we would do first anyway. We then write tests to make sure everything works.</p>
-<p>A couple days later, they come to us with a problem. They have to write tests and they cannot hit the pubsub system directly when my test runs so they need to mock that out. They want us to give them an interface. However, we don’t need an interface because our API doesn’t need an interface. They need an interface, not us. They need to decouple from the pubsub system, not us.</p>
-<p>They can do any decoupling they want because this is Go. The next file will be an example of their application. Package pubsub simulates a package that provides publication/subscription type services.</p>
+<h4 id="모조품-만들기mocking">모조품 만들기(Mocking)</h4>
+<h5 id="mock-할-패키지">Mock 할 패키지</h5>
+<p>Mocking은 중요하다. 네트워크에서 발생하는 대부분의 것들은 mock할 수 있다. 하지만, 데이터베이스를 mocking하는 것은 매우 복잡하기에 mock하기가 어렵다. 하지만 Docker를 사용하면 테스트를 위한 데이터베이스를 깔끔하게 생성할 수 있다.</p>
+<p>모든 API는 테스트에만 집중하여야 한다. 더이상 애플리케이션 유저에 관해 걱정하지 않아도 된다. 이전에는 인터페이스가 없으면 유저 입장에서 테스트를 작성할 수 없었지만 이제는 아니다. 아래 예시가 그 이유를 보여준다.</p>
+<p>Go를 사용하기로 결정한 회사에서 일한다고 가정해보자. 사내에는 모든 애플리케이션이 사용하는 pubsub 시스템을 가지고 있다. 아마도 이벤트소싱을 사용 하고 있고 pubsub 플랫폼은 대체되지 않을 것이다. 이런 이벤트소스에 연결하여 서비스를 만들기위해 Go 용 pubsub API가 필요하다.</p>
+<p>우선 무엇이 변할 수 있는가? 이벤트소스가 변할 수 있을까?</p>
+<p>만약 답이 ’아니오’라면, 인터페이스를 사용할 이유가 없다. 그렇다면 모든 API를 구체적인 타입으로 작성할 것이다. 그리고 테스트를 작성하여 정상적으로 작동하는지 확인할 것이다.</p>
+<p>며칠이 지난 후, 사용자들에게 문제가 발생하였다. 테스트를 작성해야 하는데 pubsub 시스템을 직접 호출할 수 없어서 mock을 사용해야 한다는 것이다. 그래서 사용자들은 인터페이스를 제공해주기를 원한다. 하지만, 현재 API는 인터페이스를 필요로 하고 있지 않다. 사용자들이 필요한 것이고 우리가 필요한 것이 아니다. 우리가 아닌 사용자가 pubsub 시스템을 분리시켜야 한다.</p>
+<p>Go를 사용하기 때문에 이러한 분리가 가능하다. 다음 파일은 사용자 애플리케이션을 예시로 보여준다. pubsub 패키지는 pubsub 서비스를 시뮬레이션하는 패키지이다.</p>
 <div class="sourceCode" id="cb349"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb349-1"><a href="#cb349-1" aria-hidden="true"></a><span class="kw">package</span>  main</span>
 <span id="cb349-2"><a href="#cb349-2" aria-hidden="true"></a></span>
 <span id="cb349-3"><a href="#cb349-3" aria-hidden="true"></a><span class="kw">import</span>  (</span>
 <span id="cb349-4"><a href="#cb349-4" aria-hidden="true"></a>    <span class="st">&quot;fmt&quot;</span></span>
 <span id="cb349-5"><a href="#cb349-5" aria-hidden="true"></a>)</span></code></pre></div>
-<p><code>PubSub</code> provides access to a queue system.</p>
+<p><code>PubSub</code>는 큐(queue) 시스템에 접근할 수 있게 한다.</p>
 <div class="sourceCode" id="cb350"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb350-1"><a href="#cb350-1" aria-hidden="true"></a><span class="kw">type</span> PubSub struct {</span>
 <span id="cb350-2"><a href="#cb350-2" aria-hidden="true"></a>    host <span class="dt">string</span></span>
 <span id="cb350-3"><a href="#cb350-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>New creates a pubsub value for use.</p>
+<p><code>New</code>는 pubsub을 사용하기 위한 값을 반환한다.</p>
 <div class="sourceCode" id="cb351"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb351-1"><a href="#cb351-1" aria-hidden="true"></a><span class="kw">func</span> New(host <span class="dt">string</span>) *PubSub {</span>
 <span id="cb351-2"><a href="#cb351-2" aria-hidden="true"></a>    ps := PubSub{</span>
 <span id="cb351-3"><a href="#cb351-3" aria-hidden="true"></a>        host: host,</span>
@@ -2528,12 +2528,12 @@ Got Unlucky</code></pre>
 <span id="cb351-5"><a href="#cb351-5" aria-hidden="true"></a></span>
 <span id="cb351-6"><a href="#cb351-6" aria-hidden="true"></a>    <span class="kw">return</span>  &amp;ps</span>
 <span id="cb351-7"><a href="#cb351-7" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Publish sends the data to the specified key.</p>
+<p><code>Publish</code>는 특정 키에 데이터를 전송한다.</p>
 <div class="sourceCode" id="cb352"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb352-1"><a href="#cb352-1" aria-hidden="true"></a><span class="kw">func</span> (ps *PubSub) Publish(key <span class="dt">string</span>, v <span class="kw">interface</span>{}) <span class="dt">error</span> {</span>
 <span id="cb352-2"><a href="#cb352-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Actual PubSub: Publish&quot;</span>)</span>
 <span id="cb352-3"><a href="#cb352-3" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
 <span id="cb352-4"><a href="#cb352-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>Subscribe sets up a request to receive messages from the specified key.</p>
+<p><code>Subscribe</code>는 특정 키값으로부터 메시지를 수신한다.</p>
 <div class="sourceCode" id="cb353"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb353-1"><a href="#cb353-1" aria-hidden="true"></a><span class="kw">func</span> (ps *PubSub) Subscribe(key <span class="dt">string</span>) <span class="dt">error</span> {</span>
 <span id="cb353-2"><a href="#cb353-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Actual PubSub: Subscribe&quot;</span>)</span>
 <span id="cb353-3"><a href="#cb353-3" aria-hidden="true"></a>    <span class="kw">return</span> <span class="ot">nil</span></span>
