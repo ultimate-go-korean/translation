@@ -4195,7 +4195,7 @@ User Not Found</code></pre>
 <span id="cb618-7"><a href="#cb618-7" aria-hidden="true"></a>}</span></code></pre></div>
 <pre class="terminal"><code>work complete {123}</code></pre>
 <h5 id="requestresponse-171">Request/Response 171</h5>
-<p>Sample program that implements a web request with a context that is used to timeout the request if it takes too long.</p>
+<p>리퀘스트가 너무 오래 걸리는 경우 타임아웃에 사용되는, 컨텍스트를 이용한 뤱 리퀘스트를 구현한 프로그램이다.</p>
 <div class="sourceCode" id="cb620"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb620-1"><a href="#cb620-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb620-2"><a href="#cb620-2" aria-hidden="true"></a></span>
 <span id="cb620-3"><a href="#cb620-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -4209,16 +4209,16 @@ User Not Found</code></pre>
 <span id="cb620-11"><a href="#cb620-11" aria-hidden="true"></a>)</span>
 <span id="cb620-12"><a href="#cb620-12" aria-hidden="true"></a></span>
 <span id="cb620-13"><a href="#cb620-13" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Create a new request</p>
+<p>새로운 리퀘스트를 생성한다.</p>
 <div class="sourceCode" id="cb621"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb621-1"><a href="#cb621-1" aria-hidden="true"></a>    req, err := http.NewRequest(<span class="st">&quot;GET&quot;</span>, <span class="st">&quot;https://www.ardanlabs.com/blog/post/index.xml&quot;</span>, <span class="ot">nil</span>)</span>
 <span id="cb621-2"><a href="#cb621-2" aria-hidden="true"></a>    <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
 <span id="cb621-3"><a href="#cb621-3" aria-hidden="true"></a>        log.Println(err)</span>
 <span id="cb621-4"><a href="#cb621-4" aria-hidden="true"></a>        <span class="kw">return</span></span>
 <span id="cb621-5"><a href="#cb621-5" aria-hidden="true"></a>    }</span></code></pre></div>
-<p>Create a context with a timeout of 50 milliseconds.</p>
+<p>제한시간이 50ms인 컨텍스트를 생성한다.</p>
 <div class="sourceCode" id="cb622"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb622-1"><a href="#cb622-1" aria-hidden="true"></a>    ctx, cancel := context.WithTimeout(req.Context(), <span class="dv">50</span> * time.Millisecond)</span>
 <span id="cb622-2"><a href="#cb622-2" aria-hidden="true"></a>    <span class="kw">defer</span> cancel()</span></code></pre></div>
-<p>Declare a new transport and client for the call.</p>
+<p>호출에 대한 새로운 Transport와 클라이언트를 선언한다.</p>
 <div class="sourceCode" id="cb623"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb623-1"><a href="#cb623-1" aria-hidden="true"></a>    tr := http.Transport {</span>
 <span id="cb623-2"><a href="#cb623-2" aria-hidden="true"></a>        Proxy: http.ProxyFromEnvironment,</span>
 <span id="cb623-3"><a href="#cb623-3" aria-hidden="true"></a>        DialContext: (&amp;net.DialerP{</span>
@@ -4234,25 +4234,25 @@ User Not Found</code></pre>
 <span id="cb623-13"><a href="#cb623-13" aria-hidden="true"></a>    client := http.Client{</span>
 <span id="cb623-14"><a href="#cb623-14" aria-hidden="true"></a>        Transport: &amp;tr,</span>
 <span id="cb623-15"><a href="#cb623-15" aria-hidden="true"></a>    }</span></code></pre></div>
-<p>Make the web call in a separate Goroutine so it can be cancelled.</p>
+<p>취소 가능하도록 별도의 고루틴으로 웹 호출을 생성한다.</p>
 <div class="sourceCode" id="cb624"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb624-1"><a href="#cb624-1" aria-hidden="true"></a>    ch := <span class="bu">make</span>(<span class="kw">chan</span> <span class="dt">error</span>, <span class="dv">1</span>)</span>
 <span id="cb624-2"><a href="#cb624-2" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
 <span id="cb624-3"><a href="#cb624-3" aria-hidden="true"></a>        log.Println(<span class="st">&quot;Starting Request&quot;</span>)</span></code></pre></div>
-<p>Make the web call and return any <code>error.client.Do</code> is going out and trying to hit the request URL. It’s probably blocked right now because it will need to wait for the entire document to come back.</p>
+<p>웹 호출을 수행하고 <code>error.Client.Do</code>에서 얻는 것을 리턴하고 리퀘스트 URL을 호출하려고 해본다. 전체 문서가 돌아올 때 까지 대기해야 하기 때문에 지금 당장은 블록될 것이다.</p>
 <div class="sourceCode" id="cb625"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb625-1"><a href="#cb625-1" aria-hidden="true"></a>        resp, err := client.Do(req)</span></code></pre></div>
-<p>If the error occurs, we perform a send on the channel to report that we are done. We are going to use this channel at some point to report back what is happening.</p>
+<p>오류가 발생하면, 채널에서 작업이 완료되었음을 보고한다. 어떤 시점에서 어떤 일이 일어났는지 보고하기 위해서 채널을 사용할 것이다.</p>
 <div class="sourceCode" id="cb626"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb626-1"><a href="#cb626-1" aria-hidden="true"></a>        <span class="kw">if</span> err != <span class="ot">nil</span> {</span>
 <span id="cb626-2"><a href="#cb626-2" aria-hidden="true"></a>            ch &lt;- err</span>
 <span id="cb626-3"><a href="#cb626-3" aria-hidden="true"></a>            <span class="kw">return</span></span>
 <span id="cb626-4"><a href="#cb626-4" aria-hidden="true"></a>        }</span></code></pre></div>
-<p>If it doesn’t fail, we close the response body on the return.</p>
+<p>실패하지 않는다면, 리턴할 때에 respose body를 닫는다.</p>
 <div class="sourceCode" id="cb627"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb627-1"><a href="#cb627-1" aria-hidden="true"></a>        <span class="kw">defer</span> resp.Body.Close()</span></code></pre></div>
-<p>Write the response to <code>stdout</code>.</p>
+<p><code>stdout</code>에 respose를 작성한다.</p>
 <div class="sourceCode" id="cb628"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb628-1"><a href="#cb628-1" aria-hidden="true"></a>        io.Copy(os.Stdout, resp.Body)</span></code></pre></div>
-<p>Then, send back the <code>nil</code> instead of <code>error</code>.</p>
+<p>그리고, <code>error</code>대신에 <code>nil</code>을 돌려보낸다.</p>
 <div class="sourceCode" id="cb629"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb629-1"><a href="#cb629-1" aria-hidden="true"></a>        ch &lt;- <span class="ot">nil</span></span>
 <span id="cb629-2"><a href="#cb629-2" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>Wait the request or timeout. We perform a receive on <code>ctx.Done()</code> saying that we want to wait 50 ms for that whole process above to happen. If it doesn’t, we signal back to that Goroutine to cancel the sending request. We don’t have to just walk away and let that eat up resources and finish because we are not going to need it. We are able to call <code>CancelRequest</code> and underneath, we are able to kill that connection.</p>
+<p>리퀘스트 혹은 타임아웃을 기다린다. <code>ctx.Done()</code>에 대한 수신을 수행해서 위의 전체 프로세스가 일어날 때 까지 50ms을 기다린다. 그렇지 않은 경우, 리퀘스트 취소 신호를 고루틴으로 보낸다. 이것이 필요로 하지 않기 때문에, 자원을 소비하도록 내버려 둘 필요가 없다. <code>CancelRequest</code>를 호풀 할 수 있으며, 바로 아래에서 커넥션을 종료할 수 있다.</p>
 <div class="sourceCode" id="cb630"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb630-1"><a href="#cb630-1" aria-hidden="true"></a>    <span class="kw">select</span> {</span>
 <span id="cb630-2"><a href="#cb630-2" aria-hidden="true"></a>    <span class="kw">case</span> &lt;-ctx.Done():</span>
 <span id="cb630-3"><a href="#cb630-3" aria-hidden="true"></a>        log.Println(<span class="st">&quot;timeout, cancel work...&quot;</span>)</span>
