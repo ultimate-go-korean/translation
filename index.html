@@ -3231,7 +3231,7 @@ Goroutine 7 (finished) created at: main.main()
 Final Counter: 4
 Found 1 data race(s)
 exit status 66</code></pre>
-<h5 id="atomic-functions">Atomic Functions</h5>
+<h5 id="아토믹-함수atomic-functions">아토믹 함수(Atomic Functions)</h5>
 <div class="sourceCode" id="cb441"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb441-1"><a href="#cb441-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb441-2"><a href="#cb441-2" aria-hidden="true"></a></span>
 <span id="cb441-3"><a href="#cb441-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -3244,32 +3244,32 @@ exit status 66</code></pre>
 <div class="sourceCode" id="cb442"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb442-1"><a href="#cb442-1" aria-hidden="true"></a><span class="kw">var</span> counter <span class="dt">int64</span></span>
 <span id="cb442-2"><a href="#cb442-2" aria-hidden="true"></a></span>
 <span id="cb442-3"><a href="#cb442-3" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Number of Goroutines to use.</p>
+<p><code>grs</code>에 사용할 고루틴의 수를 지정.</p>
 <div class="sourceCode" id="cb443"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb443-1"><a href="#cb443-1" aria-hidden="true"></a>    <span class="kw">const</span> grs = <span class="dv">2</span></span></code></pre></div>
-<p>wg is used to manage concurrency.</p>
+<p><code>wg</code>는 동시성을 관리하는데 사용된다.</p>
 <div class="sourceCode" id="cb444"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb444-1"><a href="#cb444-1" aria-hidden="true"></a>    <span class="kw">var</span> wg sync.WaitGroup</span>
 <span id="cb444-2"><a href="#cb444-2" aria-hidden="true"></a>    wg.Add(grs)</span></code></pre></div>
-<p>Create two goroutines.</p>
+<p>2개의 고루틴들을 생성한다.</p>
 <div class="sourceCode" id="cb445"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb445-1"><a href="#cb445-1" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; grs; i++ {</span>
 <span id="cb445-2"><a href="#cb445-2" aria-hidden="true"></a>        <span class="kw">go</span> <span class="kw">func</span>() {</span>
 <span id="cb445-3"><a href="#cb445-3" aria-hidden="true"></a>            <span class="kw">for</span> count := <span class="dv">0</span>; count &lt; <span class="dv">2</span>; count++ {</span></code></pre></div>
-<p>Safely add one to the counter. Add the atomic functions that we have taken an address as the first parameter and that is being syncronized, no matter how many Goroutines they are. If we call one of these functions on the same location, they will get serialized. This is the fastest way to serialization.</p>
-<p>We can run thist program all day long and still get 4 every time.</p>
+<p><code>counter</code>에 동시성에 안전하게 1을 더해준다. 동기화 보장을 원하는 대상의 주소를 첫 번째 매개변수로 하는 원지적 연산 함수를 사용한다. 같은 주소에 대해 이러한 함수들을 사용하면, 이것들은 직렬화된다. 이것이 직렬화 할 수 있는 가장 빠른 방법이다.</p>
+<p>우리는 이 프로그램을 하루 종일 실행하더라도 매번 4라는 값을 얻을 수 있다.</p>
 <div class="sourceCode" id="cb446"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb446-1"><a href="#cb446-1" aria-hidden="true"></a>                atomic.AddInt64(&amp;counter, <span class="dv">1</span>)</span></code></pre></div>
-<p>This call is now irrelevant because by the time AddInt64 function completes, counter is increment.</p>
+<p>이 호출은 <code>AddInt64</code> 함수 호출이 완료됐을 때 <code>counter</code>가 이미 증가했으므로 큰 의미가 없다.</p>
 <div class="sourceCode" id="cb447"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb447-1"><a href="#cb447-1" aria-hidden="true"></a>                runtime.Gosched()</span>
 <span id="cb447-2"><a href="#cb447-2" aria-hidden="true"></a>            }</span>
 <span id="cb447-3"><a href="#cb447-3" aria-hidden="true"></a>        wg.Done()</span>
 <span id="cb447-4"><a href="#cb447-4" aria-hidden="true"></a>        }()</span>
 <span id="cb447-5"><a href="#cb447-5" aria-hidden="true"></a>    }</span></code></pre></div>
-<p>Wait for the Goroutines to finish.</p>
+<p>고루틴이 끝날 때까지 기다린다.</p>
 <div class="sourceCode" id="cb448"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb448-1"><a href="#cb448-1" aria-hidden="true"></a>    wg.Wait()</span></code></pre></div>
-<p>Display the final value.</p>
+<p>최종 값을 보여준다.</p>
 <div class="sourceCode" id="cb449"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb449-1"><a href="#cb449-1" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Final Counter:&quot;</span>, counter)</span>
 <span id="cb449-2"><a href="#cb449-2" aria-hidden="true"></a>}</span></code></pre></div>
 <pre class="shell"><code>Final Counter: 4</code></pre>
-<h5 id="mutexes">Mutexes</h5>
-<p>We don’t always have the luxury of using 4-8 bytes of memory as shared data. This is where the mutex comes in. Mutex allows us to have an API like the WaitGroup (Add, Done and Wait) where any Goroutine can execute one at a time.</p>
+<h5 id="뮤텍스mutexes">뮤텍스(Mutexes)</h5>
+<p>일반적으로 데이터 공유를 하기 위해 매번 4-8바이트를 할당할 만큼 메모리가 여유롭지 않다. 이럴 때 뮤텍스를 사용하면 좋다. 뮤텍스를 사용하면 모든 고루틴이 한번에 하나씩 실행할 수 있는 WaitGroup(Add, Done and Wait)과 같은 API를 사용할 수 있다.</p>
 <div class="sourceCode" id="cb451"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb451-1"><a href="#cb451-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb451-2"><a href="#cb451-2" aria-hidden="true"></a></span>
 <span id="cb451-3"><a href="#cb451-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -3278,47 +3278,47 @@ exit status 66</code></pre>
 <span id="cb451-6"><a href="#cb451-6" aria-hidden="true"></a>)</span>
 <span id="cb451-7"><a href="#cb451-7" aria-hidden="true"></a></span>
 <span id="cb451-8"><a href="#cb451-8" aria-hidden="true"></a><span class="kw">var</span> (</span></code></pre></div>
-<p>counter is a variable increment by all Goroutines.</p>
+<p><code>counter</code>는 모든 고루틴들에 의해 증가되는 변수이다.</p>
 <div class="sourceCode" id="cb452"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb452-1"><a href="#cb452-1" aria-hidden="true"></a>    counter <span class="dt">int</span></span></code></pre></div>
-<p>mutex is used to define a critical section of code. Picture mutex as a room where all Goroutines have to go through. However, only one Goroutine can go at a time. The scheduler will decide who can get in and which one is next. We cannot determine what the scheduler is gonna do. Hopefully, it is gonna be fair. Just because one Goroutine got to the door before another, it doesn’t mean that Goroutine will get to the end first. Nothing here is predictable.</p>
-<p>The key here is, once a Goroutine is allowed in, it must report that it’s out. All the Goroutines will ask for a lock and unlock when they leave for another one to get in. Two different functions can use the same mutex which means only one Goroutine can execute any of given functions at a time.</p>
+<p><code>mutex</code>는 코드의 임계 구역을 정의하는데 사용된다. 모든 고루틴들이 통과해야하는 방으로 mutex를 상상해보자. 그러나 한번에 하나의 고루틴만이 이동할 수 있다. 스케줄러는 누가 들어갈지, 그리고 누가 다음이될지를 정한다. 우리는 스케줄러가 무엇을 할 지 결정할 수 없다. 바라건대, 그것은 공정할 것이다. 한 고루틴이 다른 고루틴들보다 먼저 문에 도착했다고해서 먼저 끝난다는 것을 의미하지는 않는다. 여기는 예측할 수 있는것이 없다.</p>
+<p>여기서 핵심은 들어오도록 허용된 고루틴이, 나갈 때 보고해야 한다는 것이다. 모든 고루틴들은 다른 고루틴이 들어오도록 나갈때, 잠금과 해제를 요청한다. 두 개의 다른 함수가 동일한 <code>mutex</code>를 사용할 수 있으므로 한번에 하나의 고루틴만 주어진 함수를 실행할 수 있다.</p>
 <div class="sourceCode" id="cb453"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb453-1"><a href="#cb453-1" aria-hidden="true"></a>    mutex sync.Mutex</span>
 <span id="cb453-2"><a href="#cb453-2" aria-hidden="true"></a>)</span></code></pre></div>
 <div class="sourceCode" id="cb454"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb454-1"><a href="#cb454-1" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>Number of Goroutines to use.</p>
+<p><code>grs</code>에 사용할 고루틴의 수를 지정.</p>
 <div class="sourceCode" id="cb455"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb455-1"><a href="#cb455-1" aria-hidden="true"></a>    <span class="kw">const</span> grs = <span class="dv">2</span></span></code></pre></div>
-<p>wg is used to manage concurrency.</p>
+<p><code>wg</code>는 동시성을 관리하는데 사용된다.</p>
 <div class="sourceCode" id="cb456"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb456-1"><a href="#cb456-1" aria-hidden="true"></a>    <span class="kw">var</span> wg sync.WaitGroup</span>
 <span id="cb456-2"><a href="#cb456-2" aria-hidden="true"></a>    wg.Add(grs)</span></code></pre></div>
-<p>Create two Goroutines.</p>
+<p>2개의 고루틴들을 생성한다.</p>
 <div class="sourceCode" id="cb457"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb457-1"><a href="#cb457-1" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; grs; i++ {</span>
 <span id="cb457-2"><a href="#cb457-2" aria-hidden="true"></a>        <span class="kw">go</span> <span class="kw">func</span>() {</span>
 <span id="cb457-3"><a href="#cb457-3" aria-hidden="true"></a>            <span class="kw">for</span> count := <span class="dv">0</span>; count &lt; <span class="dv">2</span>; count++ {</span></code></pre></div>
-<p>Only allow one Goroutine through this critical section at a time. Creating these artificial curly brackets gives readability. We don’t have to do this but it is highly recommended. The Lock and Unlock function must always be together in line of sight.</p>
+<p>Only allow one Goroutine through this critical section at a time. Creating these artificial curly brackets gives readability. We don’t have to do this but it is highly recommended. The Lock and Unlock function must always be together in line of sight. 한번에 오직 하나의 고루틴만이 임계 구역에 들어올 수 있도록 허용된다. 이렇게 중괄호를 만들어주면 가독성이 높아진다. 이 작업을 꼭 할 필요는 없지만 적극적으로 권장한다.. 잠금과 해제 함수는 항상 같은 맥락에 있도록 해야한다.</p>
 <div class="sourceCode" id="cb458"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb458-1"><a href="#cb458-1" aria-hidden="true"></a>                mutex.Lock()</span>
 <span id="cb458-2"><a href="#cb458-2" aria-hidden="true"></a>                {</span></code></pre></div>
-<p>Capture the value of counter.</p>
+<p><code>counter</code>의 값을 저장한다.</p>
 <div class="sourceCode" id="cb459"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb459-1"><a href="#cb459-1" aria-hidden="true"></a>                    value := counter</span></code></pre></div>
-<p>Increment our local value of counter.</p>
+<p><code>counter</code>의 로컬 값을 늘린다.</p>
 <div class="sourceCode" id="cb460"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb460-1"><a href="#cb460-1" aria-hidden="true"></a>                    value++</span></code></pre></div>
-<p>Store the value back into counter.</p>
+<p>값을 다시 <code>counter</code>에 저장해준다.</p>
 <div class="sourceCode" id="cb461"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb461-1"><a href="#cb461-1" aria-hidden="true"></a>                    counter = value</span>
 <span id="cb461-2"><a href="#cb461-2" aria-hidden="true"></a>                }</span>
 <span id="cb461-3"><a href="#cb461-3" aria-hidden="true"></a>                mutex.Unlock()</span></code></pre></div>
-<p>Relese the lock and allow any waiting Goroutine through.</p>
+<p>잠금을 해제하고, 대기중인 고루틴들이 들어올 수 있도록 허용한다.</p>
 <div class="sourceCode" id="cb462"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb462-1"><a href="#cb462-1" aria-hidden="true"></a>            }</span>
 <span id="cb462-2"><a href="#cb462-2" aria-hidden="true"></a></span>
 <span id="cb462-3"><a href="#cb462-3" aria-hidden="true"></a>            wg.Done()</span>
 <span id="cb462-4"><a href="#cb462-4" aria-hidden="true"></a>        }()</span>
 <span id="cb462-5"><a href="#cb462-5" aria-hidden="true"></a>    }</span></code></pre></div>
-<p>Wait for the Goroutines to finish.</p>
+<p>고루틴이 끝날 때까지 기다린다.</p>
 <div class="sourceCode" id="cb463"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb463-1"><a href="#cb463-1" aria-hidden="true"></a>    wg.Wait()</span>
 <span id="cb463-2"><a href="#cb463-2" aria-hidden="true"></a>    fmt.Printf(<span class="st">&quot;Final Counter: %d</span><span class="ch">\n</span><span class="st">&quot;</span>, counter)</span>
 <span id="cb463-3"><a href="#cb463-3" aria-hidden="true"></a>}</span></code></pre></div>
 <pre class="shell"><code>Final Counter: 4</code></pre>
-<h5 id="readwrite-mutex">Read/Write Mutex</h5>
-<p>There are times when we have a shared resource where we want many Goroutines reading it.</p>
-<p>Occasionally, one Goroutine can come in and make change to the resource. When that happens, everybody has to stop reading. It doesn’t make sense to synchronize reads in this type of scenario because we are just adding latency to our software for no reason.</p>
+<h5 id="읽기쓰기-뮤텍스readwrite-mutex">읽기/쓰기 뮤텍스(Read/Write Mutex)</h5>
+<p>많은 고루틴이 읽기 원하는 공유 자원이 있다고 하자.</p>
+<p>때때로, 하나의 고루틴이 들어와서 리소스를 바꿀 수 있다. 그렇게 되면, 모두 읽는 것을 중단해야한다. 아무런 이유 없이 소프트웨어에 대기시간을 추가하기 때문에 이러한 유형의 사나리오에서 읽기를 동기화하는 것은 의미가 없다.</p>
 <div class="sourceCode" id="cb465"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb465-1"><a href="#cb465-1" aria-hidden="true"></a><span class="kw">package</span> main</span>
 <span id="cb465-2"><a href="#cb465-2" aria-hidden="true"></a></span>
 <span id="cb465-3"><a href="#cb465-3" aria-hidden="true"></a><span class="kw">import</span> (</span>
@@ -3328,24 +3328,24 @@ exit status 66</code></pre>
 <span id="cb465-7"><a href="#cb465-7" aria-hidden="true"></a>    <span class="st">&quot;sync/atomic&quot;</span></span>
 <span id="cb465-8"><a href="#cb465-8" aria-hidden="true"></a>    <span class="st">&quot;time&quot;</span></span>
 <span id="cb465-9"><a href="#cb465-9" aria-hidden="true"></a>)</span></code></pre></div>
-<p>data is a slice that will be shared.</p>
+<p><code>data</code>는 공유될 slice 이다.</p>
 <div class="sourceCode" id="cb466"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb466-1"><a href="#cb466-1" aria-hidden="true"></a><span class="kw">var</span> (</span>
 <span id="cb466-2"><a href="#cb466-2" aria-hidden="true"></a>    data []<span class="dt">string</span></span></code></pre></div>
-<p><code>rwMutex</code> is used to define a critical section of code. It is a little bit slower than Mutex but we are optimizing the correctness first so we don’t care about that for now.</p>
+<p><code>rwMutex</code>는 코드의 임계 구역을 정의하는데 사용된다. 그것은 뮤텍스보다 살짝 느리지만 먼저 정확성을 최적화하고 있으므로 지금은 신경쓰지 않는다.</p>
 <div class="sourceCode" id="cb467"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb467-1"><a href="#cb467-1" aria-hidden="true"></a>    rwMutex sync.RWMutex</span></code></pre></div>
-<p>Number of reads occurring at any given time. As soon as we see <code>int64</code> here, we should start thinking about using atomic instruction.</p>
+<p>조회하는 시간에 시도된 읽기 수를 의미한다. 여기서 <code>int64</code>를 보자마자 아토믹 명령어 사용에 대해 생각해야한다.</p>
 <div class="sourceCode" id="cb468"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb468-1"><a href="#cb468-1" aria-hidden="true"></a>    readCount <span class="dt">int64</span></span>
 <span id="cb468-2"><a href="#cb468-2" aria-hidden="true"></a>)</span></code></pre></div>
-<p><code>init</code> is called prior to <code>main</code>.</p>
+<p><code>init</code>은 <code>main</code>보다 먼저 호출된다.</p>
 <div class="sourceCode" id="cb469"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb469-1"><a href="#cb469-1" aria-hidden="true"></a><span class="kw">func</span> init() {</span>
 <span id="cb469-2"><a href="#cb469-2" aria-hidden="true"></a>    rand.Seed(time.Now().UnixNano())</span>
 <span id="cb469-3"><a href="#cb469-3" aria-hidden="true"></a>}</span>
 <span id="cb469-4"><a href="#cb469-4" aria-hidden="true"></a></span>
 <span id="cb469-5"><a href="#cb469-5" aria-hidden="true"></a><span class="kw">func</span> main() {</span></code></pre></div>
-<p>wg is used to manage concurrency.</p>
+<p><code>wg</code>는 동시성을 관리하는데 사용된다.</p>
 <div class="sourceCode" id="cb470"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb470-1"><a href="#cb470-1" aria-hidden="true"></a>    <span class="kw">var</span> wg sync.WaitGroup</span>
 <span id="cb470-2"><a href="#cb470-2" aria-hidden="true"></a>    wg.Add(<span class="dv">1</span>)</span></code></pre></div>
-<p>Create a writer Goroutine that performs 10 different writes.</p>
+<p>10개의 서로 다른 쓰기를 수행하는 쓰기용 고루틴을 만든다.</p>
 <div class="sourceCode" id="cb471"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb471-1"><a href="#cb471-1" aria-hidden="true"></a>    <span class="kw">go</span> <span class="kw">func</span>() {</span>
 <span id="cb471-2"><a href="#cb471-2" aria-hidden="true"></a>        <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">10</span>; i++ {</span>
 <span id="cb471-3"><a href="#cb471-3" aria-hidden="true"></a>            time.Sleep(time.Duration(rand.Intn(<span class="dv">100</span>)) * time.Millisecond)</span>
@@ -3353,7 +3353,7 @@ exit status 66</code></pre>
 <span id="cb471-5"><a href="#cb471-5" aria-hidden="true"></a>        }</span>
 <span id="cb471-6"><a href="#cb471-6" aria-hidden="true"></a>        wg.Done()</span>
 <span id="cb471-7"><a href="#cb471-7" aria-hidden="true"></a>    }()</span></code></pre></div>
-<p>Create eight reader Goroutines that runs forever.</p>
+<p>영원히 실행되는 8개의 읽기용 고루틴을 만든다.</p>
 <div class="sourceCode" id="cb472"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb472-1"><a href="#cb472-1" aria-hidden="true"></a>    <span class="kw">for</span> i := <span class="dv">0</span>; i &lt; <span class="dv">8</span>; i ++ {</span>
 <span id="cb472-2"><a href="#cb472-2" aria-hidden="true"></a>        <span class="kw">go</span> <span class="kw">func</span>(i <span class="dt">int</span>) {</span>
 <span id="cb472-3"><a href="#cb472-3" aria-hidden="true"></a>            <span class="kw">for</span> {</span>
@@ -3361,39 +3361,39 @@ exit status 66</code></pre>
 <span id="cb472-5"><a href="#cb472-5" aria-hidden="true"></a>            }</span>
 <span id="cb472-6"><a href="#cb472-6" aria-hidden="true"></a>        }(i)</span>
 <span id="cb472-7"><a href="#cb472-7" aria-hidden="true"></a>    }</span></code></pre></div>
-<p>Wait for the write Goroutine to finish.</p>
+<p>쓰기 고루틴이 끝날 때까지 기다린다.</p>
 <div class="sourceCode" id="cb473"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb473-1"><a href="#cb473-1" aria-hidden="true"></a>    wg.Wait()</span>
 <span id="cb473-2"><a href="#cb473-2" aria-hidden="true"></a>    fmt.Println(<span class="st">&quot;Program Complete&quot;</span>)</span>
 <span id="cb473-3"><a href="#cb473-3" aria-hidden="true"></a>}</span></code></pre></div>
-<p>writer adds a new string to the slice in random intervals.</p>
+<p>쓰기용 고루틴은 임의의 간격으로 슬라이스에 새 문자열을 추가한다.</p>
 <div class="sourceCode" id="cb474"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb474-1"><a href="#cb474-1" aria-hidden="true"></a><span class="kw">func</span> writer(i <span class="dt">int</span>) {</span></code></pre></div>
-<p>Only allow one Goroutine to read/write to the slice at a time.</p>
+<p>한번에 오직 하나의 고루틴만이 슬라이스에 읽기/쓰기를 하도록 허용된다.</p>
 <div class="sourceCode" id="cb475"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb475-1"><a href="#cb475-1" aria-hidden="true"></a>    rwMutex.Lock()</span>
 <span id="cb475-2"><a href="#cb475-2" aria-hidden="true"></a>    {</span></code></pre></div>
-<p>Capture the current read count. Keep this safe though we can do it without this call. We want to make sure that no other Goroutines are reading. The value of rc should always be 0 when this code runs.</p>
+<p>현재 <code>readCount</code>를 캡쳐한다. 이 호출 없이 수행할 수 있지만 안전하게 처리하는 것이 좋다. 다른 고루틴이 읽기를 수행하지 않는 것을 보장해야 한다. 이 코드가 실행될 때 <code>rc</code>의 값은 항상 0 이어야한다.</p>
 <div class="sourceCode" id="cb476"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb476-1"><a href="#cb476-1" aria-hidden="true"></a>        rc := atomic.LoadInt64(&amp;readCount)</span></code></pre></div>
-<p>Perform some work since we have a full lock.</p>
+<p>전체 잠금이 있으므로 작업을 수행한다.</p>
 <div class="sourceCode" id="cb477"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb477-1"><a href="#cb477-1" aria-hidden="true"></a>        fmt.Printf(<span class="st">&quot;****&gt; : Performing Write : RCount[%d]</span><span class="ch">\n</span><span class="st">&quot;</span>, rc)</span>
 <span id="cb477-2"><a href="#cb477-2" aria-hidden="true"></a>        data = <span class="bu">append</span>(data, fmt.Sprintf(<span class="st">&quot;String: %d&quot;</span>, i))</span>
 <span id="cb477-3"><a href="#cb477-3" aria-hidden="true"></a>    }</span>
 <span id="cb477-4"><a href="#cb477-4" aria-hidden="true"></a>    rwMutex.Unlock()</span>
 <span id="cb477-5"><a href="#cb477-5" aria-hidden="true"></a>}</span></code></pre></div>
-<p>reader wakes up and iterates over the data slice.</p>
+<p><code>reader</code>가 수행되고 데이터 슬라이스를 반복한다.</p>
 <div class="sourceCode" id="cb478"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb478-1"><a href="#cb478-1" aria-hidden="true"></a><span class="kw">func</span> reader(id <span class="dt">int</span>) {</span></code></pre></div>
-<p>Any Goroutine can read when no write operation is taking place. RLock has the corresponding RUnlock.</p>
+<p>모든 고루틴은 쓰기 작업이 일어나지 않을 때 읽을 수 있다. <code>RLock</code>에는 그에 해당하는 <code>RUnlock</code>이 있다.</p>
 <div class="sourceCode" id="cb479"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb479-1"><a href="#cb479-1" aria-hidden="true"></a>    rwMutex.RLock()</span>
 <span id="cb479-2"><a href="#cb479-2" aria-hidden="true"></a>    {</span></code></pre></div>
-<p>Increment the read count value by 1.</p>
+<p><code>readCount</code>를 1씩 증가시킨다.</p>
 <div class="sourceCode" id="cb480"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb480-1"><a href="#cb480-1" aria-hidden="true"></a>        rc := atomic.AddInt64(&amp;readCount, <span class="dv">1</span>)</span></code></pre></div>
-<p>Perform some read work and display values.</p>
+<p>읽기 작업을 수행하고 값을 표시한다.</p>
 <div class="sourceCode" id="cb481"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb481-1"><a href="#cb481-1" aria-hidden="true"></a>        time.Sleep(time.Duration(rand.Intn(<span class="dv">10</span>)) * time.Millisecond)</span>
 <span id="cb481-2"><a href="#cb481-2" aria-hidden="true"></a>        fmt.Printf(<span class="st">&quot;%d : Performing Read : Length[%d] RCount[%d]</span><span class="ch">\n</span><span class="st">&quot;</span>, id, <span class="bu">len</span>(data), rc)</span></code></pre></div>
-<p>Decrement the read count value by 1.</p>
+<p><code>readCount</code>를 1씩 감소시킨다.</p>
 <div class="sourceCode" id="cb482"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb482-1"><a href="#cb482-1" aria-hidden="true"></a>        atomic.AddInt64(&amp;readCount, <span class="dv">-1</span>)</span>
 <span id="cb482-2"><a href="#cb482-2" aria-hidden="true"></a>    }</span>
 <span id="cb482-3"><a href="#cb482-3" aria-hidden="true"></a>    rwMutex.RUnlock()</span>
 <span id="cb482-4"><a href="#cb482-4" aria-hidden="true"></a>}</span></code></pre></div>
-<p>The output will lock similar to this.</p>
+<p>출력은 이와 유사하게 잠긴다.</p>
 <pre class="shell"><code>0 : Performing Read : Length[0] RCount[1]
 4 : Performing Read : Length[0] RCount[5]
 5 : Performing Read : Length[0] RCount[6]
@@ -3418,8 +3418,8 @@ exit status 66</code></pre>
 2 : Performing Read : Length[10] RCount[8]
 2 : Performing Read : Length[10] RCount[8]</code></pre>
 <p><strong>Lesson:</strong></p>
-<p>The atomic functions and mutexes create latency in our software. Latency can be good when we have to coordinate orchestrating. However, if we can reduce latency using Read/Write Mutex, life is better.</p>
-<p>If we are using mutex, make sure that we get in and out of mutex as fast as possible. Do not do anything extra. Sometimes just reading the shared state into a local variable is all we need to do. The less operation we can perform on the mutex, the better. We then reduce the latency to the bare minimum.</p>
+<p>아토믹 함수와 뮤텍스는 사용자의 소프트웨어에 대기시간을 만든다. 대기시간은 여러 고루틴 사이에 자원 접근에 대한 조율이 필요할 때 유용하다. Read/Write 뮤텍스는 대기시간을 줄이는 데 유용하다.</p>
+<p>뮤텍스를 사용하는 경우, 잠금 이후 최대한 빨리 잠금을 해제해야 한다. 다른 불필요한 행위는 하지 않는 것이 좋다. 때로는 공유 자원을 읽기를 위해 로컬 변수만 사용하는 것으로도 충분하다. 뮤텍스를 적게 사용할수록 좋다. 이를 통해 대기시간을 최소한으로 줄일 수 있다.</p>
 <h4 id="채널">채널</h4>
 <h5 id="언어-작동-원리">언어 작동 원리</h5>
 <p>채널은 오케스트레이션(orchestration)을 위해 존재한다. 채널을 쓰면 2개의 고루틴(Goroutine)이 특정 워크플로우를 함께 처리하도록 할 수 있으며 또한 우리가 원하는 대로 워크플로우를 관리할 수 있다. 채널이 큐(queue)처럼 선입선출(first-in-first-out)로 구현된 듯 하지만 우리가 생각해야 하는 점은 채널이 큐라는 것이 아니다. 채널을 큐라고 생각하면 개념을 이해하기 어려워진다. 대신에 채널은 또다른 고루틴에 이벤트(event)가 발생했다는 신호를 주는 방식이라고 생각해야 한다. 멋지게도, 데이터가 있을 때는 물론 데이터 없이도 이벤트 신호를 줄 수 있다.</p>
