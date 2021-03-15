@@ -2,37 +2,35 @@
 
 Assigned to
 
-- 이경석/@lee-kyungseok
+* 이경석/@lee-kyungseok
 
 Mandatory reviewer
 
-- 김지훈/@ghun2
-- 배지원/@baewang
-- 강영주/@979156
-
----
+* 김지훈/@ghun2
+* 배지원/@baewang
+* 강영주/@979156
 
 > #### Embedding 55
 >
-> > ##### Declaring fields, NOT Embedding 55
+> > **Declaring fields, NOT Embedding 55**
 > >
-> > ##### Embedding types 56
+> > **Embedding types 56**
 > >
-> > ##### Embedded type and Interface 57
+> > **Embedded type and Interface 57**
 > >
-> > ##### Outer and inner type implementing the same interface 58
+> > **Outer and inner type implementing the same interface 58**
 >
 > #### Exporting 60
 >
-> > ##### Guideline 60
+> > **Guideline 60**
 > >
-> > ##### Exported identifier 60
+> > **Exported identifier 60**
 > >
-> > ##### Accessing a value of an unexported identifier 61
+> > **Accessing a value of an unexported identifier 61**
 > >
-> > ##### Unexported fields from an exported struct 62
+> > **Unexported fields from an exported struct 62**
 > >
-> > ##### Exported types with embedded unexported types 63
+> > **Exported types with embedded unexported types 63**
 
 ## Software Design 65
 
@@ -40,6 +38,7 @@ Mandatory reviewer
 
 > #### Grouping types 65
 >
-> > ##### Grouping By State 65
+> > **Grouping By State 65**
 > >
-> > ##### Grouping By Behavior 67
+> > **Grouping By Behavior 67**
+
