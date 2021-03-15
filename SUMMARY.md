@@ -4,7 +4,7 @@
 * [Table of Contents](table-of-contents/README.md)
   * [table-of-contents-eng](table-of-contents/table-of-contents-eng.md)
 * [5-20 pages translation](5-20/README.md)
-  * [5-20](5-20/5-20.md)
+  * [서문](5-20/5-20.md)
 * [20-37 pages translation](20-37/README.md)
   * [데이터 구조\(Data Structures\)](20-37/20-37.md)
 * [37-55 pages translation](37-55/README.md)
