@@ -163,9 +163,9 @@ display: block;
 </header>
 <nav id="TOC" role="doc-toc">
 <ul>
-<li><a href="#section">5-20</a>
+<li><a href="#서문">서문</a>
 <ul>
-<li><a href="#서문">서문</a></li>
+<li><a href="#서문-1">서문</a></li>
 <li><a href="#go-언어의-역학적-고찰language-mechanics">Go 언어의 역학적 고찰(Language Mechanics)</a>
 <ul>
 <li><a href="#문법">문법</a>
@@ -224,7 +224,7 @@ display: block;
 <li><a href="#인터페이스-타입의-슬라이스">인터페이스 타입의 슬라이스</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#section-1">55-70</a>
+<li><a href="#section">55-70</a>
 <ul>
 <li><a href="#임베딩">임베딩</a></li>
 <li><a href="#내보내기exporting">내보내기(Exporting)</a></li>
@@ -243,7 +243,7 @@ display: block;
 <li><a href="#인터페이스-구성">인터페이스 구성</a></li>
 <li><a href="#인터페이스-구성을-사용한-디커플링">인터페이스 구성을 사용한 디커플링</a></li>
 </ul></li>
-<li><a href="#section-2">89-101</a>
+<li><a href="#section-1">89-101</a>
 <ul>
 <li><a href="#변환conversion">변환(Conversion)</a>
 <ul>
@@ -331,7 +331,7 @@ display: block;
 </ul></li>
 </ul></li>
 </ul></li>
-<li><a href="#section-3">191-199</a>
+<li><a href="#section-2">191-199</a>
 <ul>
 <li><a href="#벤치마킹">벤치마킹</a>
 <ul>
@@ -347,8 +347,8 @@ display: block;
 </ul></li>
 </ul>
 </nav>
-<h1 id="section">5-20</h1>
-<h2 id="서문">서문</h2>
+<h1 id="서문">서문</h1>
+<h2 id="서문-1">서문</h2>
 <p>2019년 8월, 1년쯤 전 <a href="https://github.com/hoanhan101/ultimate-go">Ultimate Go Study Guide</a> 라는 프로젝트를 GitHub 에 공유 하였습니다. 그리고 놀랍게도, 커뮤니티의 많은 관심을 받았으며 2020년 8월 기준 12K star, 900 fork 를 넘어섰습니다. 20 여분의 contributor 분들 덕분입니다.</p>
 <p>프로젝트는 <a href="https://www.oreilly.com/library/view/ultimate-go-programming/9780134757476/">Ardan Lab’s Ultimate Go course</a> 를 공부하며 정리한 것 입니다. Bill Kennedy와 Ardan Labs team이 이처럼 멋진 코스를 오픈소스화 한 것에 한 없는 감사를 드립니다. 지식과 통찰을 코스에 녹여내고, 모두에게 나누어 준 엄청난 작업이었습니다.</p>
 <p>사람마다 나름의 학습 방법이 있겠지만, 저는 예제를 따라해보고 실행하며 배웁니다. 신중히 노트하고, 소스코드에 바로 코멘트하여 코드 한 줄, 한 줄을 확실히 이해하고 코드 뒤에 숨어있는 이론까지 신경씁니다.</p>
@@ -1481,7 +1481,7 @@ My name is &quot;Hoanh&quot; and my email is &quot;hoanhan@email.com&quot;</code
 <span id="cb177-3"><a href="#cb177-3" aria-hidden="true"></a>}</span></code></pre></div>
 <pre class="text"><code>My name is Hoanh and my email is hoanhan@email.com
 My name is Hoanh An and my email is hoanhan101@gmail.com</code></pre>
-<h1 id="section-1">55-70</h1>
+<h1 id="section">55-70</h1>
 <h4 id="임베딩">임베딩</h4>
 <p><strong>임베딩이 아닌 필드로써 선언</strong></p>
 <p>프로그램에서 사용할 <code>user</code> 를 정의한다.</p>
@@ -2403,7 +2403,7 @@ In: Data
 In: Data
 Out: Data
 Out: Data</code></pre>
-<h1 id="section-2">89-101</h1>
+<h1 id="section-1">89-101</h1>
 <h2 id="변환conversion">변환(Conversion)</h2>
 <h3 id="인터페이스-변환">인터페이스 변환</h3>
 <p><code>Mover</code>는 움직이는 것을 나타내기 위해 다음과 같이 정의합니다.</p>
@@ -4871,7 +4871,7 @@ ok      github.com/hoanhan101/ultimate-go/go/testing/web_server/handlers
     web_test.go:135:    ✓     Should have 1 item in the feed.
 PASS
 ok      command-line-arguments 0.191s</code></pre>
-<h1 id="section-3">191-199</h1>
+<h1 id="section-2">191-199</h1>
 <h3 id="벤치마킹">벤치마킹</h3>
 <h4 id="기본-벤치마크">기본 벤치마크</h4>
 <p>벤치마크 함수가 있는 <code>&lt;file_name&gt;_test.go</code> 파일로 벤치마크를 할 수 있다. <code>Sprint</code>와 <code>Sprintf</code> 중 어느 것이 더 성능이 좋고, 효율적으로 자원을 할당하는지 벤치마크 해볼 텐데, <code>Sprint</code>가 문자열 포맷을 하는 동안 오버헤드가 없기 때문에 더 나을 것으로 보이지만 그렇지 않다. 추측보다는 실제 확인한 결과로 판단하자.</p>
