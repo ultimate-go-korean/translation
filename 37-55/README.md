@@ -2,12 +2,12 @@
 
 Assigned to
 
-* 정영훈/@aeuveritas
+- 정영훈/@aeuveritas
 
 Mandatory reviewer
 
-* 김지훈/@ghun2
-* 최희재/@gmlwo530
+- 김지훈/@ghun2
+- 최희재/@gmlwo530
 
 ## Decoupling 37
 
@@ -24,4 +24,3 @@ Mandatory reviewer
 > > #### Valueless type 46
 > >
 > > #### Interface via pointer receiver 50
-

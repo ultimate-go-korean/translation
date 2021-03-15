@@ -2,13 +2,13 @@
 
 Assigned to
 
-* 이재원/@mumunuu
+- 이재원/@mumunuu
 
 Mandatory reviewer
 
-* 권용민/@snowmerak
-* 조용래/@dramgonfly
-* 신정훈/@shin2jhoon
+- 권용민/@snowmerak
+- 조용래/@dramgonfly
+- 신정훈/@shin2jhoon
 
 ## Concurrency 114
 
@@ -23,4 +23,3 @@ Mandatory reviewer
 > > **Goroutine time slicing 124**
 > >
 > > **Goroutines and parallelism 126**
-

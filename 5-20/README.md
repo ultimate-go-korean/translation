@@ -2,12 +2,12 @@
 
 Assigned to
 
-* 정현석/@nicewook
+- 정현석/@nicewook
 
 Mandatory reviewer
 
-* 이재원/@mumunuu
-* 김준희/@juunini
+- 이재원/@mumunuu
+- 김준희/@juunini
 
 ## Introduction 5
 
@@ -46,4 +46,3 @@ Mandatory reviewer
 > > **Declare and initialize 17**
 > >
 > > **iota 19**
-

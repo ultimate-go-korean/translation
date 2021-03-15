@@ -2,13 +2,13 @@
 
 Assigned to
 
-* 조용래/@dreamgonfly
+- 조용래/@dreamgonfly
 
 Mandatory reviewer
 
-* 배지원/@baewang
-* 정영훈/@aeuveritas
-* 신정훈/@shin2jhoon
+- 배지원/@baewang
+- 정영훈/@aeuveritas
+- 신정훈/@shin2jhoon
 
 > ## Channel 139
 >
@@ -31,4 +31,3 @@ Mandatory reviewer
 > > ### Buffered channel: Fan Out 153
 > >
 > > ### Select 157
-

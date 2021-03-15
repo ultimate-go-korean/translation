@@ -2,13 +2,13 @@
 
 Assigned to
 
-* 최희재/@gmlwo530
-* 신정훈/@shin2jhoon
+- 최희재/@gmlwo530
+- 신정훈/@shin2jhoon
 
 Mandatory reviewer
 
-* 권용민/@snowmerak
-* 이재원/@mumunuu
+- 권용민/@snowmerak
+- 이재원/@mumunuu
 
 ## Data Structures 20
 
@@ -57,4 +57,3 @@ Mandatory reviewer
 > > #### Find key 36
 > >
 > > #### Map key restrictions 36
-

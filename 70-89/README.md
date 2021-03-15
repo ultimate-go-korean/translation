@@ -2,12 +2,12 @@
 
 Assigned to
 
-* 김지훈/@ghun2
+- 김지훈/@ghun2
 
 Mandatory reviewer
 
-* 정현석/@nicewook
-* 이경석/@lee-kyungseok
+- 정현석/@nicewook
+- 이경석/@lee-kyungseok
 
 > ## Decoupling 70
 >
@@ -18,4 +18,3 @@ Mandatory reviewer
 > > ### Interface Composition 79
 > >
 > > ### Decoupling With Interface Composition 84
-

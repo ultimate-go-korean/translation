@@ -2,13 +2,13 @@
 
 Assigned to
 
-* 이경석/@lee-kyungseok
+- 이경석/@lee-kyungseok
 
 Mandatory reviewer
 
-* 김지훈/@ghun2
-* 배지원/@baewang
-* 강영주/@979156
+- 김지훈/@ghun2
+- 배지원/@baewang
+- 강영주/@979156
 
 > #### Embedding 55
 >
@@ -41,4 +41,3 @@ Mandatory reviewer
 > > **Grouping By State 65**
 > >
 > > **Grouping By Behavior 67**
-

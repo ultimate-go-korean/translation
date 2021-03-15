@@ -2,12 +2,12 @@
 
 Assigned to
 
-* 김준희/@juunini
+- 김준희/@juunini
 
 Mandatory reviewer
 
-* 조동헌/@davinnovation
-* Mark Hahn/@TangoEnSkai
+- 조동헌/@davinnovation
+- Mark Hahn/@TangoEnSkai
 
 ### Benchmarking 191
 
@@ -28,4 +28,3 @@ Mandatory reviewer
 > > **Memory Tracing 196**
 
 ## Keep in touch 199
-

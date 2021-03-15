@@ -2,12 +2,12 @@
 
 Assigned to
 
-* 조동헌/@davinnovation
+- 조동헌/@davinnovation
 
 Mandatory reviewer
 
-* 김준희/@juunini
-* Mark Hahn/@TangoEnSkai
+- 김준희/@juunini
+- Mark Hahn/@TangoEnSkai
 
 ## Testing and Profiling 173
 
@@ -22,4 +22,3 @@ Mandatory reviewer
 > > **Web Server 181**
 > >
 > > **Mock Server 187**
-

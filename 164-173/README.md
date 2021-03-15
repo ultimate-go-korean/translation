@@ -2,12 +2,12 @@
 
 Assigned to
 
-* Mark Hahn/@TangoEnSkai
+- Mark Hahn/@TangoEnSkai
 
 Mandatory reviewer
 
-* 권경모/@kkweon
-* 정영훈/@aeuveritas
+- 권경모/@kkweon
+- 정영훈/@aeuveritas
 
 ## Patterns 164
 
@@ -22,4 +22,3 @@ Mandatory reviewer
 > > #### WithTimeout 169
 > >
 > > #### Request/Response 171
-

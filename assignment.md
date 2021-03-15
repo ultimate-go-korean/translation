@@ -1,18 +1,17 @@
 # Assignment table
 
-| No | Pages | Contents | Assignee/GitHub account | Reviewers |
-| :--- | :--- | :--- | :--- | :--- |
-| 1 | 5-20 | **Introduction** Language Mechanics Syntax - Variables - Struct - Pointer - Escape analysis - Function - Constant | 정현석/@nicewook | 이재원/@mumunuu&lt;br&gt;김준희/@juunini |
-| 2 | 20-37 | Data Structures - Array - Slice - Map | 최희재/@gmlwo530&lt;br&gt;신정훈/@shin2jhoon | 권용민/@snowmerak&lt;br&gt;이재원/@mumunuu |
-| 3 | 37-55 | Decoupling - Method - Interface  | 정영훈/@aeuveritas | 김지훈/@ghun2&lt;br&gt;최희재/@gmlwo530 |
-| 4 | 55-70 | Decoupling - Embedding - Exporting **Software Design** Composition - Grouping types | 이경석/@lee-kyungseok | 김지훈/@ghun2&lt;br&gt;배지원/@baewang&lt;br&gt;강영주/@979156 |
-| 5 | 70-89 | Composition - Decoupling | 김지훈/@ghun2 | 정현석/@nicewook&lt;br&gt;이경석/@lee-kyungseok |
-| 6 | 89-101 | Composition - Conversion - Interface Pollution - Mocking  | 권경모/@kkweon | 정현석/@nicewook&lt;br&gt;이경석/@lee-kyungseok |
-| 7 | 101-114 | Error Handling - Default error values - Error variables - Type and context - Behavior as context - Finding the bug - Wrapping Errors | 권용민/@snowmerak&lt;br&gt;강영주/@979156 | 권경모/@kkweon&lt;br&gt;최희재/@gmlwo530 |
-| 8 | 114-128 | **Concurrency** Mechanics - Goroutine - Language Mechanics | 이재원/@mumunuu | 권용민/@snowmerak&lt;br&gt;조용래/@dramgonfly&lt;br&gt;신정훈/@shin2jhoon |
-| 9 | 128-139 | Mechanics - Data race | 배지원/@baewang | 조동헌/@davinnovation&lt;br&gt;강영주/@979156 |
-| 10 | 139-164 | Mechanics - Channel | 조용래/@dreamgonfly | 배지원/@baewang&lt;br&gt;정영훈/@aeuveritas&lt;br&gt;신정훈/@shin2jhoon |
-| 11 | 164-173 | Patterns - Context | Mark Hahn/@TangoEnSkai | 권경모/@kkweon&lt;br&gt;정영훈/@aeuveritas |
-| 12 | 173-191 | **Testing and Profiling** Testing - Basic Unit Test | 조동헌/@davinnovation | 김준희/@juunini Mark Hahn/@TangoEnSkai |
-| 13 | 191-199 | Benchmarking - Basic Benchmark - Sub Benchmark Profiling - Stack Trace - GODEBUG **Keep in touch** | 김준희/@juunini | 조동헌/@davinnovation Mark Hahn/@TangoEnSkai |
-
+| No  | Pages   | Contents                                                                                                                             | Assignee/GitHub account                      | Reviewers                                                                 |
+| :-- | :------ | :----------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- | :------------------------------------------------------------------------ |
+| 1   | 5-20    | **Introduction** Language Mechanics Syntax - Variables - Struct - Pointer - Escape analysis - Function - Constant                    | 정현석/@nicewook                             | 이재원/@mumunuu&lt;br&gt;김준희/@juunini                                  |
+| 2   | 20-37   | Data Structures - Array - Slice - Map                                                                                                | 최희재/@gmlwo530&lt;br&gt;신정훈/@shin2jhoon | 권용민/@snowmerak&lt;br&gt;이재원/@mumunuu                                |
+| 3   | 37-55   | Decoupling - Method - Interface                                                                                                      | 정영훈/@aeuveritas                           | 김지훈/@ghun2&lt;br&gt;최희재/@gmlwo530                                   |
+| 4   | 55-70   | Decoupling - Embedding - Exporting **Software Design** Composition - Grouping types                                                  | 이경석/@lee-kyungseok                        | 김지훈/@ghun2&lt;br&gt;배지원/@baewang&lt;br&gt;강영주/@979156            |
+| 5   | 70-89   | Composition - Decoupling                                                                                                             | 김지훈/@ghun2                                | 정현석/@nicewook&lt;br&gt;이경석/@lee-kyungseok                           |
+| 6   | 89-101  | Composition - Conversion - Interface Pollution - Mocking                                                                             | 권경모/@kkweon                               | 정현석/@nicewook&lt;br&gt;이경석/@lee-kyungseok                           |
+| 7   | 101-114 | Error Handling - Default error values - Error variables - Type and context - Behavior as context - Finding the bug - Wrapping Errors | 권용민/@snowmerak&lt;br&gt;강영주/@979156    | 권경모/@kkweon&lt;br&gt;최희재/@gmlwo530                                  |
+| 8   | 114-128 | **Concurrency** Mechanics - Goroutine - Language Mechanics                                                                           | 이재원/@mumunuu                              | 권용민/@snowmerak&lt;br&gt;조용래/@dramgonfly&lt;br&gt;신정훈/@shin2jhoon |
+| 9   | 128-139 | Mechanics - Data race                                                                                                                | 배지원/@baewang                              | 조동헌/@davinnovation&lt;br&gt;강영주/@979156                             |
+| 10  | 139-164 | Mechanics - Channel                                                                                                                  | 조용래/@dreamgonfly                          | 배지원/@baewang&lt;br&gt;정영훈/@aeuveritas&lt;br&gt;신정훈/@shin2jhoon   |
+| 11  | 164-173 | Patterns - Context                                                                                                                   | Mark Hahn/@TangoEnSkai                       | 권경모/@kkweon&lt;br&gt;정영훈/@aeuveritas                                |
+| 12  | 173-191 | **Testing and Profiling** Testing - Basic Unit Test                                                                                  | 조동헌/@davinnovation                        | 김준희/@juunini Mark Hahn/@TangoEnSkai                                    |
+| 13  | 191-199 | Benchmarking - Basic Benchmark - Sub Benchmark Profiling - Stack Trace - GODEBUG **Keep in touch**                                   | 김준희/@juunini                              | 조동헌/@davinnovation Mark Hahn/@TangoEnSkai                              |

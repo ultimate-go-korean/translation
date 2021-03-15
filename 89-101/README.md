@@ -2,12 +2,12 @@
 
 Assigned to
 
-* 권경모/@kkweon
+- 권경모/@kkweon
 
 Mandatory reviewer
 
-* 정현석/@nicewook
-* 이경석/@lee-kyungseok
+- 정현석/@nicewook
+- 이경석/@lee-kyungseok
 
 > ## Conversion 89
 >
@@ -26,4 +26,3 @@ Mandatory reviewer
 > > ### Package To Mock 98
 > >
 > > ### Client 100
-
